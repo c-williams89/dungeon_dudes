@@ -1,0 +1,2409 @@
+:imagesdir: art_assets/
+
+:toc: left
+:toclevels: 4
+
+
+image::logo.jpg[]
+
+## Dungeon Dudes
+
+In the dimly lit corridors of the Digital Kingdom, a tale as old as code unfolds. The realm of *_Dungeon Dudes_* is a treacherous world, riddled with monsters of various forms and diverse abilities. From the fiery depths rise the **Elementals**, while the vast forests hide **Beasts** of untold terror. **Golems**, crafted from earth and metal roam the mountains,  the source of the **Undead** over the kingdom, and even treachery from your fellow **Humanoids**.
+
+And the heroes who serve as the last line of defense against monsters:
+
+* **Fighters** - the masters of equipment and martial combat
+* **Rogues** - with their nimble fingers and shadowy presence
+* **Wizards** - who command the elemental forces
+* **Clerics** - with their divine blessings
+* **Barbarians** - capable of great feats through raw strength and power alone 
+
+Every hero and monster, a creation, a manifestation of a developers' imagination, brought to life in the vast landscape of Python.
+
+Your quest, should you choose to accept it, is to forge a character or creature, so unique, so powerful, that it integrates seamlessly into this expansive world without altering the fabric of the game. 
+
+Remember, in the land of "Dungeon Dudes", while the challenges are great, the rewards are greater. So, don your coding armor, unsheathe your keyboard, and embark on an adventure of a lifetime. The Digital Kingdom awaits!
+
+---
+
+### Heroes
+
+image::Heroes.jpg[role=right, width=450]
+
+In the heart of the Digital Kingdom, where danger lurks at every corner, rises the vanguard of valor and virtue: 
+
+the **Character Classes** of __Dungeon Dudes__. Each class, a beacon of hope in this terminal rendered chaos, offering unique skills and strengths, tailored to different strategies and playstyles. 
+
+These classes, designed with meticulous detail, provide players with the tools to face the myriad challenges that await. 
+
+As you delve deeper into the specifications of these guardians, you'll discover the depth of their potential and the vastness of their legend. 
+
+Choose wisely, for the fate of the Digital Kingdom rests upon the shoulders of these champions.
+
+---
+
+#### Fighter
+
+image::Fighter.jpg[role=right, width=450]
+
+In the vast realm of __Dungeon Dudes,__ where magic and might clash, emerges a class revered for their unmatched prowess in combat: the **Fighters**. 
+
+Renowned as the masters of equipment and martial combat, these warriors command the battlefield with a blend of raw strength and tactical finesse. 
+
+As they gain power they will land **Critical Strikes**, occasionally greatly increasing the damage they deal.
+
+**Fighters** master the ability to rejuvenate themselves between fights, and can withstand deathblows through the force of will of their heroism alone.
+
+With skills like **Fortify**, they can reduce incoming damage, standing firm amidst elemental onslaughts. Their strikes can **Weaken** foes, reducing their defenses, or **Strengthen** their own might. And when they reach their zenith, they can launch into a **Rampage**, guaranteeing a critical hit. 
+
+---
+
+##### Fighter Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Attack
+|1
+|Fighter attacks deal damage with a base of their `attack_power`
+
+|Unbound Modifiers
+|1
+|Fighter static modifiers for Offensive and Defensive stats are not bound to any range
+
+|Shield Slam 
+|3 
+|Does damage based on `shield armor (x2) + defense power` 
+
+|Critical Strikes 
+|5 
+|`passive`: All your physical damage (attacks and abilities) have a `10%` chance to deal double damage. 
+
+|Second Wind 
+|8 
+|`passive`: You heal for 25% of your maximum hit points whenever you defeat an enemy 
+
+|Fortify 
+|10 
+|Increase your physical and elemental (fire, ice, lightning) defense modifiers by  `15` for the remainder of the encounter
+
+|Weaken 
+|13 
+|Deal an attack which does `50%` normal damage, worsen opponents' physical mitigation modifier by `10` for the remainder of the encounter 
+
+|Strengthen 
+|17 
+|Deal an attack which does `50%` normal damage, increase your physical damage modifier by `10` for the remainder of the encounter 
+
+|Improved Critical Strikes
+|20 
+|`passive`: your critical hits now do `x3` damage (was x2) 
+
+|Rampage 
+|25 
+|`Once per battle`: Attack this turn with a 100% chance to deal a critical strike 
+
+| Damage/Variance
+| Physical
+| Fighters only do `Physical` damage with their attacks.  Fighter variation is  normally distributed with a mean of the base amount and a standard deviation of 8% of the base damage for damage events and base amount /2.5 for equipment values.  Fighter abilities never do below `1` base damage.
+
+|===
+
+##### Fighter Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 100
+| 25
+| Health Points
+
+| Strength
+| 13
+| 2
+| Fighter `Strength` translates to `attack power` at 1 strength = 1 attack power
+
+| Agility
+| 10
+| 1
+| Fighter `Agility` translates to `defense power` at 2 agility = 1 defense power.  `Agility` also decreases the chance you'll be surprise attacked in battle.
+
+| Intelligence
+| 5
+| 0
+| Fighter `Intelligence` has no effect on combat ability
+
+| Heroism (Special)
+| 1
+| 1/4
+| Fighter will automatically consume 1 point of `Heroism` to avoid death and be healed to 25% of maximum `Hit Points`
+
+| Experience
+| 0
+| 40x^2^
+| Fighters need an average amount of experience to progress levels
+
+|===
+
+##### Fighter Equipment
+
+[cols="10%,15%, 75%"]
+|===
+| Slot
+| Types
+| Expected Stats
+
+| Weapon
+| Sword, Axe, Mace
+| Fighter Weapons have `attack power` equal to approximately their level + 10.  They also have a modifier approximately equal to their level which modifies all `Physical` damage dealt.  They have a chance to have `defense power` or additional bonus `attack power` approximately half their level.
+
+| Armor
+| Heavy
+| Fighter Armors have `defense power` equal to approximately their `1.25` times their level `+10`.  They have defensive modifiers to 2 damage types.  They have a chance to have additional bonus `defense power` or `attack power` of approximately half their level.  Armor defensive modifiers have `20 + (level *2)` modification value across both stats. 
+
+| Accessory
+| Shield
+| The Fighter `Accessory` is the shield.  Shields have `defense power` equal to approximately `0.5` times their level and `attack power` equal to approximately `0.1` times their level.  Shields have at least 2 defensive damage modifiers (sometimes 3) and occasionally have bonus `attack power` or `defense power`.  Shields with 2 defensive modifiers use the same modifier scaling as Armor. 
+|===
+
+---
+
+#### Rogue
+
+image::Rogue.jpg[role=right, width=450]
+
+In the mysterious shadows of __Dungeon Dudes__, where guile and agility reign supreme, emerges a class known for their cunning and stealth: the **Rogues**.
+
+Celebrated as the masters of subterfuge and precision, these nimble adventurers navigate the battlefield with a blend of swiftness and strategic deception.
+
+Harnessing the power of **Luck**, they ensure their strikes are precise and devastating.
+
+Rogues possess the innate ability to maximize their profits, gaining more gold from their conquests.  Their opening attacks catch enemies off guard, and deal extra damage by applying deadly Poisons to their weapons. 
+
+Using quick relaxes and **Evasion** Rogues can avoid even the hardest hitting attacks.
+
+---
+
+##### Rogue Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Attack
+|1
+|Rogue attacks deal damage with a base of their `attack_power`.  `Empower`:  Attack Empowered with luck always deal their maximum damage as base damage.
+
+|Luck
+|1
+|Rogue uses a Luck point to empower their next ability.  Using `Luck` does not pass the Rogue's turn.
+
+|Thieves Tricks
+|1 
+|`passive`: Rogues gain `30%` more gold from winning a battle.
+
+|Preparation
+|3 
+|The Rogue analyzes the battlefield, gaining 10 to their `Physical` and `Poison` damage modifiers, and coating their weapon in poison.  Adding additional `Poison` damage to each attack which deals `Physical` damage (base `Poison` damage done equal to intelligence).  Increase damage modifier adjustments by 5 if the Rogue's weapons are already coated in poison.  `Empower`: Preparation also `Identifies` the enemy.
+
+|Healing Potion Affinity
+|5 
+|`passive`: Using a `Healing_Potion` during combat also gives the Rogue time to coat their weapon in poison.  Rogues have a percentage chance equal to their `level * 1.5` to find a `Healing_Potion` after winning a battle.
+
+|Surprise Attack 
+|8 
+|`passive`: The first `Attack` each turn a Rogue does deals `50%` increased damage and lowers the enemies `Poison` defensive modifier by an amount equal to the Rogue's level.
+
+|Evasion 
+|10 
+|Rogue has a 50% chance to avoid 100% of the damage from the next two events which would cause the Rogue `1` or more damage.  `Empower`: Evasion has a 10% additional chance to avoid 100% of the damage and lasts 1 additional damage event.
+
+|Ambush 
+|13 
+|`Once per Battle`: Rogue attacks for damage equal to `Attack Power` + `Agility` + `Strength`.  Ambush can consume `Surprise Attack`.  `Empower`: Ambush does its maximum damage as base damage deals `x3` the normal poison damage if weapons are coated in poison.
+
+|Increase Luck 
+|17 
+|Deal an attack which does `70%` normal damage, the Rogue gains 1 Luck point, up to their maximum.
+
+|Auto-Potion 
+|20 
+|`passive`: Rogues automatically consume a `Healing_Potion` on their first action in combat.  If the Rogue is at maximum hit points, no "Healing_Potion" is consumed but the Rogue gains all other benefits of `Healing Potion Affinity`
+
+|Enhance Abilities 
+|25 
+|`Passive`: Base modifier adjustment of Preparation is increased to 20, `Surprise Attack` now increases damage `75%`, `Evasion` has a base avoidance chance of 60% and lasts for 3 damage events.  Ambush now deals additional damage equal to the Rogue's agility, Increased Luck now does `85%` of Normal Damage.    
+
+| Damage/Variance
+| Physical, Poison
+| Rogues only do `Physical` damage with their attacks with additional `Poison` damage if their weapons are coated in poison.  All Rogue variance is the base damage normally distributed 8% of the base damage with a standard deviation of 4% of the base damage, up to 24% additional damage + `max(0, min(base*.24,random.gauss(base*.8, base*.4)))`.Their equipment variance follows the same formula as Fighter variance.
+|===
+
+##### Rogue Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 75
+| 18
+| Health Points
+
+| Strength
+| 10
+| 1
+| Rogue `Strength` translates to `attack power` at 1 strength = 1 attack power.  Rogue `Strength` directly increases the damage of `Ambush`.
+
+| Agility
+| 12
+| 2
+| Rogue `Agility` translates to `attack power` at 1 agility = 1 attack power and `defense power` at 2 agility = 1 defense power.  `Agility` also decreases the chance you'll be surprise attacked in battle.  Rogue `Agility` directly increases the damage of `Ambush`.
+
+
+| Intelligence
+| 5
+| 1
+| Rogue `Intelligence` directly increases the damage of Rogue poisons.
+
+| Luck (Special)
+| 1
+| 1/2
+| Luck can empower Rogue abilities
+
+| Experience
+| 0
+| 35x^2^
+| Rogues progress levels faster than average.
+
+|===
+
+##### Rogue Equipment
+
+[cols="10%,15%, 75%"]
+|===
+| Slot
+| Types
+| Expected Stats
+
+| Weapon
+| Dagger
+| Rogue Weapons have `attack power` equal to approximately their level.  They also have a modifier approximately equal to their level which modifies all `Physical` damage dealt. Weapons over level 10 have a modifier approximately equal to half their level to which modifies all `Poison` damage dealt.  They have a chance to additional bonus `attack power` of approximately half their level.
+
+| Armor
+| Medium
+| Rogue Armors have `defense power` equal to approximately their `0.85` times their level `+8`.  They have defensive modifiers to 2 damage types.  They have a chance to have additional bonus `defense power` or `attack power` of approximately half their level.  Armor defensive modifiers have approximately `20 + (level *2)` modification value across both stats. 
+
+| Accessory
+| Thieves Tools
+| The Rogues `Accessory` are Thieves Tools.  Thieves Tools have `attack power` equal to approximately `75%` of their level and defensive modifiers to 2 damage types.  Thieves Tools use the same defensive modifier scaling as Armor.  Thieves Tools sometimes have additional `Physical` or `Poison` damage modifiers equal to approximately 30% of their level or a defensive modifier for `Physical` Damage equal to approximately their `half their level + 10`.  
+|===
+
+---
+
+#### Wizard
+
+image::Wizard.jpg[role=right, width=450]
+
+In the arcane corridors of Dungeon Dudes, where elemental forces and ancient spells intertwine, stands a class revered for their knowledge and mastery over the elements: the **Wizards**.
+
+Esteemed as the guardians of arcane secrets and elemental power, these learned spellcasters channel the energies of the universe, weaving them into formidable spells to decimate their foes.
+
+Drawing upon the vast reservoirs of **Mana**, they unleash torrents of __fire, ice, and lightning__, ensuring that every spell cast sends ripples of awe and destruction.
+
+Wizards have the innate capability to harness the raw energies around them, converting them into **shields** or **enhancing their elemental damage**. 
+
+---
+
+##### Wizard Skills
+
+[cols="15%,5%,10%, 70%"]
+|===
+|Skill |Level| Mana Cost |Description
+
+|Attack
+|1
+|
+|Wizard attacks deal damage with a base of their `attack_power`.  Wizard attacks deal damage of the type of their equipped weapon. 
+
+|Magic Armor
+|1
+|
+|`passive`: Wizards defensive modifier against all non-Physical damage is improved by their `intelligence / 5` - rounded up. Wizards take 30% less damage from the first source of `Physical` damage each combat.  Wizard defense power mitigates `Ice`, `Fire`, and `Lightning` damage in addition to `Physical` damage.  
+
+|Fireball
+|1
+|20
+|The Wizard launches a fireball at their enemy dealing `Fire` damage based on `Intelligence x 3`.  The Wizard burns the enemy for additional damage based on their `Intelligence x1` the following round 
+
+|Blizzard
+|3
+|40
+|The Wizard summons a blizzard to the battlefield.  The Wizard deals `Ice` damage based on their `Intelligence x1` to **all enemies** this round and for each round for the remainder of the battle.
+
+|Mana Regeneration
+|5
+|
+|`passive`: The Wizard gains 15% of their Maximum Mana back at the end of each battle.  Healing Potions now restore 15% of the Wizard's maximum mana, and an additional 15% maximum hit points,  in addition to their other effects.  
+
+|Lightning Bolt
+|8 
+|50
+|The Wizard strikes their opponent with `Lightning`, dealing `Intelligence x5` based damage 
+
+|Elemental Affinity 
+|10 
+|
+|`passive`: Whenever the Wizard casts a spell which deals `Fire`, `Ice`, or `Lightning` damage, they gain a 25% damage bonus to the next `Fire`, `Ice`, or `Lightning` damage spell they cast this combat - if it deals a different type of damage.  
+
+|Reflect Damage 
+|13 
+|30
+|For the remainder of the combat, whenever the Wizard is damaged, a % of the damage equal to the Wizard's level (rounded up) is stored.  This stored damage is added to the Wizard's next damaging attack as `Lightning` damage.
+
+|Improved Passives 
+|17
+| 
+|`passive`: 25% of Magic Armor's non-Physical damage modifier bonus now applies to `Physical` damage (rounded up), Mana Regeneration end of battle and healing potions effects now restore 25% of maximum mana. 
+
+|Mana Burn 
+|20
+|All (min 1)
+|Consume all your remaining mana to do `Fire`, `Ice`, and `Lightning` damage to an enemy, the base damage of each damage type is 50% of the consumed mana (rounded up)
+
+|Elemental Master
+|25
+|
+|`Passive`: Wizard's deal +50% damage if they've dealt `Fire`, `Ice`, and `Lightning` damage this combat.  
+
+| Damage/Variance
+| Elemental
+| `Fire`, `Ice`, `Lightning`
+| Wizards deal Elemental damage with their attacks.  Their damage variance is base damage * ((current/maximum mana / 2) - 0.15) `(-0.15 - 0.35)`.  Their equipment variance follows the same formula as Fighter variance.
+|===
+
+##### Wizard Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 60
+| 10
+| Health Points
+
+| Strength
+| 5
+| 0
+| 
+
+| Agility
+| 10
+| 2
+| Wizard `Agility` translates to `defense power` at 2 agility = 1 `defense power` `Agility` also decreases the chance you'll be surprise attacked in battle.
+
+
+| Intelligence
+| 17
+| 2
+| Wizard `Intelligence` translates to `attack power` at 1 `intelligence` = 1 `attack power`.  Intelligence directly increases the damage of several Wizard spells.
+| Mana (Special)
+| 50
+| 20
+| Wizards use Mana to cast spells
+
+| Experience
+| 0
+| 50x^2^
+| Wizards progress levels slower than average.
+|===
+
+##### Wizard Equipment
+
+[cols="10%,15%, 75%"]
+|===
+| Slot
+| Types
+| Expected Stats
+
+| Weapon
+| Staff, Wand
+| Wizard weapons have attack power equal to approximately 25% of their level (rounded up).  They have an Elemental damage type (`Fire`, `Ice`, `Lightning`), and they have modifier to that damage type of approximately equal to their level.  They have a chance to have defense power or additional damage modifier strength of approximately half their level.
+
+| Armor
+| Robes
+|  Wizard Robes have `defense power` equal to approximately their `0.5` times their level `+5`.  They have defensive modifiers to 3 non-Physical damage types.  They have a chance to have additional defense modifier or `defense power`. Armor defensive modifiers have approximately `30 + (level *3)` modification value across both stats. 
+
+| Accessory
+| Arcane Orb
+| The Wizard `Accessory` are Arcane Orbs.  Arcane Orbs have offensive modifiers to 1 Elemental damage type `Fire`, `Ice`, `Lightning`, equal to approximately their level and defensive modifiers to 2 damage types.  Defensive modifiers have approximately `20+(level *2)` modification value across both stats.  Arcane Orbs sometimes have additional bonuses to their offensive or defensive modifiers equal to approximately 25% of their level. 
+|===
+
+---
+
+#### Cleric
+
+image::Cleric.jpg[role=right, width=450]
+
+In the hallowed halls of Dungeon Dudes, where divine light meets the shadowed depths, emerges a class revered not only for their combat prowess but also for their spiritual guidance: the **Clerics**.
+
+Dedicated disciples of the celestial realms, Clerics are both warriors and healers, guardians of the balance between the physical and ethereal. With unwavering faith as their guide, they invoke blessings that mend wounds and bestow shields, while channeling the wrath of their deities to **smite** foes with radiant energy.
+
+Harnessing the sacred power of **Mana**, Clerics can weave miracles on the battlefield, casting forth beams of holy light to both harm their adversaries and **heal** their allies.
+
+Grounded in both the spiritual and martial, Clerics are a beacon of hope, always ready to restore balance and light even in the darkest corners of the dungeon.
+
+---
+
+##### Cleric Skills
+
+[cols="15%,5%,10%, 70%"]
+|===
+|Skill |Level |Mana Cost | Description
+
+|Attack
+|1
+|
+|Cleric attacks deal damage with a base of their `attack_power`
+
+|Armor of Faith
+|1
+|`passive:` Cleric `defense_power` mitigates against `Holy` damage in addition to `Physical` damage.
+
+|Smite
+|1
+|
+|`passive:` Cleric attacks deal additional `Holy` damage with a base of 1/3 their `Intelligence`
+
+|Heal 
+|1
+|20
+|Cleric heals for 50% of their maximum hit points
+
+|Radiance
+|3
+|40 
+|Cleric heals `Holy` damage to **all enemies** with a base of their `Intelligence` + their `Attack_Power`and heals for `Intelligence // 3` hit points 
+
+|Divine Blessing
+|5
+| 
+|`passive`: Whenever the cleric takes a combat action, they recover 10% of their maximum HP if they are at full mana, and 10% of their maximum mana if they are at full hit points.
+
+|Prayer 
+|8
+|30 
+|The Cleric protects them self with an incantation, raising their defense modifier to `Holy`, `Poison`, and `Physical` damage by `5` for the remainder of the battle and reducing the damage from the next incoming damage event to `0`. 
+
+|Retribution 
+|10
+| 
+|`passive:` Attacks against the cleric deal `level // 5` less damage and increase the clerics `Holy` damage modifier by `level //10` for the remainder of the encounter.
+
+|Avenger 
+|13
+|100 
+|`Once per battle:` The Cleric increases their `Holy` Damage Modifier by `30` for the remainder of the encounter.  The Cleric strikes their opponent with Holy light, dealing `Intelligence x6` based `Holy` Damage. 
+
+|Greater Heal
+|17
+|50 
+|Cleric heals for 70% of their maximum hit points.  The damage from the next incoming damage event on the Cleric is reduced by 50%.
+
+|Battle Cleric
+|20
+| 
+|`passive`: Smite now deals damage based on 1/2 `Intelligence`.  Additionally Smite triggers whenever one of the Cleric's spells heals them.   
+
+|Improved Healing 
+|25
+| 
+|`passive`: When above 50% maximum mana, Heal and Greater Heal consume 100% more mana and deal `Holy` damage equal to the amount of hit points healed. 
+
+| Damage/Variance
+| Physical, Holy
+|
+| Clerics do `Physical` damage with their attacks and `Holy` Damage with their abilities.  Cleric damage variation is  normally distributed with a mean of the base amount and a standard deviation of 12% of the base damage for damage events and base amount.  Cleric abilities never do below `1` base damage.  Their equipment variance follows the same formula as Fighter variance.
+
+|===
+
+##### Cleric Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 85
+| 20
+| Health Points
+
+| Strength
+| 13
+| 1
+| Cleric `Strength` translates to `attack power` at 1 `Strength` = 1 `Attack Power`
+
+| Agility
+| 10
+| 1
+| Cleric `Agility` translates to `defense power` 2 agility = 1 `defense power` `Agility` also decreases the chance you'll be surprise attacked in battle.
+
+
+| Intelligence
+| 10
+| 1
+| Intelligence directly increases the damage of several Cleric spells.
+| Mana (Special)
+| 50
+| 15
+| Cleric spells use Mana
+
+| Experience
+| 0
+| 40x^2^
+| Clerics progress levels at an average rate.
+|===
+
+##### Cleric Equipment
+
+[cols="10%,15%, 75%"]
+|===
+| Slot
+| Types
+| Expected Stats
+
+| Weapon
+| Mace, Flail
+| Cleric Weapons have `attack power` equal to approximately their level + 10.  Cleric Maces also have a modifier approximately equal to their level which modifies all `Physical` damage dealt.  Cleric Flails also have a modifier approximately equal to their level which modifies all `Holy` damage dealt.  Cleric weapons have a chance to have `defense power` or additional bonus `attack power` approximately half their level. 
+
+| Armor
+| Heavy
+|  Clerics Armors have `defense power` equal to approximately their `1.25` times their level `+10`.  They have defensive modifiers to 2 damage types.  They have a chance to have additional bonus `defense power` or `attack power` of approximately half their level.  Armor defensive modifiers have `20 + (level *2)` modification value across both stats. 
+
+| Accessory
+| Holy Symbol
+| The Cleric `Accessory` is Holy Symbols.  Holy Symbols have offensive modifiers to `Holy` damage equal to approximately their level.  Holy symbols have defensive modifiers to `Physical`, `Holy`, and `Poison` damage, with a total of approximately `25+(level*2.5)` modification value across all 3 modifiers.  Holy Symbols sometimes have additional bonuses to their offensive modifiers qual to approximately 25% of their level or a defensive modifier to an Elemental damage type (`Fire`, `Ice`, `Lightning`) for approximately 10 + level. 
+|===
+
+---
+
+#### Ranger
+
+image::Ranger.jpg[role=right, width=450]
+
+Masters of both bow and beast, **Rangers** embody the spirit of nature, harnessing its raw power and **focus** to prevail in the heart of battle. As nimble as the wind and as silent as the shadows, they strike with precision, their arrows finding their mark even in the darkest corners of the Dungeon Dudes realm. 
+
+A Ranger is never alone; their bond with the animal kingdom ensures they are always accompanied by loyal **companions**, each enhancing the Ranger's **prowess and defense**. With a keen sense of their surroundings, they can anticipate an enemy's every move, turning the environment into their ally. In a world where danger lurks behind every corner, the Ranger stands vigilant, a sentinel of the wilderness and a beacon for those who walk the path less traveled.
+
+---
+
+##### Ranger Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |  Description
+
+|Attack
+|1
+|Ranger attacks deal damage with a base of their `attack_power`
+
+|Nature's Defense
+|1
+|`passive:` Ranger `defense_power` mitigates against `Poison`, `Fire`, and `Ice` damage in addition to `Physical` damage.
+
+|Summon Wolf Companion
+|1
+|Ranger summons a Wolf Companion.  Whenever the Ranger deals damage this combat, the Wolf attacks, dealing `Physical` damage based on 60% of the Ranger's `attack_power`.  The Ranger's in combat defensive modifier against `Physical` and `Ice` damage are improved by 10 while Wolf is the active Animal Companion. Animal Companions share all the same Offensive and Defensive Modifiers as the Ranger.  Only 1 Animal Companion can be active at any time.
+
+|Awareness
+|1
+|`passive`: Whenever the Ranger spends a turn without directly damaging the opponent, they gain `Awareness`.  Their next damaging attack or special ability will attempt to consume 1 point of `Focus` to deal 50% increased damage.  Ignore this effect if the Ranger is out of Focus.
+
+|Take Aim
+|3
+|Ranger takes aim with their weapon.  Next turn they will `Attack` in addition to any other actions preformed. (Take Aim triggers `Awareness`)
+
+|Summon Bear Companion
+|5
+|Ranger summons a Bear Companion.  Whenever the Ranger deals damage this combat, the Bear attacks, dealing `Physical` damage based on 60% of the Ranger's `attack_power`.  The Ranger's in combat defensive modifier against `Physical` damage is improved by 10 and the Ranger's `defense_power` is increased by 10% while the Bear is the active Animal Companion.  Animal Companions share all the same Offensive and Defensive Modifiers as the Ranger.  Only 1 Animal Companion can be active at any time.
+
+|Steel Trap
+|8
+|Ranger traps their opponent.  Dealing `Physical` damage based on 75% of the Ranger's attack power this turn, and `Physical` damage based on 50% of the Ranger's attack power each turn for the remainder of the encounter.  All steel trap damage is calculated using the Ranger's attack power on the turn Steel Trap was originally used.  Only 1 steel trap can be active on an opponent at any time.  
+
+|Improved Awareness
+|10
+|`passive:` gaining `Awareness` also increases the `attack_power` scaling of the Ranger's next damaging action by `25%`, improves the Ranger's defense modifiers against `Ice`, `Poison`, and `Physical` damage by 10 for the remainder of the encounter, and heals the Ranger for 10% of their maximum hit points.
+
+|Focused Regeneration 
+|10
+|`passive:` The Ranger recovers a % of their hit_points equal to their current focus after defeating an enemy.
+
+|Summon Cat Companion
+|13
+|Ranger summons a Cat Companion.  Whenever the Ranger deals damage this combat, the Cat attacks, dealing `Physical` damage based on 75% of the Ranger's `attack_power`.  The Ranger's in combat defensive modifier against `Lightning` and `Fire` damage is improved by 10 and the Ranger's `Attack_Power` is increased by 10% while the Cat is the active Animal Companion.  Animal Companions share all the same Offensive and Defensive Modifiers as the Ranger.  Only 1 Animal Companion can be active at any time.
+
+|Improved Animal Companion
+|15
+|The first animal companion summoned each encounter does not pass the Ranger's turn.  Adjustments to defensive modifiers provided by companions is improved by 10.  The Ranger may have up to 2 animal companions active at any time.    
+
+|Lucky Strike
+|20
+|`passive`: Whenever the Ranger attacks, it has a `50%` chance to consume 1 point of focus and deal 50% increased damage.  The Ranger recovers 1 focus after defeating an enemy, and 1 additional focus after defeating an enemy for each active animal companion.  This `focus_point` recovery is calculated before `Focused Regeneration`.
+
+|Improved Animal Companion 2
+|25
+|`passive`: The first 2 animal companion's summoned each encounter do not pass the Ranger's turn.  Adjustments and `attack_power` and `defense_power` provided by animal companions is doubled.  Animal companions deal an additional 10% of the Ranger's `attack_power` in damage per animal companion active (other than themselves). 
+
+| Damage/Variance
+| Physical, Elemental
+| Ranger's do `Physical` damage with their attacks.  Ranger Quiver's add Elemental damage to their Attacks.  Ranger damage variation follows the same formula as Rogue.  Their equipment variance follows the same formula as Fighter variance.
+
+|===
+
+##### Ranger Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 90
+| 22
+| Health Points
+
+| Strength
+| 7
+| 1
+| Ranger `Strength` translates to `attack power` at 1 `Strength` = 1 `Attack Power`
+
+| Agility
+| 14
+| 2
+| Ranger `Agility` translates to `defense_power` and `attack_power` at 2 agility = 1 `defense_power/attack_power`. Agility` also decreases the chance you'll be surprise attacked in battle.
+
+| Intelligence
+| 5
+| 0
+| 
+
+| Focus (Special)
+| 2
+| 1
+| Ranger Abilities and Attacks Consume Focus to deal additional damage.
+
+| Experience
+| 0
+| 40x^2^
+| Rangers progress levels at an average rate.
+|===
+
+##### Ranger Equipment
+
+[cols="10%,15%, 75%"]
+|===
+| Slot
+| Types
+| Expected Stats
+
+| Weapon
+| Bow
+| Ranger Weapons have `attack power` equal to approximately their level + 20 and having `Physical` damage offensive modifiers equal to approximately their level+10.  Ranger weapons have a chance to have `defense power` or additional bonus `attack power` approximately half their level. 
+
+| Armor
+| Light
+| Ranger Armors have `defense power` equal to approximately their `0.65` times their level `+10`.  They have defensive modifiers to at least 1 Elemental Damage type (`Fire`, `Ice`, `Lightning`) and 1 other `non-Physical` damage type.  They have a chance to have additional bonus `defense power` or `attack power` of approximately half their level.  Armor defensive modifiers have `20 + (level *2)` modification value across both stats. 
+
+| Accessory
+| Quiver
+| The Ranger `Accessory` is the Quiver.  Quivers have an Elemental Damage type (`Ice`, `Fire`, `Lightning`) which adds `25% attack_power` based damage of that type to every `Attack` the Ranger does.  This damage is not adjusted by `Awareness` or any other focus consuming effects. Quivers sometimes have additional bonuses to `attack_power` or `defense_power` equal to approximately half their level. 
+|===
+
+---
+
+### Monsters
+
+image::Monsters.jpg[role=right, width=450]
+
+In the shadowy recesses of the Digital Kingdom, where danger constantly brews, lurk the menacing adversaries of the Dungeon Dudes: 
+
+**Monsters.** Each type, a testament to the dark creativity of the digital realm, poses unique threats and challenges.
+
+* **Beasts** - wild and ferocious.
+* **Undead** - cursed remains of fallen Heroes.
+* **Elemental** - born of nature's fury.
+* **Humanoids** - tactical and calculating opponents.
+* **Golem** - ancient constructs of stone, metal, and treasure
+
+As you venture into the details of these formidable foes, prepare to encounter the sheer diversity and complexity of the kingdom's antagonists.
+
+---
+
+#### Beasts
+
+image::Beast.jpg[role=right, width=450]
+
+
+In the wild expanses of the Digital Kingdom, where nature's essence is untamed and raw, the **Beasts** reign supreme. 
+
+Among these formidable creatures, three types stand out, each a symbol of nature's might and majesty: 
+
+* **Drakes** - winged serpents breathing fury
+* **Chimera** - an amalgamation of terror with unmatched versatility
+* **Griffons** - soaring high with pride and power. 
+
+The Beasts of Dungeon Dudes deal wide ranging and erratic damage to their opponents.
+
+They are even more formidable when injured.
+
+---
+
+##### Beast Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Attack
+|1
+|Beasts attacks deal damage with a base of their `attack_power`
+
+|Enrage
+|1
+|`Passive`:  All Beast Damage is Increased by 25% when under 25% Max Hit Points 
+
+| Damage/Variance
+| Physical
+| All Beasts deal `Physical` damage with their attacks, some types of Beasts do additional types of damage.  All Beast damage variation is randomly assigned between 75% and 125% of the base value. 
+|===
+
+##### Beast Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| None (Special)
+| 0
+| 0
+| Beasts have no Special Stat
+
+| Experience
+| 12
+| 20
+| Beasts are worth experience equal to the normal `Monster` experience scaling
+
+| Gold
+| 5
+| 5
+| Beasts award gold equal to 5 times their level
+
+|===
+
+The realm of Dungeon Dudes has 3 types of **Beasts**: **Drakes**, **Chimeras**, and **Griffons**
+
+---
+
+##### Drakes
+
+*Drakes* randomly belong to one of 3 subtypes.  **Swamp Drakes**, **Green Drakes**, and **Storm Drakes**
+
+###### Drake Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Breath
+|1
+|Drakes breath dealing 50% their current HP + intelligence damage of their drake's damage type
+
+| Skill Selection
+| `take_turn`
+| Drake's `take_turn` AI has an equal chance of returning any skill the Drake is able to preform regardless of the circumstance
+|===
+
+###### Drake Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 65
+| 14
+| Health Points, Drakes breath attack scales with current `hit_points`
+
+| Strength
+| 16
+| 3
+| Beasts have `attack_power` equal to their `strength`
+
+| Agility
+| 12
+| 3
+| Beasts have `defense_power` equal to their `agility`
+
+| Intelligence
+| 5
+| 1
+| Drakes breath attack and other special abilities scale with `intelligence`
+
+|===
+
+###### Storm Drakes
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Damage Type
+|1
+|Lightning
+
+|Lightning Strikes
+|1
+|Storm Drakes attacks for 75% normal attack damage and then additional lightning damage with base damage = `intelligence`
+
+|Lightning Resist
+|1
+|Storm Drakes take 40% less Lightning Damage
+|===
+
+###### Swamp Drakes
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Damage Type
+|1
+|Poison
+
+|Poison Cloud
+|1
+|Swamp Drakes deals `Poison` damage based on `intelligence`.  Lowers enemy `Poison` defense modifier by 15 and `Physical` modifier by 10
+
+|Poison Resist
+|1
+|Swamp Drakes take 40% less Poison Damage
+|===
+
+###### Green Drakes
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Damage Type
+|1
+|Fire
+
+|Fiery Fortification
+|1
+|Green Drake deals `Fire` damage based on `intelligence`.  Green Drake raises their `attack_power` and `defense_power` by 25% of `intelligence` for the remainder of the battle.
+
+|Fire Resist
+|1
+|Green Drakes take 40% less Fire Damage
+|===
+
+---
+
+##### Chimera
+
+###### Chimera Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Switch Heads
+|1
+|Every turn, one of the three Chimera heads (Eagle, Snake, Lion) is randomly selected and takes the turn
+
+|Summon Lightning
+|1
+|Eagle Head summons a storm which deals lightning damage based on intelligence
+
+|Poison Breath
+|1
+|Snake Head Breaths Poison for intelligence based poison damage
+
+|Lion Roar
+|1
+|Lion Head unleashes a fierce roar, dealing 75% normal attack damage as physical damage and increasing `Physical`, `Lightning`, and `Poison` damage modifiers by 10 for the remainder of the battle.
+
+|Additional Attack: Lion
+|3
+|Whenever the Lion head acts, one of the other 2 heads will also attack with a normal attack
+
+|Additional Attack: Eagle
+|5
+|Whenever the Eagle head acts, one of the other 2 heads will also attack with a normal attack
+
+|Additional Attack: Snake
+|7
+|Whenever the Snake head acts, one of the other 2 heads will also attack with a normal attack
+
+| Skill Selection
+| `take_turn`
+| Chimera's `take_turn` AI has an equal chance to returning an action from any of the 3 heads, and each head has an equal chance to return an attack or their special ability
+|===
+
+###### Chimera Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 75
+| 16
+| Health Points
+
+| Strength
+| 15
+| 3
+| Beasts have `attack_power` equal to their `strength`
+
+| Agility
+| 15
+| 3
+| Beasts have `defense_power` equal to their `agility`
+
+| Intelligence
+| 15
+| 3
+| Snake and Eagle head special attacks scale with `Intelligence`
+
+|===
+---
+
+##### Griffon
+
+*Griffon* randomly belong to 1 of 2 subtypes: *Sunfire Griffon* and *Anointed Griffon*
+
+###### Griffon Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Empower
+|1
+|Drake deals damage from its damage type at a base of 75% normal attack damage and `empowers` future attacks to deal additional damaged of their damage type of approximately their intelligence
+
+| Skill Selection
+| `take_turn`
+| Griffon's `take_turn` AI has an equal chance to returning any skill the Griffon is able to preform, but will not empower if already empowered
+|===
+
+###### Griffon Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 65
+| 15
+| Health Points, Griffon Special Attacks scale with Hit Points
+
+| Strength
+| 20
+| 4
+| Beasts have `attack_power` equal to their `strength`
+
+| Agility
+| 12
+| 4
+| Beasts have `defense_power` equal to their `agility`
+
+| Intelligence
+| 5
+| 1
+| Griffons deal additional damage when `empowered` based on their `intelligence`
+
+|===
+
+###### Sunfire Griffon
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Damage Type
+|1
+|Fire
+
+|Cauterizing Burst
+|1
+|Sunfire Griffon deals damage from its damage type at a base of 1/3 current `hit_points` and heals for `hit_points` equal to its `intelligence`
+
+|===
+
+###### Anointed Griffon
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Damage Type
+|1
+|Holy
+
+|Hymn
+|1
+|Anointed Griffon deals damage from its damage type at a base of 1/3 current `hit_points` and increases its defensive mod vs `Physical` and `Holy` by 10 for the rest of the battle.
+
+|===
+---
+
+#### Elementals
+
+image::Elemental.jpg[role=right, width=450]
+
+In the mystic corners of the Digital Kingdom, where the very fabric of existence is woven with the raw power of the elements, the Elementals hold dominion.
+
+Among these ethereal beings, three manifestations resonate with the primal forces of the cosmos:
+
+* **Storm Elementals** - tempestuous spirits channeling the wrath of the skies,
+
+* **Fire Elementals** - blazing entities embodying the ferocity of raging infernos,
+
+* **Frost Elementals** - chilling presences mirroring the cold embrace of winter.
+
+But beware, for when the stars align, one might encounter the rare and formidable **Elemental Lords**, the pinnacle of their elemental might.
+
+---
+
+##### Elemental Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Attack
+|1
+|Elemental attacks deal damage of their elemental type with a base of their `attack_power`
+
+|Reconstitute 
+|1
+|`passive`:  Elementals heal for 8% of their current `hit_points` at the beginning of each of their turns (rounded up). 
+
+|Elemental Immunity
+|1
+|`passive`:  Elementals are immune to all damage from their type (IE: `Fire` Elementals are immune to `Fire` damage)
+
+|Elemental Vulnerability
+|1
+|`passive`: Elementals take 50% increased damage from the Elemental type they are vulnerable to (`Fire` vulnerable to `Ice`, `Ice` vulnerable to `Lightning`, `Lightning` vulnerable to `Fire`) - this damage increase is calculated separately from all other modifiers.  
+
+| Damage/Variance
+| Elemental (`Fire`, `Ice`, `Lightning`)
+| All Elementals deal damage associated with their specific elemental type (`Fire`, `Ice`, `Lightning`) with their attacks.  All Elemental variation is normally distributed with a mean of the base damage and a standard deviation of 10% of the base damage.
+|===
+
+##### Elemental Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| None (Special)
+| 0
+| 0
+| Elementals have no Special Stat
+
+| Experience
+| 12
+| 20
+| Elementals are worth experience equal to the normal `Monster` experience scaling
+
+| Gold
+| 5
+| 5
+| Elementals award gold equal to 5 times their level
+
+|===
+
+The realm of Dungeon Dudes has 3 types of **Elementals**: **Fire**, **Frost**, and **Storm**
+
+---
+
+##### Fire Elemental
+
+###### Fire Elemental Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Burning Strikes
+|1
+|`passive:` Fire Elemental `Attack` increase their `Fire` damage offensive modifier by `5` for the remainder of combat in addition to the damage dealt.  This effect is capped at an increase of `20`
+
+|Immolate
+|1
+|Fire Elemental deals `Fire` damage to their opponent based on 75% `attack_power`.  The next action the Fire Elemental takes also deals `Fire` damage to their opponent based on 50% of attack power.  The effect of Reconstitute is increased by 1% for the remainder of the battle. (Maximum increase 4%)
+
+|Scorched Earth
+|5
+|`Once per Combat:` Fire Elemental lights the area blaze, dealing 33% `attack_power` based `Fire` damage every time the Fire Elemental takes an action for the remainder of combat.  
+
+| Skill Selection
+| `take_turn`
+| Fire Elemental has a 75% to `Attack` each turn and a 25% chance to return a random skill, until they have maxed out the benefit of `Burning Strikes`.  When `Burning Strikes` reaches maximum benefit, Fire Elementals have a 75% chance to return a random skill, and a 25% chance to `Attack`.      
+|===
+
+###### Fire Elemental Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 65
+| 16
+| Health Points
+
+| Strength
+| 10
+| 2
+| Elementals have `attack_power` equal to their `Strength + Intelligence`
+
+| Agility
+| 10
+| 3
+| Elementals have `defense_power` equal to their `agility`
+
+| Intelligence
+| 8
+| 1
+| Elementals have `attack_power` equal to their `Strength + Intelligence`
+
+|===
+
+###### Lesser Fire Elemental
+
+All Fire Elementals level 5 or lower are `Lesser Fire Elementals`
+
+`Lesser Fire Elementals` have no changes to the base Elemental gold, experience, stat growth, or abilities.
+
+###### (Regular) Fire Elemental
+
+Fire Elementals level 6 to 10 have a 20% chance per level over 5 to be a `Fire Elemental` (20% at level 6 up to 100% at level 10.)
+
+Fire Elementals between level 6-9 which fail this chance are `Lesser Fire Elementals`.
+
+`Fire Elementals` have all the skills of previous Elemental Tiers, plus:
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Explode
+|5
+|`Once per battle:` The Fire Elemental Explodes, dealing damage to itself equal to `25%` its `max_hit_points` + `25%` of its current `hit_points` and dealing an equal amount of `Fire` damage to their opponent. 
+
+|===
+
+###### Greater Fire Elemental
+Fire Elementals level 11 to 20 have a 10% chance per level over 10 to be a `Greater Fire Elemental` (10% at level 11 up to 100% at level 20)
+
+Fire Elementals between level 11-19 which fail this chance are `Fire Elementals`
+
+`Greater Fire Elementals` have all the skills of previous Elemental Tiers, plus:
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Improved Reconstitute
+|11
+|`passive:` `Greater Fire Elemental` Reconstitute Healing is based on `max_hit_points` instead of current `hit_points`
+
+|===
+
+`Greater Fire Elementals` have the following updated stat growth:
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 75
+| 20
+| Health Points
+
+| Intelligence
+| 15
+| 1
+| Elementals have `attack_power` equal to their `Strength + Intelligence`
+
+|===
+
+###### Fire Elemental Lord
+Fire Elementals above level 25 have a 1% chance per level to be a `Fire Elemental Lord`.  
+
+`Fire Elemental Lords` have the same skills and stat growth as previous Elemental Tiers, their base stats (Hit Points, Strength, Agility, Intelligence) are increased by an amount equal to their level. 
+
+`Fire Elemental Lords` drop 20% more Gold and are worth 50% more experience as compared to `Greater Fire Elementals`
+
+##### Frost Elemental
+
+###### Frost Elemental Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Brittle Strikes
+|1
+|`passive:` Frost Elemental `Attack` reduces their opponents defensive modifier to `Ice` by 5 in addition to the damage dealt.  This effect is capped at a reduction of 25.
+
+|Freeze
+|1
+|Frost Elemental pulses a wave of `Ice` dealing 75% `attack_power` based `Ice` damage and improve the Frost Elementals defensive modifier to `Physical` damage by 10 for the remainder of the encounter. (Maximum improvement of 30) 
+
+|Blizzard
+|5
+|`Once per Combat:` Frost Elemental Summons a Blizzard, which deals 10% of the Frost Elementals current `hit_points` in `Ice` damage each turn and heals the Frost Elemental for 6% `max_hit_points` per turn.  The blizzard lasts for the Frost Elementals next 3 attacks when cast.
+
+|Improved Freeze
+|8
+|`passive:`  After the defensive `Physical`  modifier for Freeze reaches its maximum effect, subsequent casts of `Freeze` deal twice as much damage.
+
+|Frost Splinter
+|10
+| `once per combat:` Frost Elemental splints a piece of itself, summoning an Lesser Frost Elemental which attacks immediately for 33% `attack_power` based damage. The Lesser Frost Elemental attacks every time the Frost Elemental takes an action for the remainder of the encounter.
+
+|Improved Blizzard
+|15
+|`passive:` Blizzard now lasts for 5 turns, deals damage based on 10% `max_hit_points` instead of current `hit_points`, heals for the same amount, and increases Lesser Frost Elemental Damage by 25% while it is active.
+
+|Improved Frost Splinter
+|20
+|`passive` Frost Splinter can now be cast `twice per combat`
+
+| Skill Selection
+| `take_turn`
+| Frost Elemental has a 60% to `Attack` each turn and a 40% chance to return a random skill, until they have maxed out the benefit of `Brittle Strikes`.  When `Brittle Strikes` reaches maximum benefit, Frost Elementals have a 75% chance to return a random skill, and a 25% chance to `Attack`.      
+|===
+
+###### Frost Elemental Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 78
+| 16
+| Health Points
+
+| Strength
+| 15
+| 1
+| Elementals have `attack_power` equal to their `Strength + Intelligence`
+
+| Agility
+| 12
+| 5
+| Elementals have `defense_power` equal to their `agility`
+
+| Intelligence
+| 8
+| 2
+| Elementals have `attack_power` equal to their `Strength + Intelligence`
+
+|===
+
+###### Frost Elemental Lord
+
+Frost Elementals above level 25% have a 1% chance per level to be a `Frost Elemental Lord`
+
+`Frost Elemental Lords` have the same skills and stat growth as other Frost Elementals, their base stats (Hit Points, Strength, Agility, Intelligence) are increased by an amount equal to their level.
+
+`Frost Elemental Lords` drop 20% more Gold and are worth 50% more experience as compared to `Frost Elemental`
+
+##### Storm Elemental
+
+###### Storm Elemental Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Static Shock
+|1
+|`passive:` Storm Elemental `Attack` grants them a `Static Shock`.  When they reach 5 static shock they automatically unleash a `Shock Nova` which deals `attack_power` * 150% base damage as `Lightning` damage and resets static shock stacks to 0.
+
+|Double Shock
+|1
+|Storm Elemental quickly shocks their opponent twice, dealing 50% `attack_power` base damage as `Lightning` damage and gaining a charge of `Static Shock` each time.  
+
+|Lightning Storm
+|5
+|`Once per Combat:` Storm Elemental summons a lightning storm, dealing 33% `attack_power` base damage as `Lightning` damage and granting a charge of `Static Shock` each time the Storm Elemental takes an action for the remainder of combat.
+
+|Improved Static Shock
+|10
+|`passive:` Storm Elementals now begin combat with 1 charge of `Static Shock` and `Shock Nova` deals `attack_power` * 200% base damage.
+
+|Improved Lightning Storm
+|15
+|`passive:` When the Storm Elemental unleashes `Shock Nova`, `Lightning Storm` is automatically cast if it has not be cast already.  
+
+|Summon Lesser Elemental
+|20
+|The Storm Elemental Summons a Lesser Storm Elemental which attacks immediately for 33% `attack_power`.  The Lesser Storm Elemental will attack each time the Storm Elemental takes an action this combat.  When `Shock Nova` is unleashed, All Lesser Storm Elementals are destroyed, each Lesser Elemental destroyed this way makes the `Shock Nova` deal 20% more damage (non compounding) and causes the Storm Elemental to gain 1 `Static Shock` charge. 
+
+| Skill Selection
+| `take_turn`
+| Storm Elemental has a 75% to `Attack` each turn and a 25% chance to return a random skill, until they have unleashed a `Shock Nova`.  After unleashing a `Shock Nova` Storm Elementals have a 100% chance to return a random non-Attack action.      
+|===
+
+###### Storm Elemental Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 60
+| 15
+| Health Points
+
+| Strength
+| 8
+| 1
+| Elementals have `attack_power` equal to their `Strength + Intelligence`
+
+| Agility
+| 12
+| 3
+| Elementals have `defense_power` equal to their `agility`
+
+| Intelligence
+| 15
+| 2
+| Elementals have `attack_power` equal to their `Strength + Intelligence`
+
+| Static Shock (Special)
+| 5
+| 0
+| Static Shock Charges have a Maximum of 5 but initialize at 0.
+
+|===
+---
+
+###### Storm Elemental Lord
+
+Storm Elementals above level 25% have a 1% chance per level to be a `Storm Elemental Lord`
+
+`Storm Elemental Lords` have the same skills and stat growth as other Storm Elementals, their base stats (Hit Points, Strength, Agility, Intelligence) are increased by an amount equal to their level.
+
+`Storm Elemental Lords` begin combat with 3 `Static Shock` charges and 1 `Lesser Storm Elemental`. 
+
+`Storm Elemental Lords` drop 40% more Gold and are worth 60% more experience as compared to `Frost Elemental`
+
+#### Humanoid
+
+image::Humanoid.jpg[role=right, width=450]
+
+In the shadowed alleys and forgotten realms of the Digital Kingdom, the ever-evolving tapestry of conflict and alliance is enriched by the presence of the **Humanoids**. These distinct tribes, each with their unique ethos and tactics, are a force to be reckoned with.
+
+**Murlocs** - Agile amphibians from the deepest waters, these creatures strike swiftly, moving as one with coordinated precision, their strength in unity echoing the relentless waves crashing against the shore.
+
+**Bandits** - Cunning and opportunistic, these rogue renegades lurk in the fringes, always in packs, ever ready to pounce and plunder. Their tactics rely on overwhelming numbers and the element of surprise.
+
+**Ogres** - Towering behemoths, embodiments of raw power and chaotic magic. Their hulking forms might be slow, but when they harness their innate wild spells and brutal strength, few can stand in their path.
+
+
+---
+
+##### Humanoid Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Attack
+|1
+|Humanoid attacks deal `Physical` damage with a base of their `attack_power`
+
+|Strategic Thinking
+|1
+|`passive:` Humanoids deal 25% increased damage when their current `hit_points` are at least 75% of their `max_hit_points`.  Humanoids have a 25% chance to `Escape` combat each turn if their current `hit_points` are less than 10% of their `max_hit_points`  
+
+|Healing Potion
+|1
+|`Once per battle:`  Humanoids drink a healing potion - restoring 45% of their `max_hit_points`
+
+|Quick Potion
+|5
+|`passive:` Humanoids can use 1 potion each combat action in addition to their normal action for the turn. 
+
+|Damage/Variance
+|Physical, Various
+|Humanoids deal physical damage with their `Attacks` and various types of damage with their special abilities. Humanoid damage variance is random between 0.75 and 1.25 times base damage. 
+|===
+
+##### Humanoid Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| None (Special)
+| 0
+| 0
+| Humanoids have no Special Stat
+
+| Experience
+| 12
+| 22
+| Humanoids are worth slightly more experience than other `Monsters`
+
+| Gold
+| 10
+| 8
+| Humanoids are worth slightly more gold than other `Monsters`
+
+|===
+
+The realm of Dungeon Dudes has 3 types of **Humanoids**: **Bandits**, **Murlocs**, and **Ogres**
+
+---
+
+##### Band of Bandits
+
+`Band of Bandits` is a `Monster` which simulates a *pack* of enemies.  *Packs* of enemies produce multiple attacks on each of their turns, and take increased damage from abilities that damage *all enemies*.
+
+###### Bandit Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Band Size
+|1
+|`passive:` Bandit bands have 3 members.  One member of the Bandit Band preforms an `Action` each turn, and the other members of the band all `Attack`, dealing damage with a base of their `attack_power`.  `Band of Bandits` takes 300% damage from abilities which damage *all enemies* 
+
+|Fireball
+|1
+|`Twice per Battle:`  A Bandit Sorcerer in the band casts `Fireball` dealing `Fire` damage with a base of their `Intelligence`
+
+|Dirty Tricks
+|1
+|`Once per Battle:` A Bandit Rogue `Attacks` for damage based on 75% of their `attack_power` and reduces the Physical Damage Defensive multiplier for the opponent by 10 for the remainder of the Encounter
+
+|Stock Potions
+|3
+|`passive:` Bands of Bandits have 1 additional Healing Potion
+
+|Increased Band Size
+|8
+|`passive` A Bard joins the Band of Bandits.  Making the Band have 4 members.  The band performs 1 `Action` each turn and the other 3 members `Attack`.  `Band of Bandits` now takes 400% damage from abilities which damage *all enemies*
+
+|Rallying Cry
+|8
+|`Once per Battle:` A Bandit Bard inspires their companions.  Increasing their `Physical` damage offensive multiplier by 10 for the remainder of the encounter.   
+
+|Increased Band Size
+|15
+|`passive` A Cleric joins the Band of Bandits.  Making the Band have 5 members.  The band performs 1 `Action` each turn and the other 4 members `Attack`.  `Band of Bandits` now takes 500% damage from abilities which damage *all enemies*
+
+|Bless
+|15
+|`Once per Battle:` A Bandit Cleric blesses inspires their companions.  Improving all defensive damage modifiers by 10 for the rest of the encounter and healing the band for 50% of `max_hit_points`.
+
+| Skill Selection
+| `take_turn`
+| Bandits return a random option from their available actions each turn, with a few exceptions: 
+
+Bandits do not use Healing Potions when over 50% health, and have a 50% chance to use their healing potion, if available, when under 50% health.
+Bandits will Escape with a 25% chance if they are at or below 10% health.
+
+A Bandit at 10% health will 50% Healing Potion (if available), 25% Escape, 25% any random option.
+A Bandit at 10% health with an no healing potion available will 25% Escape, 75% any random option. 
+
+|===
+
+###### Band of Bandits Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 75
+| 20
+| Health Points
+
+| Strength
+| 5
+| 1
+| Bandits have `attack_power` equal to their `Strength`
+
+| Agility
+| 10
+| 3
+| Bandits have `defense_power` equal to their `agility`
+
+| Intelligence
+| 7
+| 1
+| Some Bandit abilities scale damage with `Intelligence`
+
+|===
+
+##### Ogre
+
+*Ogres* randomly belong to 1 of 2 subtypes: *Blood-Thirster* and *Ogre-Magi*:
+
+###### Ogre Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Ogre Strategic Thinking
+|1
+|`passive:` Ogre's deal 25% increased damage when their current `hit_points` are at least 75% of their `max_hit_points` or their `hit_points` are lower than 25% of their `max_hit_points`.  Ogres never attempt to escape from battle.
+
+|Spiked Potions
+|1
+|`passive:` When an Ogre consumes their `healing_potion` they go into a bloodlust, increasing their damage modifier for `Physical`, `Fire`, `Ice`, and `Lightning` damage by 30% for their next two damage dealing `Actions`.
+
+|Improved Spiked Potions
+|10
+|`passive:` The effect of Spike potions lasts 1 additional damage dealing `Action`
+
+| Skill Selection
+| `take_turn`
+| Ogres return a random option from their available actions each turn.  
+
+When under 50% `hit_points`, Ogres have a 75% chance to use their `healing_potion` each round if it is available.
+
+|===
+
+###### Ogre Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Strength
+| 18
+| 3
+| Ogre's have `attack_power` equal to their `Strength`
+
+| Agility
+| 10
+| 3
+| Bandits have `defense_power` equal to their `agility`
+
+|===
+
+###### Blood-Thirster
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Frenzy
+|1
+|`passive:` When a Blood-Thirster `Actions` there is a 25% chance to launch an additional `Attack` which deals damage based on `attack_power`
+
+|Risky Blow
+|1
+|The Blood-Thirster Actions, with a 50% chance to deal 0 damage and a 50% chance to deal double damage.  `Risky Blow` can trigger Frenzy
+
+|Improved Frenzy
+|10
+|`passive` Whenever `Frenzy` triggers, there is a 25% chance `Improved Frenzy` will trigger and launch and additional `Attack` which deals damage based on `attack_power`
+
+|===
+
+###### Blood-Thirster Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 90
+| 25
+| Health Points
+
+| Intelligence
+| 5
+| 0
+|
+
+|===
+
+###### Ogre-Magi
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|`Wild-Magics`
+|1
+|The Ogre-Magi deals `Lightning`, `Ice`, or `Fire` damage (chosen randomly) damage with a base equal to their `Intelligence`
+
+|of 2 Minds
+|5
+|Whenever an `Ogre-Magi` `Attacks` for their `Action`, they also cast `Wild-Magics`.  Whenever an `Ogre-Magi` casts `Wild-Magics` for their `Action` they also `Attack`
+
+|Improved Ogre Strategic Thinking
+|10
+|`passive` When under 25% `hit_points`, `Ogre-Magi` heal for 20% `max_hit_points` whenever they preform an `Action`.  When over 75% `hit_points`, `Ogre-Magi` gain an additional 10% damage. 
+
+|===
+
+###### Ogre-Magi Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 75
+| 16
+| Health Points
+
+| Intelligence
+| 15
+| 3
+| Ogre-Mage Spell Damage is Adjusted by `Intelligence`
+
+|===
+
+
+##### Murloc Tribe
+
+`Murloc Tribe` is a `Monster` which simulates a *pack* of enemies.  *Packs* of enemies produce multiple attacks on each of their turns, and take increased damage from abilities that damage *all enemies*.
+
+---
+
+###### Murloc Tribe Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Tribe Size
+|1
+|`passive:` Murloc Tribes have 4 members.  One member of the Murloc Tribe preforms an `Action` each turn, and the other members of the tribe all `Attack`, dealing damage with a base of their `attack_power`.  `Murloc Tribe` takes 400% damage from abilities which damage *all enemies* 
+
+|Ice Bolt
+|1
+|`Twice per Battle:`  A Murloc Wizard in the tribe casts `Ice Bolt` dealing `Ice` damage with a base of their `Intelligence`
+
+|Forage
+|1
+|`Twice per Battle:` A Murloc Forager gathers materials and makes a healing_potion - increasing the number of times the `Murloc Tribe` can use `healing_potion` this combat by 1.
+
+|Poisons
+|3
+| `Once per Battle:` A Murloc Rogue coats all Murloc Weapons in poisons.  Murloc attacks have a 30% chance to do an additional 30% damage as `Poison` damage.
+
+|Increase Tribe Size
+|10
+|A Murloc Oracle joins the tribe, bringing it to 5 members.  One member of the Murloc Tribe preforms an `Action` each turn, and the other members of the tribe all `Attack`, dealing damage with a base of their `attack_power`.  `Murloc Tribe` takes 500% damage from abilities which damage *all enemies* 
+
+|Holy Nova
+|10
+|`Once per Battle` A Murloc Oracle erupts with Holy energy.  Dealing `Holy` damage based on `Intelligence` and healing the tribe for 30% `max_hit_points`.
+
+|
+| Skill Selection
+| `take_turn`
+| `Murloc Tribes` Return a random option from their available skills each turn with 1 exception.  A `Murloc Tribe` will not use a `healing_potion` or `Holy Nova` when over 75% `hit_points`
+
+|===
+
+###### Murloc Tribe Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 75
+| 20
+| Health Points
+
+| Strength
+| 5
+| 1
+| Murlocs have `attack_power` equal to their `Strength`
+
+| Agility
+| 10
+| 3
+| Murlocs have `defense_power` equal to their `agility`
+
+| Intelligence
+| 6
+| 2
+| Some Murloc abilities scale damage with `Intelligence`
+
+|===
+
+#### Undead
+
+image::Undead.jpg[role=right, width=450]
+
+Beyond the veil of life in the Digital Kingdom, in the eerie void where life meets death, the *Undead* emerge, drawing power from the abyss of eternal rest. These beings, once bound by mortality, now transcend the limitations of flesh and spirit, bringing forth a chilling blend of terror and strategy.
+
+* *Zombie Hordes* - Decaying legions rising from the ground, their sheer numbers make them a formidable force. Moving as a single entity, driven by insatiable hunger, they engulf everything in their path like a relentless tide of rot and despair.
+
+* *Vampires* - Ageless predators of the night, these masters of manipulation excel in draining the life force of their foes. With an unparalleled ability to strategize, they weave intricate webs of deception, always playing the long game, waiting for the perfect moment to strike.
+
+* *Banshees* - Wailing spirits of anguish, their haunting cries send chills down the spine. Floating between realms, these spectral entities utilize their evasiveness and damage immunities, slowly wearing down even the most tenacious of enemies with a dance of despair and doom.
+
+
+---
+
+##### Undead Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Attack
+|1
+|Undead attacks deal `Physical` damage with a base of their `attack_power`
+
+|Holy Vulnerability 
+|1
+|`passive:` Undead take 50% increased damage from `Holy` type damage.  
+
+|Haunting Aura
+|1
+|`passive:`  When Undead `Monsters` take their first `Action` of combat, the opponents `Physical` damage defensive modifier is reduced by 10 for the remainder of combat.
+
+|Resist Death
+|5
+|`passive:` The kill time a damage event would kill an Undead `Monster` in combat, it reduces the Undead to 1 `Hit_Point` instead.
+
+|Damage/Variance
+|Physical, Physical/Ice, Ice/Poison
+|Undead deal `Physical` or `Ice` damage with their `Attacks` `Ice` or `Poison` damage with their special abilities.  Undead damage variance varies widely.  Randomly dealing between 1-175% of base damage. 
+|===
+
+##### Undead Stat Growth
+
+[cols="15%,15%,10%,60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| None (Special)
+| 0
+| 0
+| Undead have no Special Stat
+
+| Experience
+| 9
+| 18
+| Undead are worth slightly less experience than other `Monsters`
+
+| Gold
+| 4
+| 4
+| Undead are worth slightly less gold than other `Monsters`
+
+|===
+
+The realm of Dungeon Dudes has 3 types of **Undead**: **Zombies**, **Banshees**, and **Vampires**
+
+##### Zombie Horde
+
+`Zombie Horde` is a `Monster` which simulates a *pack* of enemies.  *Packs* of enemies produce multiple attacks on each of their turns, and take increased damage from abilities that damage *all enemies*.
+
+###### Zombie Horde Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Horde Size
+|1
+|`passive:` Zombie Hordes have 6 members.  All members of the Zombie Horde attack each turn with damage based on their `attack_power`.  Zombie hordes take 600% damage from abilities that damage *all enemies*.
+
+|Infection
+|1
+|`passive:` When Zombies in a Zombie Horde attack, they have a 30% chance for the Horde to gain a stack of infection.  When Zombie Hordes gain 4 stacks of infection, their infection is reset to 0 and all `Attacks` deal +1 `Poison` damage for the remainder of the encounter (this effect stacks)
+
+|Improved Infection
+|5, 15, 25, 35, 45
+|`passive:` At level 5, and everyone 10 levels after, Zombie Horde attacks have an additional 5% chance to grant a stack of infection.
+
+|Increase Horde Size
+|8, 16, 24, 32, 40, 48
+|Every 8th level, 1 additional Zombie joins the Horde, giving the Horde + 20 `max_hit_points`, 1 additional attack each turn and making the Horde take an additional 100% of base damage from abilities which damage *all enemies*.
+
+| Skill Selection
+| `take_turn`
+| `Zombie Hordes` always attack.  Doing a number of melee attacks equal to the number of Zombies in the Horde.  
+
+|===
+
+###### Zombie Horde Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 85
+| 20
+| Health Points
+
+| Strength
+| 4
+| 1
+| Zombies have `attack_power` equal to their `Strength`
+
+| Agility
+| 8
+| 3
+| Zombies have `defense_power` equal to their `agility`
+
+| Intelligence
+| 0
+| 0
+| Zombies have no Intelligence
+
+|Infection (Special)
+|4
+|0
+|Infection Stacks lead to additional poison damage on melee strikes.  Zombie Hordes start each encounter with 0 Infection and a Maximum infection of 4.
+
+|===
+
+##### Vampire
+
+Vampires over level 20 have a chance to be *Elder Vampires*
+
+###### Vampire Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Leeching Strikes
+|1
+|`passive:` Vampire's Heal for 10% of the base damage of all damaging abilities they do.  This healing is calculated before any mitigation or armor is applied.
+
+|Icy Touch
+|1
+|`passive:` Attacks for `intelligence * 0.67` base `Ice` damage and lower `Physical` and `Ice` defensive modifiers for the opponent by 10 for the remainder of the encounter. 
+
+|Summon Bat Companion
+|1
+|`Once per Combat:` Vampire Summons a Bat which attacks for 50% `attack_power` based `Physical` damage immediately and 33% `attack_power` based `Physical` damage every time the Vampire takes an action for the remainder of combat. Bat Companion damage does not trigger `Leeching Strikes`
+
+|Damage Modifiers
+|3
+|`passive:` Vampires are immune to `Ice` and `Poison` damage and take 25% additional damage from `Fire`.
+
+|Mist Form
+|5
+|`Once per Combat:` Vampire turns into Mist - reducing the damage of the next damage event the Vampire would receive to 0 and dealing `intelligence // 3` `Ice` damage to their opponent.
+
+|Summon Wolf Companion
+|10
+|`Once per Combat:` Vampire Summons a Wolf which attacks for 50% `attack_power` based on `Physical` damage immediately and 40% `attack_power` based `Physical` damage every time the Vampire takes an action for the remainder of combat.  Wolf Companion damage does not trigger `Leeching Strikes`
+
+|Improved Mist Form
+|15
+|`Twice per Combat:` Mist Form can now be cast twice per combat.  The first cast works normally, the second cast `Escapes` the battle.
+
+|Improved Animal Companions
+|20
+|`Once per Combat: `Summoning a Wolf or Bat Companion in Combat summons the other Companion as well (neither skill can be used again this combat.)  Both Companions now do 50% `attack_power` damage each turn.  
+
+| Skill Selection
+| `take_turn`
+| `Vampires` are intelligent enemies.  They will prioritize summoning their companions until both are present, and then will prefer `Icy Touch`.  `Vampires` will use `Mist Form` to avoid damage when under 30% `hit_points`.  `Vampires will use `Mist Form` to `Escape` combat when under 10% `hit_points`
+
+|===
+
+###### Vampire Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 75
+| 15
+| Health Points
+
+| Strength
+| 10
+| 2
+| Vampires have `attack_power` equal to their `Strength`
+
+| Agility
+| 15
+| 3
+| Vampires have `defense_power` equal to their `agility`
+
+| Intelligence
+| 16
+| 4
+| Several Vampire abilities have damage which scales with `Intelligence`
+
+|===
+
+###### Elder Vampire
+
+Beginning at level 20, *Vampires* have a 2% chance per level (40% at level 20, 100% at level 50) to be an *Elder Vampire*.  
+
+*Elder Vampires* have 2 additional `max_hit_points`, and 1 additional `intelligence` per level as compared to regular *Vampires*.  They have the following ability modifications:
+
+*Elder Vampires* drop 50% additional Gold and are worth 60% additional Experience as compared to regular *Vampires*
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Improved Leeching Strikes
+|20
+|`passive:` Elder Vampire's Heal for an additional 5% of the base damage of all damaging abilities they do.  This healing is calculated before any mitigation or armor is applied.
+
+|Animal Companions
+|20
+|`passive:` Elder Vampires begin combat with a Bat Companion summoned already.  They can summon an additional `Bat` and `Wolf` companion during combat the same way as other `Vampires`
+
+|===
+
+##### Banshee
+
+###### Banshee Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Attack
+|1
+|Banshee Attacks do `Ice` damage based on their `attack_power`
+
+|Incorporeal 
+|1
+|`passive:` Banshees have a 10% chance to reduce any incoming `Physical` damage to 0.  Banshees are immune to `Poison` damage.  
+
+|Anti-Magic Shield
+|3
+|`Once per 5 incoming damage events:` Banshee summons an Anti-Magic Shield which reduces the damage of the next 3 `Ice`, `Lightning`, or `Fire` incoming damage sources to 0.  Anti-Magic Shield cannot be cast again until the Banshee has processed 5 incoming damage events from the previous cast. 
+
+|Chilling Aura
+|5
+|`passive:` Every action a Banshee takes lowers their opponents in-combat `Ice` defensive modifier by 4.  Maximum 40.  
+
+|Blizzard
+|10
+|`Once per Combat:` Banshee summons a Blizzard which deals 10% intelligence based damage immediately and every time the Banshee takes an `Action` for the remainder of the encounter.
+
+|Improved Auras
+|15
+|`passive:` `Chilling Aura` now lowers opponent `Ice` defensive modifier by 5. Maximum 50.  Incorporeal now has a 15% chance to avoid `Physical` damage. 
+
+| Skill Selection
+| `take_turn`
+| `Banshees` are intelligent enemies.  They will prioritize casting `Blizzard` early in combat.  Banshees will prioritize casting `Anti-Magic Shield` as early as possible in combat (after summoning a blizzard), but will only recast `Anti-Magic Shield` if the opponent deals `Fire`, `Ice`, or `Lightning` damage.  Once the opponent deals damage of one of these types, the Banshee will cast `Anti-Magic Shield` whenever possible for the remainder for the encounter.
+|===
+
+###### Banshee Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 65
+| 15
+| Health Points
+
+| Strength
+| 0
+| 0
+| Banshees are incorporeal and don't have `Strength`
+
+| Agility
+| 15
+| 3
+| Banshees have `defense_power` equal to their `agility`
+
+| Intelligence
+| 16
+| 4
+| Banshee abilities have damage which scales with `Intelligence`, Banshees have `attack_power` equal to their `intelligence`
+
+|===
+---
+
+#### Golem
+
+image::Golem.jpg[role=right, width=450]
+
+---
+
+##### Golem Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Attack
+|1
+|Golem attacks deal `Physical` damage with a base of their `attack_power`
+
+|Construct
+|1
+|`passive:` Golems are immune to `Poison` damage
+
+|Sum of their parts
+|1
+|`passive:`  A golems `attack_power` and `defense_power` are reduced 15% each time they lose 25% of their `max_hit_points`.  (15 at 75% health, 30 at 50% health, 45 at 25% health)
+
+|Damage/Variance
+|Physical, various
+|Golems deal `Physical` with their `Attacks` and Special Abilities - some Golem special abilities do additional damage types.  Golem damage is very consistent, deal normally distributed damage with a mean of the base damage and a standard deviation of 3% of the base damage.
+
+| Skill Selection
+| `take_turn`
+| Golems return a random action from their available actions each turn.  
+
+|===
+
+##### Golem Stat Growth
+
+[cols="15%,15%,10%,60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Intelligence
+| 0
+| 0
+| Golems are animated objects and have no `Intelligence`
+
+| None (Special)
+| 0
+| 0
+| Golems have no Special Stat
+
+| Experience
+| 10
+| 20
+| Golems are worth are average amount of experience`
+
+| Gold
+| 6
+| 6
+| Golems are worth slightly more gold than other `Monsters`
+
+|===
+
+The realm of Dungeon Dudes has 3 types of **Golems**: **Stone**, **Treasure**, and **Metallic**
+
+##### Stone Golem
+
+Stone Golems have a 75% chance of being *Granite* golems, and a 25% chance of being *Obsidian* golems.
+
+###### Stone Golem Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Grounded
+|1
+|`passive:` Stone Golems are Immune to `Lightning` damage
+
+|Ignore Pain
+|1, 11, 21, 31,41
+|`passive:` Stone Golems Ignore 2 damage from every incoming damage event.  This increases by 2 every 10 levels (11, 21, etc.)
+
+|Absorb Heat
+|10
+|`passive:` Whenever Stone Golems take `Fire` damage, they improve their `Physical` damage offensive modifier by 10 for the remainder of the encounter. (Max 50)
+
+|===
+
+###### Stone Golem Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 75
+| 17
+| Health Points
+
+| Strength
+| 18
+| 4
+| Golem Strength translates to `attack_power` at a rate of 1 `Strength` = 1 `attack_power`
+
+| Agility
+| 10
+| 2
+| Stone Golems are slow, but they make the most of it.  Agility grants Stone Golems `defense_power` at a rate of 1 `Agility` = 2 `defense_power`
+
+|===
+
+###### Granite Golem
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Splinter
+|5
+|`passive:` Whenever `Sum of their parts` triggers, `Granite Golems` splinter into a `Lesser Granite Golem`.  The `Lesser Granite Golem` `Attacks` each time the Granite Golem takes an `Action`, dealing 33% `attack_power` based damage.   
+
+|Exploding Shards
+|10
+|`passive:` When preforming their first `Attack` after summoning a `Splinter`, `Stone Golems` throw off shards of rock, dealing an additional 100% `attack_power` based `Physical` damage.  If `Absorb Heat` has triggered this encounter, the `Exploding Shards` also explode for 50% `attack_power` based `Fire` damage.
+
+|Lightning Rod
+|15
+|`Once per Combat:` The `Granite Golem` grounds itself.  Calling for a `Lightning Bolt` every time they take an action for the remainder of combat.  `Lightning Bolts` deal 40% `attack_power` based `Lightning` damage.
+|===
+
+###### Obsidian Golem
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Harden
+|3
+|`passive:` Whenever an Obsidian Golem takes an `Action` - Their defensive `Physical` modifier is improved by 5 for the remainder of the encounter (max 40).  Taking `Fire` damage resets the modifier change from `Harden` to zero.
+
+|Improved Absorb Heat
+|10
+|`passive:` `Absorb Heats` maximum modifier is capped at 70.  Whenever `Absorb Heat` triggers, the `Obsidian Golems` `defense_power` is reduced by 5% and `attack_power` is increased by 10% for the remainder of the battle.  (max -50/+100).  The next action after `Absorb Heat` triggers will do an additional 30% `attack_power` based `Fire` damage.   
+
+|Thermal Core
+|15
+|`Once per Combat:` The `Obsidian Golem` ignites itself.  The Golem adds 50% level based fire damage to every `Action` it takes for the remainder of the battle.  Every incoming damage event to the Golem, causes the Golem to take 25% level based `Fire` damage for the remainder of the encounter.  This `Fire` damage triggers `Improved Absorb Heat`, `Absorb Heat`, and resets `Harden` 
+|===
+
+##### Treasure Golem
+
+###### Treasure Golem Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Molten Gold
+|1
+|`passive:` Whenever a `Treasure Golem` takes `Fire` damage, they lose 5% of their gold (max -50%) and their next `Attack` deals 50% `attack_power` additional `Fire` damage.  
+
+|Gem Rain
+|5
+|Treasure Golem summons a rain for razer sharp Gems.  The gems dealt 50% `attack_power` based `Physical` damage immediately and 20% `attack_power` `Physical` damage every time the Treasure Golem takes an action for the remainder of the encounter.  `Gem Rain` initial increases the `Treasure Golems` gold by 10% and every round the gems fall increases it's gold by an additional 4%. 
+
+|Gold to Iron
+|10
+|Treasure Golem improves its defensive modifiers vs `Physical`, `Fire`, `Ice`, and `Holy` damage by 15 for the remainder of combat.  Treasure Golem worsens its defensive modifier vs `Lightning` by 15 for the remainder of combat.  (max +45/-45).  This reduces the Treasure Golems gold by 15%.
+
+|===
+
+###### Treasure Golem Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 70
+| 15
+| Health Points
+
+| Strength
+| 18
+| 4
+| Golem Strength translates to `attack_power` at a rate of 1 `Strength` = 1 `attack_power`
+
+| Agility
+| 8
+| 2
+| Treasure Golems are slow, but they make the most of it.  Agility grants Stone Golems `defense_power` at a rate of 1 `Agility` = 2 `defense_power`
+
+| Gold
+| 20
+| 20
+| Treasure Golems are worth significantly more gold than other `Monsters`
+
+| Experience
+| 5
+| 10
+| Treasure Golems are worth very little experience. 
+
+|===
+
+##### Metallic Golem
+
+Metallic Golems between levels 1-10 are 75% *Iron Golems* and 25% *Chromatic Golems*
+
+Metallic Golems above level 10 are 55% *Iron Golems*, 25% *Chromatic Golems* and 20% *Mithril Golems*
+
+###### Metallic Golem Skills
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Defensive Modifiers
+|1
+|`passive:` `Metallic Golems` all take 50% more damage from `Lightning` damage and take `20%` less damage from `Physical` damage.  `Metallic Golem` subtypes all have their own expanded `Defensive Modifiers`
+
+|Greater then the Sum of their Parts
+|1
+|`passive:` `Sum of their Parts` still triggers, but has no effect on the `attack_power` and `defense_power` of Metallic Golems
+
+
+
+|===
+
+###### Metallic Golem Stat Growth
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 60
+| 13
+| Health Points
+
+| Strength
+| 18
+| 4
+| Golem Strength translates to `attack_power` at a rate of 1 `Strength` = 1 `attack_power`
+
+| Agility
+| 11
+| 2
+| Metallic Golems are slow, but they make the most of it.  Agility grants Stone Golems `defense_power` at a rate of 1 `Agility` = 2 `defense_power`
+
+|===
+
+###### Iron Golem
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Improved Defensive Modifiers
+|1
+|`passive:` `Iron Golems` take 30% reduced damage from `Ice`,`Fire`, and `Holy` damage
+
+|Razor Sharp Body
+|1
+|`passive:` Whenever an `Iron Golem` takes an `Action` which deals `Physical` damage, their next `Action` will do additional `Physical` damage equal to 25% of the damage deal.  (`Razor Sharp Body` damage does not trigger the effects of `Razor Sharp Body`)
+
+|Double Attack
+|1
+|Iron Golem quickly `Attacks` with both hands, dealing 75% `attack_power` based damage with each strike.
+
+|Spiked Body
+|10
+|`Once per Combat` `Iron Golem` creates Iron Spikes out of its body, every time the `Iron Golem` takes `Physical` the its next Action will deal 25% attack_power based damage to the opponent.
+
+|===
+
+###### Chromatic Golem
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Improved Defensive Modifiers
+|1
+|`passive:` Chromatic Golem are always immune to the last type of damage they took from: `Lightning`, `Fire`, `Ice`, `Holy` damage.  (If a Chromatic Golem takes `Fire` damage, it is immune to `Fire` damage until it takes `Lightning`, `Ice`, or `Holy` damage.)  While immune to one of these damage types, every `Action` the Golem takes deals an additional 33% `attack_power` damage of that damage type. 
+
+|Elemental Discharge
+|1
+|`passive:` Whenever damage to the Chromatic Golem triggers `Sum of their parts` the Chromatic Golem discharges elemental energy.  Causing it to randomly take 1 `Lightning`, `Fire`, `Ice`, or `Holy` damage.  This triggers `Improved Defensive Modifiers`
+
+|Explode
+|10
+|`Once per Combat` When `Sum of their parts` triggers at 50% or 25% `max_hit_points`, `Chromatic Golems` have a 50% chance to `Explode` as their next `Action`.  `Explode` reduces the `Chromatic Golem` to 1 hit_point, deals 1.5x `attack_power` based `Physical` damage, and `attack_power` based damage of the current `Improved Defensive Modifiers` immunity damage type.  On their next `Action`, if the Golem is still alive, it takes no action and is defeated.  
+
+|===
+
+###### Mithril Golem
+
+[cols="15%,15%, 70%"]
+|===
+|Skill |Level |Description
+
+|Invulnerable
+|1
+|`passive:` Mithril Golems have a 50% chance to avoid any incoming damage event.  All damage dealt to a Mithril Golem is reduced to 1.  Whenever a Mithril Golem takes damage, they become immune to all damage until their next `Action`
+
+|Run Away
+|1
+|`Mithril Golem` Escapes the Encounter.
+
+| Skill Selection
+| `take_turn`
+| `Mithril Golems` can `Run Away` or `Attack`, they have a 25% chance to `Run Away` each turn. This is increased to 75% when they are reduced to 1 hit_point.
+
+|===
+
+[cols="15%,15%, 10%, 60%"]
+|===
+|Stat |Initial |Per Level | Description
+
+| Hit Points
+| 3
+| 0
+| Mithril Golems have 3 max_hit_points
+
+| Strength
+| 15
+| 3
+| Mithril Golem Strength translates to `attack_power` at a rate of 1 `Strength` = 1 `attack_power`
+
+| Agility
+| 100
+| 0
+| Mithril Golems gain 2 `defense_power` for every 1 `Agility`
+
+| Gold
+| 0
+| 0
+| Mithril Golems are not worth any Gold
+
+| Experience
+| 100
+| 25
+| Mithril Golems are worth significantly more experience than other `Monsters`
+
+|===
+
+
+
+
+
+

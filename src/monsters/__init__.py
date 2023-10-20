@@ -1,0 +1,1 @@
+from .monsters_abc import Monster

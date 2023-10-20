@@ -1,0 +1,128 @@
+= 170D Module O Practical 1B
+
+== Dungeon Dudes
+
+
+In Pylandia's quaint village of Codeville, tales of brave knights and fearsome monsters are whispered in hushed tones around crackling campfires. Recently, the villagers have taken to a new form of entertainment - a text-based RPG called "Dungeon Dudes". Yet, as the game gained popularity, they realized something was amiss. The game lacked depth in its characters and monsters, and the villagers were yearning for more.
+
+Enter the budding programmers of Codeville Academy! They've been tasked with breathing life into the game. 
+
+* Each student will design their own '**Character**' or '**Monster**' module
+** ensuring that their creation fits seamlessly into the existing world of "Dungeon Dudes". 
+* Along the way, they will sharpen their skills in **Object-Oriented Programming**, 
+* learn to **integrate their work into an established codebase**
+* and master the art of **git collaboration**.
+
+The villagers of Codeville have high hopes. Now, they eagerly await the adventures that the new "Dungeon Dudes" will bring. Just remember, young coders, in Codeville, it's not just about writing code - it's about creating legends! So, gear up and dive into the dungeons. The world of "Dungeon Dudes" awaits your magic touch!
+
+
+<<<
+== DIcE Rubric
+
+[cols="3,3,9,1,1"]
+|===
+.17+^.^| *Document*
+.3+| Design Plan      | Does the design plan provide a clear general overview of the module? | 2%|
+| Is the design plan easy to understand? | 1%|
+| Does the design plan include supporting diagrams | 1%|
+
+.3+| Test Plan        | Are test cases detailed enough to repeat easily? | 2%|
+| Are expected results stated clearly? | 1%|
+| Are requirements adequately covered by test cases? | 1%|
+
+.2+| Project Writeup  | Does the writeup document challenges and successes encountered? | 2%|
+| Does the writeup document any lessons learned? | 1%|
+
+.2+| Writing          | Is the project free of grammatical and spelling errors? | 2%|
+| Is non-code formatting consistent? | 1%|
+
+.5+| Code Formatting  | Does `pycodestyle` produce no warnings or errors? | 2%|
+| Does `pylint` flag any problems with code formatting | 3%|
+| Are appropriate names chosen to enable code readability? | 1%|
+| Are comments added where appropriate and aid understanding of the logic? | 1%|
+| Is any outside code cited appropriately? | 1%|
+
+.2+| *Total*          |  | *20%* |
+|===
+
+[cols="3,3,9,1,1"]
+|===
+.13+^.^| *Implement*
+.3+<| Version Control  <| Does the project have the correct name and default branch? >| 1%|
+                       <| Were commits broken down into appropriate scopes? >| 2%|
+                       <| Are commit messages simple and informative? >| 1%|
+.4+<| Architecture     <| Are effective and efficient data structures used? >| 3%|
+                       <| Are Object Oriented Principles Correctly Applied >| 5% |
+                       <| Was the code designed and constructed in a modular fashion? >| 3%|
+                       <| Were generally sound decisions made with regard to architecture? >| 5%|
+.2+<| Lynting          <| Does the project appropriate use type-hinting? >| 3% |
+                       <| Does the project pass `mypy` type checking with no warnings? >| 2%|
+.2+<| Testing		   <| Does the program include robust unit tests? >| 4%|
+                       <| Do all automated tests pass? >| 1%|
+ 2+<| *Total*          >| *30%* |
+|===
+
+[cols="3,3,9,1,1"]
+|===
+.9+^.^| *Execute*
+.1+<| Safety           <| Does the program avoid crashing or infinite loops, even on invalid input? >| 5%|
+.1+<| Parsing          <| Does the program pass `python3 compileall .` with no warnings? >| 2%|
+.2+<| Requirements     <| Were all inputs parsed correctly and yield the correct output? >| 3%|
+                       <| Are all other requirements met? >| 17%|
+.2+<| Performance      <| Does the program scale appropriately with input and data? >| 5%|
+                       <| Does the program execute in a timely manner? >| 5% |
+.1+<| Discrentionary   <| Grader Evaluation of General Project Quality in areas not explicitly covered in the Rubric >| 10%|
+ 2+<| *Total*          >| *50%* | |
+|===
+
+**Total:**
+
+<<<
+== Requirements
+
+[cols="1,6, 1"]
+|===
+^| Area      ^| Requirement | Met 
+
+| Document  | All documentation must be in PDF format unless otherwise specified.|
+| Document  | All documentation must be located in a `<student>_doc/` folder at the top level of the project.|
+| Document  | The design document must be located in `design.pdf`|
+| Document  | The test plan must be located in `testplan.pdf`|
+| Document  | The project writeup must be located in `writeup.pdf`|
+| Document  | All code must conform to PEP8 guidelines.
+`pycodestyle` and `pylint` must report no warnings or errors.|
+
+| Implement | Project must be stored appropriate collaborative git for the project.  In the directory corresponding to the module name.|
+| Implement | No third-party header files/libraries may be used unless signed off by the Program Manager or Instructor.|
+| Implement | Project must use appropriate data types or structures.|
+| Implement | All automated tests and test code must be located in a `<student>_test/` folder at the top level.|
+| Implement | Project must provide appropriate automated unit tests for your module.  This includes, verification of skill development on level up, verification of correct processing of damage events, verification that CombatActions are being produced with appropriate values based on the skill/attack math requirements. |
+| Implement | Project must make a reasonable attempt to employ type hinting |
+| Implement | Project must pass `mypy` type checking with no warnings or errors. |
+
+| Implement | `CombatPrint` must be utilized to display an appropriate message for every combat `Action` preformed | 
+| Implement | 'LimitedDict' datatype must be used when appropriate. |
+
+| Execute   | Project must have the module in the correct location with the correct name within the project repository to be automatically detected and loaded by the project. |
+
+| Execute   | Module must be detected by the game and loaded into the game seamlessly at runtime. | 
+| Execute   | Character modules must correctly generate equipment of the appropriate stats and add to the shop |
+| Execute   | Character modules must correct equip equipment and adjust stats accordingly |
+| Execute   | Character sheet formatting must be Correct for Character modules |
+| Execute   | Monster modules must correctly implement logic for determining turn attacks.|
+| Execute   | Monster modules must correctly implement logic for determining monster subtypes and variation. |
+| Execute   | All combat math must be calculated correctly. |
+| Execute   | All CombatActions must be correctly constructed and passed to the encounter |
+| Execute   | CombatPrint must by appropriate utilized to display combat message and information. | 
+|===
+
+== Suggested Extra Credit Features
+
+[cols="3,12,2"]
+|===
+^| Area ^| Feature ^| +
+
+| Documentation | Create design diagrams (UML or Flow Diagrams) for the complete game >| +2-3
+| Documentation | Include a "recommendations.pdf" in your documents which outlines better class construction to reduce coding redundancy which is required when creating the `Character` and `Monster` modules. >| +2
+| Implementation | Construct unittests for larger sections of the code base and include them in your test plan >| +1-4
+|===
