@@ -2060,6 +2060,13 @@ Beginning at level 20, *Vampires* have a 2% chance per level (40% at level 20, 1
 
 image::Golem.jpg[role=right, width=450]
 
+Within the heart of the Digital Kingdom, where earth and metal intertwine, the *Golems* rise. Crafted by ancient hands and imbued with the essence of the materials they are forged from, these titanic sentinels are the embodiment of raw power and the world’s elemental spirit.
+
+* *Treasure Golems* - Gleaming constructs made from the rarest of gems and precious stones. These luminous beings not only serve as guardians of hidden riches but are treasures themselves. But beware, for their alluring sparkle often hides traps and tricks, tempting adventurers into their grasp.
+
+* *Stone Golems* - Carved from the very bedrock of the Digital Kingdom, these behemoths echo the ageless endurance of the mountains. Immovable and unyielding, they stand as both protector and obstacle, challenging those who dare to tread on their sacred ground.
+
+* *Metallic Golems* - Forged in the blazing heart of ancient foundries, these metallic giants are a testament to craftsmanship and elemental metal's power. Among them, the elusive *Mithril Golem* is renowned; its silvery sheen darts through battlefields, a fleeting target that promises great reward to those skillful enough to overcome its evasive maneuvers.
 ---
 
 ##### Golem Skills

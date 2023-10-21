@@ -18,7 +18,7 @@ class Fighter(Character):
         self.damage_types = damage_types
 
         self.skills_dict : Dict[int, List[str, 'function']]= {
-            3 : ["Shield Slam", self.shield_slam],
+            3 : ["Whirlwind", self.whirlwind],
             10 : ["Fortify", self.fortify],
             13 : ["Weaken", self.weaken],
             17 : ["Strengthen", self.strengthen],
@@ -128,11 +128,11 @@ class Fighter(Character):
                          f"for <value> {self._weapon.damage_type} damage")
         return CombatAction([("Attack", damage, self._weapon.damage_type, message)], "")
 
-    def shield_slam(self) ->  [bool, CombatAction]:
-        '''Does Physical damage based on shield armor (x2) + 75% defense power'''
+    def whirlwind(self) ->  [bool, CombatAction]:
+        '''Does Physical damage based 75% attack_power to All enemies'''
         damage : int = (2* self._accessory.item_stats[1]) + int((0.75 * self._defense_power))
         damage : int = self.modify_damage(damage)
-        message : str = f"Bashes with {self.accessory} for <value> Physical damage"
+        message : str = f"{self.name} unleashing a whirlwind hitting all enemies for <value> Physical damage"
         return True, CombatAction([("Attack", damage, "Physical", message)], "")
 
     def fortify(self) ->  [bool, CombatAction]:

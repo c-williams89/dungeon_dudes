@@ -28,8 +28,8 @@ class ShopMenu(cmd.Cmd):
         super().__init__()
         self._session = adventure
         self._customer : Character = adventure.character
-        self._healing_potion_price : int = 7 + self._customer.level * 3
-        self._scroll_of_escape_price : int = 15 + self._customer.level * 5
+        self._healing_potion_price : int = 9 + self._customer.level
+        self._scroll_of_escape_price : int = 13 + self._customer.level * 2
         self._inventory = self._session.shop_inventory
         self._weapon_purchased = False
         self._armor_purchased = False
