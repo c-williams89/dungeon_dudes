@@ -166,7 +166,7 @@ With skills like **Fortify**, they can reduce incoming damage, standing firm ami
 
 | Accessory
 | Shield
-| The Fighter `Accessory` is the shield.  Shields have `defense power` equal to approximately `0.5` times their level and `attack power` equal to approximately `0.1` times their level.  Shields have at least 2 defensive damage modifiers (sometimes 3) and occasionally have bonus `attack power` or `defense power`.  Shields with 2 defensive modifiers use the same modifier scaling as Armor. 
+| The Fighter `Accessory` is the shield.  Shields have `defense power` equal to approximately `0.5 * level +10` and `attack power` equal to approximately `0.5 * level + 5`.  Shields have at least 2 defensive damage modifiers (sometimes 3) and occasionally have bonus `attack power` or `defense power`.  Shields with 2 defensive modifiers use the same modifier scaling as Armor. 
 |===
 
 ---
@@ -299,7 +299,7 @@ Using quick relaxes and **Evasion** Rogues can avoid even the hardest hitting at
 
 | Accessory
 | Thieves Tools
-| The Rogues `Accessory` are Thieves Tools.  Thieves Tools have `attack power` equal to approximately `75%` of their level and defensive modifiers to 2 damage types.  Thieves Tools use the same defensive modifier scaling as Armor.  Thieves Tools sometimes have additional `Physical` or `Poison` damage modifiers equal to approximately 30% of their level or a defensive modifier for `Physical` Damage equal to approximately their `half their level + 10`.  
+| The Rogues `Accessory` are Thieves Tools.  Thieves Tools have `attack power` equal to approximately `0.75 * level + 10` of their level and defensive modifiers to 2 damage types.  Thieves Tools use the same defensive modifier scaling as Armor.  Thieves Tools sometimes have additional `Physical` or `Poison` damage modifiers equal to approximately 30% of their level or a defensive modifier for `Physical` Damage equal to approximately their `half their level + 10`.  
 |===
 
 ---
@@ -445,7 +445,7 @@ Wizards have the innate capability to harness the raw energies around them, conv
 
 | Accessory
 | Arcane Orb
-| The Wizard `Accessory` are Arcane Orbs.  Arcane Orbs have offensive modifiers to 1 Elemental damage type `Fire`, `Ice`, `Lightning`, equal to approximately their level and defensive modifiers to 2 damage types.  Defensive modifiers have approximately `20+(level *2)` modification value across both stats.  Arcane Orbs sometimes have additional bonuses to their offensive or defensive modifiers equal to approximately 25% of their level. 
+| The Wizard `Accessory` are Arcane Orbs.  Arcane Orbs have offensive modifiers to 1 Elemental damage type `Fire`, `Ice`, `Lightning`, equal to approximately their level + 20 and defensive modifiers to 3 damage types.  Defensive modifiers have approximately `30+(level *3)` modification value across both stats.  Arcane Orbs sometimes have additional bonuses to their offensive or defensive modifiers equal to approximately 25% of their level. 
 |===
 
 ---
@@ -591,7 +591,7 @@ Grounded in both the spiritual and martial, Clerics are a beacon of hope, always
 
 | Accessory
 | Holy Symbol
-| The Cleric `Accessory` is Holy Symbols.  Holy Symbols have offensive modifiers to `Holy` damage equal to approximately their level.  Holy symbols have defensive modifiers to `Physical`, `Holy`, and `Poison` damage, with a total of approximately `25+(level*2.5)` modification value across all 3 modifiers.  Holy Symbols sometimes have additional bonuses to their offensive modifiers qual to approximately 25% of their level or a defensive modifier to an Elemental damage type (`Fire`, `Ice`, `Lightning`) for approximately 10 + level. 
+| The Cleric `Accessory` is Holy Symbols.  Holy Symbols have offensive modifiers to `Holy` damage equal to approximately their level + 5.  Holy symbols have defensive modifiers to `Physical`, `Holy`, and `Poison` damage, with a total of approximately `25+(level*2.5)` modification value across all 3 modifiers.  Holy Symbols sometimes have additional bonuses to their offensive modifiers qual to approximately 25% of their level or a defensive modifier to an Elemental damage type (`Fire`, `Ice`, `Lightning`) for approximately 10 + level. 
 |===
 
 ---
@@ -721,11 +721,11 @@ A Ranger is never alone; their bond with the animal kingdom ensures they are alw
 
 | Armor
 | Light
-| Ranger Armors have `defense power` equal to approximately their `0.65` times their level `+10`.  They have defensive modifiers to at least 1 Elemental Damage type (`Fire`, `Ice`, `Lightning`) and 1 other `non-Physical` damage type.  They have a chance to have additional bonus `defense power` or `attack power` of approximately half their level.  Armor defensive modifiers have `20 + (level *2)` modification value across both stats. 
+| Ranger Armors have `defense power` equal to approximately their `0.65` times their level `+10`.  They have defensive modifiers to at least 1 Elemental Damage type (`Fire`, `Ice`, `Lightning`), 1 other `non-Physical` damage type (`Poison` or `Holy`), and 1 random defensive modifier of any type.  They have a chance to have additional bonus `defense power` or `attack power` of approximately their level.  Armor defensive modifiers have `30 + (level *3)` modification value across both stats. 
 
 | Accessory
 | Quiver
-| The Ranger `Accessory` is the Quiver.  Quivers have an Elemental Damage type (`Ice`, `Fire`, `Lightning`) which adds `25% attack_power` based damage of that type to every `Attack` the Ranger does.  This damage is not adjusted by `Awareness` or any other focus consuming effects. Quivers sometimes have additional bonuses to `attack_power` or `defense_power` equal to approximately half their level. 
+| The Ranger `Accessory` is the Quiver.  Quivers have an Elemental Damage type (`Ice`, `Fire`, `Lightning`) which adds `33% attack_power` based damage of that type to every `Attack` the Ranger does.  This damage is not adjusted by `Awareness` or any other focus consuming effects.  This damage bonus does not apply to damage dealt by animal companions or traps. Quivers sometimes have additional bonuses to `attack_power` or `defense_power` equal to approximately half their level. 
 |===
 
 ---
