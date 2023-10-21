@@ -115,16 +115,16 @@ class FighterEquipmentGenerator:
         '''
         Generates an Armor Object Appropriate for a Fighter based on their level
         '''
-        accessory_base_cost : int = level * 3
+        accessory_base_cost : int = level * 2
         accessory_type : str = "Shield"
         accessory_name : str = accessory_type
 
-        armor_average : int = ceil(0.5 * level)
+        armor_average : int = ceil(0.5 * level) + 10
         armor, armor_cost_mod = self.generate_value_mod(armor_average,
                                                         armor_average/2.5)
         armor : int = max(0, ceil(armor))
 
-        attack_average : int = ceil(0.1 * level)
+        attack_average : int = ceil(0.5 * level) + 5
         attack, attack_cost_mod = self.generate_value_mod(attack_average,
                                                     ceil(attack_average/2.5))
         attack = max(0, attack)
