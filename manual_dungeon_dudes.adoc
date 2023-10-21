@@ -1645,7 +1645,7 @@ When under 50% `hit_points`, Ogres have a 75% chance to use their `healing_potio
 
 | Hit Points
 | 90
-| 25
+| 22
 | Health Points
 
 | Intelligence
@@ -1683,7 +1683,7 @@ When under 50% `hit_points`, Ogres have a 75% chance to use their `healing_potio
 
 | Hit Points
 | 75
-| 16
+| 12
 | Health Points
 
 | Intelligence
@@ -2040,7 +2040,7 @@ Beginning at level 20, *Vampires* have a 2% chance per level (40% at level 20, 1
 
 | Hit Points
 | 65
-| 15
+| 13
 | Health Points
 
 | Strength

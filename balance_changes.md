@@ -46,3 +46,12 @@ _Wizard balance changes to address the reality they often times find it impossib
 
 `Monster` Non-Physical Damage decreased approximately 20-30% across the board.  This is reflected in the `manual_dungeon_dudes.adoc` and in the `Beast` Monster type in the code base.  
 
+# Summary of Changes 21 October 2023
+
+## Manual
+
+### Hit Point Growth Adjustments
+
+* Hit Point growth for both Ogre types has been lowered (initial `hit_points` unchanged)
+* Hit Point growth for Banshees has been lowered (initial `hit_points` unchanged)
+
