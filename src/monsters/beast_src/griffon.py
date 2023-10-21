@@ -52,7 +52,7 @@ class Griffon(Beast):
         self._special_count += 1
         msg : str = ("Anointed Griffon performs a hymn, increasing its defenses "
             "and pulses for <value> holy damage")
-        damage : int = self.beast_damage(self.modify_damage(self.hit_points//3))
+        damage : int = self.beast_damage(self.modify_damage(self.hit_points//5))
         if self._special_count > 2:
             return CombatAction([("Attack", damage, "Holy", msg)], "")
         return CombatAction([("Attack", damage, "Holy", msg), ("Aura", 10, "Holy", "")
@@ -66,7 +66,7 @@ class Griffon(Beast):
         self.hit_points += self.intelligence
         msg : str = ("Sunfire Griffon cauterizes its wounds and then bursts for "
                    "<value> fire damage")
-        damage : int = self.beast_damage(self.modify_damage(self.hit_points//3))
+        damage : int = self.beast_damage(self.modify_damage(self.hit_points//5))
         return CombatAction([("Attack", damage, "Fire", msg)], "")
 
     def special_skill(self) -> CombatAction:

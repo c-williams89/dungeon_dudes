@@ -114,9 +114,11 @@ class Fighter(Character):
         std_dev_percent : int = 0.08
         modified : int = max(floor(gauss(damage, (std_dev_percent * damage))), 1)
         if auto_crit:
+            self.printer("Critical Hit!")
             return modified * self._critical_modifier
         elif self._critical_modifier != 1:
             if randint(1,10) == 10:
+                self.printer("Critical Hit!")
                 return modified * self._critical_modifier
 
         return modified

@@ -24,6 +24,9 @@ Number of battles before automatically returning to town reduced from 5 to 4.
 
 * Shield Slam Removed
 * **New Skill:** Whirlwind, level 3 - deals damage based on 75% `attack_power` to all enemies. 
+* Added Combat Print message for Critical Hits
 
+## Monster Changes:
 
+`Monster` Non-Physical Damage decreased approximately 20-30% across the board.  This is reflected in the `manual_dungeon_dudes.adoc` and in the `Beast` Monster type in the code base.  
 
