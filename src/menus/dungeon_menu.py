@@ -15,7 +15,7 @@ class DungeonMenu(cmd.Cmd):
         self._character : Character = adventure.character
         self._session = adventure
         self._encounter_count = 0
-        self._amount_before_town = 4
+        self._amount_before_town = 5
 
     def loop_back(self):
         '''Loops User Back to Menu after Pressing Enter'''

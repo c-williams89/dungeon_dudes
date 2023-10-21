@@ -67,3 +67,11 @@ Fixed bug where damage could be negative in the face of sufficient defense power
 
 Fixed bug where Monsters were surprise attacking in combat when player won the initiative roll.  
 
+## Reverted Changes:
+
+## Dungeon Crawl Changes:
+
+Number of battles before automatically returning to town reduced from 5 to 4.
+
+Now reverted back to 5.
+

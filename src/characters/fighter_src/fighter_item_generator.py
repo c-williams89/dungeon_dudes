@@ -119,12 +119,12 @@ class FighterEquipmentGenerator:
         accessory_type : str = "Shield"
         accessory_name : str = accessory_type
 
-        armor_average : int = ceil(0.5 * level) + 10
+        armor_average : int = ceil(0.5 * level) + 3
         armor, armor_cost_mod = self.generate_value_mod(armor_average,
                                                         armor_average/2.5)
         armor : int = max(0, ceil(armor))
 
-        attack_average : int = ceil(0.5 * level) + 5
+        attack_average : int = ceil(0.5 * level) + 3
         attack, attack_cost_mod = self.generate_value_mod(attack_average,
                                                     ceil(attack_average/2.5))
         attack = max(0, attack)
