@@ -1,6 +1,6 @@
 '''Module for Dungeon Dudes Town Menu'''
 import cmd
-from ..menu_helpers import banner, clear, format_line
+from ..menu_helpers import banner, clear, line_brackets, format_line
 from ..encounter import Encounter
 from ..characters import Character
 from .encounter_menu import EncounterMenu
@@ -41,10 +41,10 @@ class DungeonMenu(cmd.Cmd):
         clear()
         print(banner())
         print(format_line)
-        print(f"{'| Welcome to Adventure '+ name +' - Prepare for Your Adventure Here':90}{'|':>}")
+        print(line_brackets(f"Welcome to Town {name} - Prepare for Your Adventure Here"))
         print(format_line)
-        print(f"{'| Start     - Begin your Dungeon Crawl, Gain xp/Gold':90}{'|':>}")
-        print(f"{'| Back      - Return to Town':90}{'|':1>}")
+        print(line_brackets("Start     - Begin your Dungeon Crawl, Gain xp/Gold"))
+        print(line_brackets("Back      - Return to Town"))
         print(format_line)
 
     def do_start(self, arg): # pylint: disable=unused-argument

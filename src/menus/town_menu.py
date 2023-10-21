@@ -1,6 +1,6 @@
 '''Module for Dungeon Dudes Town Menu'''
 import cmd
-from ..menu_helpers import banner, clear, format_line
+from ..menu_helpers import banner, clear, line_brackets, format_line
 from .save_menu import SaveMenu
 from .shop_menu import ShopMenu, check_cost, confirm_purchase
 from .dungeon_menu import DungeonMenu
@@ -36,14 +36,14 @@ class TownMenu(cmd.Cmd):
         clear()
         print(banner())
         print(format_line)
-        print(f"{'| Welcome to Town '+ name +' - Prepare for Your Adventure Here':90}{'|':>}")
+        print(line_brackets(f"Welcome to Town {name} - Prepare for Your Adventure Here"))
         print(format_line)
-        print(f"{'| Adventure - Explore the Dungeon, Fight Monsters, Gain xp/Gold':90}{'|':>}")
-        print(f"{'| Shop      - Visit the Shop':90}{'|':>}")
-        print(f"{'| Heal      - Restore HP and Class Resources - (3 Gold plus 2/Level)':90}{'|':>}")
-        print(f"{'| Character - View Character Sheet':90}{'|':1>}")
-        print(f"{'| Save      - Save Your Game':90}{'|':1>}")
-        print(f"{'| Back      - Return to New Game Menu':90}{'|':1>}")
+        print(line_brackets("Adventure - Explore the Dungeon, Fight Monsters, Gain xp/Gold"))
+        print(line_brackets("Shop      - Visit the Shop"))
+        print(line_brackets("Heal      - Restore HP and Class Resources - (3 Gold plus 2/Level)"))
+        print(line_brackets("Character - View Character Sheet"))
+        print(line_brackets("Save      - Save Your Game"))
+        print(line_brackets("Back      - Return to New Game Menu"))
         print(format_line)
 
     def do_adventure(self, arg): # pylint: disable=unused-argument
