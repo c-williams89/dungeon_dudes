@@ -26,6 +26,14 @@ Number of battles before automatically returning to town reduced from 5 to 4.
 * **New Skill:** Whirlwind, level 3 - deals damage based on 75% `attack_power` to all enemies. 
 * Added Combat Print message for Critical Hits
 
+### Wizard:
+
+* `Magic` armor now offers a `Physical` damage reduction when above 50% `max_mana`
+* Wizard `hit_point` growth is now 12 per turn (up from 10)
+* **New Skill:** Blink, level 2 - Wizard Escapes to town
+
+_Wizard balance changes to address the reality they often times find it impossible to get pass level 1-2.  Early Wizard leveling should be very challenging still,but hopefully should not feel impossible_
+
 ## Monster Changes:
 
 `Monster` Non-Physical Damage decreased approximately 20-30% across the board.  This is reflected in the `manual_dungeon_dudes.adoc` and in the `Beast` Monster type in the code base.  

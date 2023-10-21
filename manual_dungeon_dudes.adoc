@@ -332,12 +332,17 @@ Wizards have the innate capability to harness the raw energies around them, conv
 |Magic Armor
 |1
 |
-|`passive`: Wizards defensive modifier against all non-Physical damage is improved by their `intelligence / 5` - rounded up. Wizards take 30% less damage from the first source of `Physical` damage each combat.  Wizard defense power mitigates `Ice`, `Fire`, and `Lightning` damage in addition to `Physical` damage.  
+|`passive`: Wizards defensive modifier against all non-Physical damage is improved by their `intelligence / 5` - rounded up. Wizards take 30% less damage from the first source of `Physical` damage each combat. Wizards take 15% less damage from `Physical` damage sources when over 50% mana. Wizard defense power mitigates `Ice`, `Fire`, and `Lightning` damage in addition to `Physical` damage.  
 
 |Fireball
 |1
 |20
-|The Wizard launches a fireball at their enemy dealing `Fire` damage based on `Intelligence x 3`.  The Wizard burns the enemy for additional damage based on their `Intelligence x1` the following round 
+|The Wizard launches a fireball at their enemy dealing `Fire` damage based on `Intelligence x 3`.  The Wizard burns the enemy for additional damage based on their `Intelligence x1` the following round
+
+|Blink
+|2
+|30
+|The Wizard `Escapes` the Battle and returns to town
 
 |Blizzard
 |3
@@ -393,7 +398,7 @@ Wizards have the innate capability to harness the raw energies around them, conv
 
 | Hit Points
 | 60
-| 10
+| 12
 | Health Points
 
 | Strength
