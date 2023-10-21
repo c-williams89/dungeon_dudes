@@ -820,7 +820,7 @@ The realm of Dungeon Dudes has 3 types of **Beasts**: **Drakes**, **Chimeras**, 
 
 |Breath
 |1
-|Drakes breath dealing 50% their current HP + intelligence damage of their drake's damage type
+|Drakes breath dealing 30% their current HP + intelligence damage of their drake's damage type
 
 | Skill Selection
 | `take_turn`
@@ -1043,7 +1043,7 @@ The realm of Dungeon Dudes has 3 types of **Beasts**: **Drakes**, **Chimeras**, 
 
 |Cauterizing Burst
 |1
-|Sunfire Griffon deals damage from its damage type at a base of 1/3 current `hit_points` and heals for `hit_points` equal to its `intelligence`
+|Sunfire Griffon deals damage from its damage type at a base of 1/5 current `hit_points` and heals for `hit_points` equal to its `intelligence`
 
 |===
 
@@ -1059,7 +1059,7 @@ The realm of Dungeon Dudes has 3 types of **Beasts**: **Drakes**, **Chimeras**, 
 
 |Hymn
 |1
-|Anointed Griffon deals damage from its damage type at a base of 1/3 current `hit_points` and increases its defensive mod vs `Physical` and `Holy` by 10 for the rest of the battle.
+|Anointed Griffon deals damage from its damage type at a base of 1/5 current `hit_points` and increases its defensive mod vs `Physical` and `Holy` by 10 for the rest of the battle.
 
 |===
 ---
@@ -1183,7 +1183,7 @@ The realm of Dungeon Dudes has 3 types of **Elementals**: **Fire**, **Frost**, a
 | Elementals have `defense_power` equal to their `agility`
 
 | Intelligence
-| 8
+| 5
 | 1
 | Elementals have `attack_power` equal to their `Strength + Intelligence`
 
@@ -1238,11 +1238,11 @@ Fire Elementals between level 11-19 which fail this chance are `Fire Elementals`
 
 | Hit Points
 | 75
-| 20
+| 18
 | Health Points
 
 | Intelligence
-| 15
+| 10
 | 1
 | Elementals have `attack_power` equal to their `Strength + Intelligence`
 
@@ -1308,17 +1308,17 @@ Fire Elementals above level 25 have a 1% chance per level to be a `Fire Elementa
 | Health Points
 
 | Strength
-| 15
+| 5
 | 1
 | Elementals have `attack_power` equal to their `Strength + Intelligence`
 
 | Agility
 | 12
-| 5
+| 4
 | Elementals have `defense_power` equal to their `agility`
 
 | Intelligence
-| 8
+| 10
 | 2
 | Elementals have `attack_power` equal to their `Strength + Intelligence`
 
@@ -1381,7 +1381,7 @@ Frost Elementals above level 25% have a 1% chance per level to be a `Frost Eleme
 | Health Points
 
 | Strength
-| 8
+| 5
 | 1
 | Elementals have `attack_power` equal to their `Strength + Intelligence`
 
@@ -1391,7 +1391,7 @@ Frost Elementals above level 25% have a 1% chance per level to be a `Frost Eleme
 | Elementals have `defense_power` equal to their `agility`
 
 | Intelligence
-| 15
+| 10
 | 2
 | Elementals have `attack_power` equal to their `Strength + Intelligence`
 

@@ -92,7 +92,7 @@ class Drake(Beast):
         message : str = (f"{self.name} breathes {self._damage_type}"
                          f" for <value> {self._damage_type} damage")
         damage : int = self.beast_damage(self.modify_damage(
-            self.hit_points // 2 + self.intelligence))
+            int(self.hit_points * 0.3)  + self.intelligence))
         return CombatAction([("Attack", damage, self._damage_type, message)],"")
 
     def take_turn(self) -> CombatAction:
