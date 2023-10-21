@@ -40,7 +40,7 @@ class TownMenu(cmd.Cmd):
         print(format_line)
         print(f"{'| Adventure - Explore the Dungeon, Fight Monsters, Gain xp/Gold':90}{'|':>}")
         print(f"{'| Shop      - Visit the Shop':90}{'|':>}")
-        print(f"{'| Heal      - Restore HP and Class Resources - cost 5 Gold per level':90}{'|':>}")
+        print(f"{'| Heal      - Restore HP and Class Resources - (3 Gold plus 2/Level)':90}{'|':>}")
         print(f"{'| Character - View Character Sheet':90}{'|':1>}")
         print(f"{'| Save      - Save Your Game':90}{'|':1>}")
         print(f"{'| Back      - Return to New Game Menu':90}{'|':1>}")
@@ -59,7 +59,7 @@ class TownMenu(cmd.Cmd):
     def do_heal(self, arg): # pylint: disable=unused-argument
         '''Prompts user to heal in exchange for Gold'''
         character = self._session.character
-        price = 5 * character.level
+        price = 3 + character.level * 2
         if check_cost(character, price):
             if confirm_purchase("Full Heal", price):
                 character.gold -= price

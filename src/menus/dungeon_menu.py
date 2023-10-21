@@ -15,7 +15,7 @@ class DungeonMenu(cmd.Cmd):
         self._character : Character = adventure.character
         self._session = adventure
         self._encounter_count = 0
-        self._amount_before_town = 5
+        self._amount_before_town = 4
 
     def loop_back(self):
         '''Loops User Back to Menu after Pressing Enter'''
@@ -48,7 +48,7 @@ class DungeonMenu(cmd.Cmd):
         print(format_line)
 
     def do_start(self, arg): # pylint: disable=unused-argument
-        '''Launches Dungeon Crawl with 5 Monster Gauntlet'''
+        '''Launches Dungeon Crawl with 4 Monster Gauntlet'''
         printer = CombatPrint()
         encounter : Encounter = encounter_generator(self._session.character)
         self._session.active_encounter = True
