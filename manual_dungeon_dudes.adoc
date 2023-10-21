@@ -166,7 +166,7 @@ With skills like **Fortify**, they can reduce incoming damage, standing firm ami
 
 | Accessory
 | Shield
-| The Fighter `Accessory` is the shield.  Shields have `defense power` equal to approximately `0.5 * level +10` and `attack power` equal to approximately `0.5 * level + 5`.  Shields have at least 2 defensive damage modifiers (sometimes 3) and occasionally have bonus `attack power` or `defense power`.  Shields with 2 defensive modifiers use the same modifier scaling as Armor. 
+| The Fighter `Accessory` is the shield.  Shields have `defense power` equal to approximately `0.5 * level +3` and `attack power` equal to approximately `0.5 * level + 3`.  Shields have at least 2 defensive damage modifiers (sometimes 3) and occasionally have bonus `attack power` or `defense power`.  Shields with 2 defensive modifiers use the same modifier scaling as Armor. 
 |===
 
 ---
