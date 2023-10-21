@@ -301,6 +301,7 @@ class Fighter(Character):
                 self.character_death(combat=True)
                 alive = False
                 return alive
+        damage = max(1, damage)
         self._hit_points -= damage
         message = message.replace('<value>', str(damage))
         self.printer(message)

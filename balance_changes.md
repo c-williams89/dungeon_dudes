@@ -60,4 +60,10 @@ _Wizard balance changes to address the reality they often times find it impossib
 * Accessory Relative Attack/Defense power bonuses have been increased across the board.
   * This is a change in the manual for all classes
   * This is a code base change for the `Fighter` class
+  
+## Bug Fixes
+
+Fixed bug where damage could be negative in the face of sufficient defense power/mitigation and enemy damage variance.  
+
+Fixed bug where Monsters were surprise attacking in combat when player won the initiative roll.  
 

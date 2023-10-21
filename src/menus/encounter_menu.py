@@ -23,7 +23,7 @@ class EncounterMenu(cmd.Cmd):
         self.player_1_alive : bool = True
         self.player_2_alive : bool = True
         self.prompt = f'{self.player_1.name}: {self.player_1.level} {self.player_1.char_class} > '
-        if self._encounter.turn_order():
+        if not self._encounter.turn_order():
             self.printer(f"{self.player_2.name} acts before you are ready!")
             self.ai_turn()
 
