@@ -55,6 +55,7 @@ class Beast(Monster):
             self.printer(message)
             self._hit_points = 0
             return alive
+        damage = max(1, damage)
         self._hit_points -= damage
         message = message.replace('<value>', str(damage))
         self.printer(message)
