@@ -1,5 +1,13 @@
 # Summary of Changes 20 October 2023
 
+## Bug Fixes
+
+`None`
+
+## Formatting Changes
+
+Updated `dungeon_menu.py` and `town_menu.py` to use `line_brackets` instead of manual string formatting.
+
 ## Flavor Changes
 
 Introduction for "Golems" paragraph has been added to `manual_dungeon_dudes.adoc`
