@@ -2,6 +2,7 @@
 import cmd
 from ..menu_helpers import banner, clear, line_brackets, format_line
 from ..characters import Character
+from ..characters.equipment import Equipment
 
 def check_cost(customer : Character, price: int) -> bool:
     '''Checks if Customer can afford an Item at Checkout'''
@@ -31,9 +32,6 @@ class ShopMenu(cmd.Cmd):
         self._healing_potion_price : int = 9 + self._customer.level
         self._scroll_of_escape_price : int = 13 + self._customer.level * 2
         self._inventory = self._session.shop_inventory
-        self._weapon_purchased = False
-        self._armor_purchased = False
-        self._accessory_purchased = False
 
     def preloop(self):
         '''Displays Menu When Class __init__ is called'''
@@ -79,12 +77,12 @@ class ShopMenu(cmd.Cmd):
         print(format_line)
         print(self.make_greeting())
         print(format_line)
-        if not self._weapon_purchased:
-            self.format_item("Weapon", self._inventory[0])
-        if not self._armor_purchased:
-            self.format_item("Armor", self._inventory[1])
-        if not self._accessory_purchased:
-            self.format_item("Accessory", self._inventory[2])
+        if self._inventory["Weapon"]:
+            self.format_item("Weapon", self._inventory["Weapon"])
+        if self._inventory["Armor"]:
+            self.format_item("Armor", self._inventory["Armor"])
+        if self._inventory["Accessory"]:
+            self.format_item("Accessory", self._inventory["Accessory"])
         print(format_line)
         print(healing_line)
         print(format_line)
@@ -93,62 +91,68 @@ class ShopMenu(cmd.Cmd):
 
     def do_weapon(self, arg): # pylint: disable=unused-argument
         '''Attempts to Buy Weapon'''
-        weapon = self._inventory[0]
-        if check_cost(self._customer, weapon.cost):
-            if confirm_purchase(weapon.name, weapon.cost):
-                old_price : int = self._customer.weapon_cost
-                self._customer.equip(weapon)
-                self._customer.gold -= weapon.cost
-                self._customer.gold += old_price // 2
-                self._weapon_purchased = True
-                print(f"Successful Equipped New Weapon,"
-                      f" Purchased Previous Weapon for {old_price} Gold")
-                input("Press Enter to Continue...")
-                self.display_menu()
-            else:
-                input("Purchased Cancelled - Press Enter to Continue...")
-                self.display_menu()
+        weapon = self._inventory["Weapon"]
+        if isinstance(weapon, Equipment):
+            if check_cost(self._customer, weapon.cost):
+                if confirm_purchase(weapon.name, weapon.cost):
+                    old_price : int = self._customer.weapon_cost
+                    self._customer.equip(weapon)
+                    self._customer.gold -= weapon.cost
+                    self._customer.gold += old_price // 2
+                    self._session.bought_item("Weapon")
+                    print(f"Successful Equipped New Weapon,"
+                        f" Purchased Previous Weapon for {old_price} Gold")
+                    input("Press Enter to Continue...")
+                    self.display_menu()
+                else:
+                    input("Purchased Cancelled - Press Enter to Continue...")
+                    self.display_menu()
         else:
+            input("Item Doesn't Exist - Press Enter to Continue...")
             self.display_menu()
 
     def do_armor(self, arg): # pylint: disable=unused-argument
         '''Attempts to Buy Armor'''
-        armor = self._inventory[1]
-        if check_cost(self._customer, armor.cost):
-            if confirm_purchase(armor.name, armor.cost):
-                old_price : int = self._customer.armor_cost
-                self._customer.equip(armor)
-                self._customer.gold -= armor.cost
-                self._customer.gold += old_price // 2
-                self._armor_purchased = True
-                print(f"Successful Equipped New Armor,"
-                      f" Purchased Previous Armor for {old_price} Gold")
-                input("Press Enter to Continue...")
-                self.display_menu()
-            else:
-                input("Purchased Cancelled - Press Enter to Continue...")
-                self.display_menu()
+        armor = self._inventory["Armor"]
+        if isinstance(armor, Equipment):
+            if check_cost(self._customer, armor.cost):
+                if confirm_purchase(armor.name, armor.cost):
+                    old_price : int = self._customer.armor_cost
+                    self._customer.equip(armor)
+                    self._customer.gold -= armor.cost
+                    self._customer.gold += old_price // 2
+                    self._session.bought_item("Armor")
+                    print(f"Successful Equipped New Armor,"
+                        f" Purchased Previous Armor for {old_price} Gold")
+                    input("Press Enter to Continue...")
+                    self.display_menu()
+                else:
+                    input("Purchased Cancelled - Press Enter to Continue...")
+                    self.display_menu()
         else:
+            input("Item Doesn't Exist - Press Enter to Continue...")
             self.display_menu()
 
     def do_accessory(self, arg): # pylint: disable=unused-argument
         '''Attempts to Buy Accessory'''
-        accessory = self._inventory[2]
-        if check_cost(self._customer, accessory.cost):
-            if confirm_purchase(accessory.name, accessory.cost):
-                old_price : int = self._customer.accessory_cost
-                self._customer.equip(accessory)
-                self._customer.gold -= accessory.cost
-                self._customer.gold += old_price // 2
-                self._accessory_purchased = True
-                print(f"Successful Equipped New Accessory,"
-                      f" Purchased Previous Accessory for {old_price} Gold")
-                input("Press Enter to Continue...")
-                self.display_menu()
+        accessory = self._inventory["Accessory"]
+        if isinstance(accessory, Equipment):
+            if check_cost(self._customer, accessory.cost):
+                if confirm_purchase(accessory.name, accessory.cost):
+                    old_price : int = self._customer.accessory_cost
+                    self._customer.equip(accessory)
+                    self._customer.gold -= accessory.cost
+                    self._customer.gold += old_price // 2
+                    self._session.bought_item("Accessory")
+                    print(f"Successful Equipped New Accessory,"
+                        f" Purchased Previous Accessory for {old_price} Gold")
+                    input("Press Enter to Continue...")
+                    self.display_menu()
             else:
                 input("Purchased Cancelled - Press Enter to Continue...")
                 self.display_menu()
         else:
+            input("Item Doesn't Exist - Press Enter to Continue...")
             self.display_menu()
 
     def do_healing_potion(self, arg): # pylint: disable=unused-argument

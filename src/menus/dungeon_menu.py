@@ -69,6 +69,7 @@ class DungeonMenu(cmd.Cmd):
             else:
                 printer("Returning to Town...")
                 printer(f"You've Successfully Completed {self._amount_before_town} Battles!")
+                self._session.fresh_shop()
                 self._session.active_encounter = False
                 input("Press Enter to Continue...")
                 return True

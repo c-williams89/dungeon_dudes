@@ -11,8 +11,11 @@ class Adventure:
     def __init__(self):
         self._character : Character = None
         self._active_encounter : bool = False
-        self._last_shop_visit : int = 0
-        self._shop_inventory : list = []
+        self._restock_shop : bool = True
+        self._restock_level : int = 1
+        self._shop_inventory : dict = {"Weapon": None,
+                                       "Armor": None,
+                                       "Accessory": None}
 
     @property
     def character(self) -> Character:
@@ -39,14 +42,22 @@ class Adventure:
     @property
     def shop_inventory(self):
         '''Getter for shop inventory, restocks if needed'''
-        if self._character.level != self._last_shop_visit:
+        if self._restock_shop or (self._restock_level != self._character.level):
             self.stock_shop()
         return self._shop_inventory
 
+    def fresh_shop(self):
+        '''Setter for restocking the shop flag'''
+        self._restock_shop = True
+
+    def bought_item(self, item_type : str):
+        '''Empty bought item from inventory'''
+        self._shop_inventory[item_type] = None
+
     def stock_shop(self):
         '''Restocks the Shop and Sets the Level the Shop was Last Stocked at'''
-        self._shop_inventory.clear()
-        self._shop_inventory.extend([self._character.generate_weapon(),
-                                     self._character.generate_armor(),
-                                     self._character.generate_accessory()])
-        self._last_shop_visit = self._character.level
+        self._shop_inventory["Weapon"] = self._character.generate_weapon()
+        self._shop_inventory["Armor"] = self._character.generate_armor()
+        self._shop_inventory["Accessory"] = self._character.generate_accessory()
+        self._restock_shop = False
+        self._restock_level = self._character.level
