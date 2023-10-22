@@ -75,3 +75,14 @@ Number of battles before automatically returning to town reduced from 5 to 4.
 
 Now reverted back to 5.
 
+# Summary of Changes 22 October 2023
+
+## Shop Changes
+
+### Self restocking bug
+
+Fixed an issue where items would appear to restock themselves and make themselves available to be purchased if player exited and reentered the shop.
+
+### Restocking Conditions Change
+
+Shop now restocks after completing a 5 encounter gauntlet in the Dungeon Crawl.  Rather than only on level-up.  This will allow frequent shop updates when level-ups become infrequent.  And make it possible to update the shop at max level.
