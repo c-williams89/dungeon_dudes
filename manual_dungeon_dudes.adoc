@@ -477,6 +477,7 @@ Grounded in both the spiritual and martial, Clerics are a beacon of hope, always
 
 |Armor of Faith
 |1
+|
 |`passive:` Cleric `defense_power` mitigates against `Holy` damage in addition to `Physical` damage.
 
 |Smite
