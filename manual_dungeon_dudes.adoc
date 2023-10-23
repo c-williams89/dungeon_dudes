@@ -72,9 +72,9 @@ With skills like **Fortify**, they can reduce incoming damage, standing firm ami
 |1
 |Fighter static modifiers for Offensive and Defensive stats are not bound to any range
 
-|Shield Slam 
+|Whirlwind
 |3 
-|Does damage based on `shield armor (x2) + defense power` 
+|Does Physical damage based 75% attack_power to All enemies
 
 |Critical Strikes 
 |5 
