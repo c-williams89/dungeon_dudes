@@ -80,7 +80,7 @@ class Elemental(Monster):
             return damage * 1.50
 
     def elemental_reconstitute(self) -> int:
-        ''' Elementals heal for 8% of their current hit_points at the 
+        ''' Elementals heal for 8% of their current hit_points at the
         beginning of each of their turns (rounded up).
         '''
         return CombatAction([("Heal", round(self._hit_points * 1.08), "Holy")],
@@ -98,7 +98,7 @@ class Elemental(Monster):
             ice vuln to lightning
             lightning vuln to fire
 
-            dmg_type, str -- 
+            dmg_type, str --
 
             returns, bool -- true if elemental type is vulnerable to dmg_type
         '''
