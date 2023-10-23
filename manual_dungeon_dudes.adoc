@@ -239,7 +239,7 @@ Using quick relaxes and **Evasion** Rogues can avoid even the hardest hitting at
 
 | Damage/Variance
 | Physical, Poison
-| Rogues only do `Physical` damage with their attacks with additional `Poison` damage if their weapons are coated in poison.  All Rogue variance is the base damage normally distributed 8% of the base damage with a standard deviation of 4% of the base damage, up to 24% additional damage + `max(0, min(base*.24,random.gauss(base*.8, base*.4)))`.Their equipment variance follows the same formula as Fighter variance.
+| Rogues only do `Physical` damage with their attacks with additional `Poison` damage if their weapons are coated in poison.  All Rogue variance is the base damage normally distributed 8% of the base damage with a standard deviation of 4% of the base damage, up to 24% additional damage + `max(0, min(base*.24,random.gauss(base*.08, base*.04)))`.Their equipment variance follows the same formula as Fighter variance.
 |===
 
 ##### Rogue Stat Growth
