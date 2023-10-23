@@ -1,1 +1,1 @@
-from .fighter_item_generator import FighterEquipmentGenerator
+from .cleric_item_generator import ClericEquipmentGenerator
