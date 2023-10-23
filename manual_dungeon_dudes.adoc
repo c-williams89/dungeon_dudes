@@ -1801,7 +1801,7 @@ Beyond the veil of life in the Digital Kingdom, in the eerie void where life mee
 
 |Resist Death
 |5
-|`passive:` The kill time a damage event would kill an Undead `Monster` in combat, it reduces the Undead to 1 `Hit_Point` instead.
+|`passive:` The first time a damage event would kill an Undead `Monster` in combat, it reduces the Undead to 1 `Hit_Point` instead.
 
 |Damage/Variance
 |Physical, Physical/Ice, Ice/Poison
