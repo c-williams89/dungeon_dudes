@@ -1,5 +1,5 @@
 from random import gauss, choice, randint
-from math import ceil
+from math import ceil, floor
 from typing import Dict
 from ..equipment import Weapon, Armor, Accessory
 from ...dd_data import defensive_suffix_mapping
@@ -8,7 +8,7 @@ from ...dd_data import defensive_suffix_mapping
 class ClericEquipmentGenerator:
     '''Equipment Generator for Cleric Class in Dungeon Dudes'''
     def __init__(self):
-        self._defensive_suffix_mapping: Dict[tuple, str] = defensive_suffix_mapping
+        self._def_suffix_maps: Dict[tuple, str] = defensive_suffix_mapping
         self._weapons: list = ["Mace", "Flail"]
         self._weapon_prefix: Dict[int, str] = {
             10: "Sharpened", 20: "Rending", 30: "Brutal",
@@ -38,18 +38,18 @@ class ClericEquipmentGenerator:
         weapon_type: str = choice(self._weapons)
 
         attack_average: int = level
-        attack, attack_cost_mod = self.generate_value_mod(attack_average,
-                                                          ceil(
+        attack, atk_cost_mod = self.generate_value_mod(attack_average,
+                                                       ceil(
                                                            attack_average/2.5))
         attack: int = max(10, ceil(attack) + 10)
 
         # Constants in case one-but-not-other modified in conditional
         holy_cost_modifier: int = 1
-        physical_cost_modifier: int = 1
+        phys_cost_modifier: int = 1
 
         if weapon_type == "Mace":
             physical_modifier_avg: int = level
-            physical_modifier, physical_cost_modifier = self.generate_value_mod(
+            physical_modifier, phys_cost_modifier = self.generate_value_mod(
                 physical_modifier_avg, ceil(physical_modifier_avg/5))
 
             prefix_key: [str, None] = max(filter(
@@ -96,8 +96,8 @@ class ClericEquipmentGenerator:
             suffix: str = "of Wrath"
             wrath_mod: float = 1.5
 
-        cost: int = self.generate_value(weapon_base_cost, attack_cost_mod,
-                                        physical_cost_modifier,
+        cost: int = self.generate_value(weapon_base_cost, atk_cost_mod,
+                                        phys_cost_modifier,
                                         holy_cost_modifier,
                                         armor_mod, wrath_mod)
         cost = max(cost, 1)
@@ -119,7 +119,7 @@ class ClericEquipmentGenerator:
         armor: int = max(10, ceil(armor) + 10)
         attack: int = 0
 
-        modifiers, suffix = choice(list(self._defensive_suffix_mapping.items()))
+        modifiers, suffix = choice(list(self._def_suffix_maps.items()))
         modifier_amount: int = 20 + (level * 2)
         mod_1: int = randint(0, modifier_amount)
         mod_2: int = modifier_amount - mod_1
@@ -128,7 +128,7 @@ class ClericEquipmentGenerator:
         prefix: str = ""
         prefix_chance: str = randint(1, 5)
         fortified_cost_mod: int = 1
-        attack_cost_mod: int = 1
+        atk_cost_mod: int = 1
         if prefix_chance >= 4:
             armor += max(1, ceil(gauss(level/2, level/5)))
             prefix: str = "Fortified"
@@ -136,70 +136,73 @@ class ClericEquipmentGenerator:
         elif prefix_chance == 3:
             attack += max(1, ceil(gauss(level/2, level/5)))
             prefix: str = "Powerful"
-            attack_cost_mod: float = 1.5
+            atk_cost_mod: float = 1.5
 
         cost: int = self.generate_value(armor_base_cost, armor_cost_mod,
-                                        fortified_cost_mod, attack_cost_mod)
+                                        fortified_cost_mod, atk_cost_mod)
         cost = max(cost, 1)
         armor_name: str = f'{prefix} {armor_name} of {suffix}'.strip()
-        armor_special: dict = {"Defensive": [(modifiers[0], mod_1), (modifiers[1], mod_2)]}
+        armor_special: dict = {"Defensive": [(modifiers[0], mod_1),
+                                             (modifiers[1], mod_2)]}
         return Armor(armor_type, armor_name, armor=armor,
                      special=armor_special, attack=attack, cost=cost)
 
     def generate_accessory(self, level: int) -> Accessory:
         '''
-        Generates an Armor Object Appropriate for a Cleric based on level
+        Generates the Accessory Object Appropriate for a Cleric
         '''
         accessory_base_cost: int = level * 2
         accessory_type: str = "Holy Symbol"
         accessory_name: str = accessory_type
 
-        '''
-        armor_average: int = level + 5
+        armor_average: int = level
         armor, armor_cost_mod = self.generate_value_mod(armor_average,
                                                         armor_average/2.5)
         armor: int = max(0, ceil(armor))
 
-        attack_average: int = level + 5
-        attack, attack_cost_mod = self.generate_value_mod(attack_average,
-                                                          ceil(attack_average/2.5))
+        attack_average: int = level
+        attack, atk_cost_mod = self.generate_value_mod(attack_average,
+                                                       ceil(attack_average/2.5)
+                                                       )
         attack = max(0, attack)
 
-        modifiers, suffix = choice(list(self._defensive_suffix_mapping.items()))
-        modifier_amount: int = 20 + (level * 2)
-        mod_1: int = randint(0, modifier_amount)
-        mod_2: int = modifier_amount - mod_1
-        mod_1: int = 0 - mod_1
-        mod_2: int = 0 - mod_2
+        holy_modifier: int = level + 5
+        offense_special = [("Holy", holy_modifier)]
+
+        modifier_amount: int = 25 + (level * 2.5)
+        defense_special = [
+            ("Physical", (modifier_amount // 3)),
+            ("Holy", (modifier_amount // 3)),
+            ("Poison", (modifier_amount // 3))
+        ]
+        modifiers, _ = choice(list(self._def_suffix_maps.items()))
+        suffix = "Antioch"
+
         prefix_mod = 1
-        defense_special = [(modifiers[0], mod_1), (modifiers[1], mod_2)]
         prefix = ""
         prefix_chance = randint(1, 4)
+
         if prefix_chance > 2:
-            damage_types: list = ["Fire", "Ice", "Lightning", "Holy", "Poison"]
+            damage_types: list = ["Fire", "Ice", "Lightning"]
             new_mod: str = choice([damage_type for damage_type in damage_types
                                   if damage_type not in modifiers])
-            defense_special.append((new_mod, 0 - level))
+            defense_special.append((new_mod, 10 + level))
             prefix: str = "Resistant"
             prefix_mod: int = 2
+
         elif prefix_chance == 2:
-            attack += ceil(gauss(level/2, level/5))
+            attack += ceil(gauss(level/4, level/5))
             prefix: str = "Powerful"
-            prefix_mod: float = 1.5
-        else:
-            armor += ceil(gauss(level/2, level/5))
-            prefix: str = "Fortified"
             prefix_mod: float = 1.5
 
         cost: int = self.generate_value(accessory_base_cost,
-                                        attack_cost_mod, armor_cost_mod,
+                                        atk_cost_mod, armor_cost_mod,
                                         prefix_mod)
 
         cost = max(cost, 1)
         accessory_name: str = f'{prefix} {accessory_name} of {suffix}'.strip()
         accessory_special = {"Attack": attack, "Armor": armor,
-                             "Offensive": [], "Defensive": defense_special}
+                             "Offensive": offense_special,
+                             "Defensive": defense_special}
         return Accessory(accessory_type, accessory_name,
                          accessory_special, cost=cost)
-        '''
-        pass
