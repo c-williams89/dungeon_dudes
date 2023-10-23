@@ -9,19 +9,21 @@ from ...dd_data import CombatPrint, LimitedDict, damage_types
 class FireElemental(Elemental):
     '''Fire Elemental Module'''
     stats_structure: Dict[str, Tuple[int]] = {"Hit Points": (65, 16),
-                                              "Strength": (10, 2), "Agility":
-                                              (10, 3), "Intelligence": (5, 1),
+                                              "Strength": (10, 2),
+                                              "Agility": (10, 3),
+                                              "Intelligence": (5, 1),
                                               "Special": (0, 0)}
-    elemental_types = [("Lesser", "Fire"), ("", "Fire "), ("Greater", "Fire"),
-                       (("", "Fire"))]
+    elemental_types = [("Lesser Fire Elemental", "Fire"),
+                       ("Fire Elemental", "Fire "),
+                       ("Greater Fire Elemental", "Fire"),
+                       ("Fire Elemental Lord", "Fire")]
 
     def __init__(self, level_mod: int):
         elemental_type: tuple = choice(self.elemental_types)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         self._elemental_type: str = elemental_type[0]
         self._damage_type: str = elemental_type[1]
-        super().__init__(f'{self._elemental_type} Elemental', level_mod,
-                         self.stats_structure)
+        super().__init__(self._elemental_type, level_mod, self.stats_structure)
         self._sub_type: str = "Fire"
         self._dam_modifiers = LimitedDict(
             ("Fire", (self._damage_type)), default_value=100)
@@ -30,7 +32,7 @@ class FireElemental(Elemental):
 
     def base_att_def_power(self):
         self._attack_power = self.strength + self.intelligence
-        # self._defense_power = self.agility
+        self._defense_power = self.agility
 
     @property
     def damage_modifiers(self) -> LimitedDict:
@@ -59,8 +61,12 @@ class FireElemental(Elemental):
             hit_points and dealing an equal amount of Fire damage to their
             opponent.
         '''
+        self._hit_points = self._hit_points
+        pass
 
     def improved_reconstitute(self) -> CombatAction:
+        ''' passive: Greater Fire Elemental Reconstitute Healing is based on
+            max_hit_points instead of current hit_points '''
         pass
 
     def burning_strike(self) -> CombatAction:
