@@ -1,0 +1,1 @@
+from .fighter_item_generator import FighterEquipmentGenerator
