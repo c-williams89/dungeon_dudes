@@ -32,7 +32,7 @@ class Elemental(Monster):
 
     def damage_modify(self, damage) -> int:
         ''' Adds Variance to Damage Events and Calculates Critical Chance '''
-        damage_min = int(damage * 0.95)
+        damage_min = int(damage * .95)
         damage_max = int(damage * 1.05)
         modified: int = randint(damage_min, damage_max)
         return modified
@@ -68,7 +68,7 @@ class Elemental(Monster):
         self.printer(message)
         return alive
 
-    def damage_check(self, damage: str, dmg_type: str) -> callable:
+    def damage_check(self, damage: str, dmg_type: str) -> int:
         ''' Helper function for calculating damage '''
         # if damage type matches elemental type
         if self.type == dmg_type:
@@ -83,7 +83,7 @@ class Elemental(Monster):
         ''' Elementals heal for 8% of their current hit_points at the 
         beginning of each of their turns (rounded up).
         '''
-        return CombatAction([("Heal", round(self._hit_points * .08), "Holy")],
+        return CombatAction([("Heal", round(self._hit_points * 1.08), "Holy")],
                             "")
 
     def elemental_immunity(self, damage: str) -> int:
