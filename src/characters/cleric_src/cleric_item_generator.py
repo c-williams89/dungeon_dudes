@@ -6,10 +6,10 @@ from ...dd_data import defensive_suffix_mapping
 
 
 class ClericEquipmentGenerator:
-    '''Equipment Generator for Fighter Class in Dungeon Dudes'''
+    '''Equipment Generator for Cleric Class in Dungeon Dudes'''
     def __init__(self):
         self._defensive_suffix_mapping: Dict[tuple, str] = defensive_suffix_mapping
-        self._weapons: list = ["Sword", "Axe", "Mace"]
+        self._weapons: list = ["Mace", "Flail"]
         self._weapon_prefix: Dict[int, str] = {
             10: "Sharpened", 20: "Rending", 30: "Brutal",
             40: "Deadly", 50: "Devastating"
@@ -34,7 +34,6 @@ class ClericEquipmentGenerator:
         '''
         Generates a Weapon Object Appropriate for a Cleric based on level
         '''
-        '''
         weapon_base_cost: int = level * 3
         weapon_type: str = choice(self._weapons)
 
@@ -42,6 +41,7 @@ class ClericEquipmentGenerator:
         attack, attack_cost_mod = self.generate_value_mod(attack_average,
                                                           ceil(
                                                            attack_average/2.5))
+        '''
         attack: int = max(10, ceil(attack) + 10)
 
         physical_modifier_avg: int = level
@@ -83,7 +83,6 @@ class ClericEquipmentGenerator:
         '''
         Generates an Armor Object Appropriate for a Cleric based on level
         '''
-        '''
         armor_base_cost: int = ceil(level * 2.5)
         armor_type: str = "Heavy"
         armor_name: str = "Plate"
@@ -120,24 +119,22 @@ class ClericEquipmentGenerator:
         armor_special: dict = {"Defensive": [(modifiers[0], mod_1), (modifiers[1], mod_2)]}
         return Armor(armor_type, armor_name, armor=armor,
                      special=armor_special, attack=attack, cost=cost)
-        '''
-        pass
 
     def generate_accessory(self, level: int) -> Accessory:
         '''
         Generates an Armor Object Appropriate for a Cleric based on level
         '''
-        '''
         accessory_base_cost: int = level * 2
-        accessory_type: str = "Shield"
+        accessory_type: str = "Holy Symbol"
         accessory_name: str = accessory_type
 
-        armor_average: int = ceil(0.5 * level) + 3
+        '''
+        armor_average: int = level + 5
         armor, armor_cost_mod = self.generate_value_mod(armor_average,
                                                         armor_average/2.5)
         armor: int = max(0, ceil(armor))
 
-        attack_average: int = ceil(0.5 * level) + 3
+        attack_average: int = level + 5
         attack, attack_cost_mod = self.generate_value_mod(attack_average,
                                                           ceil(attack_average/2.5))
         attack = max(0, attack)
