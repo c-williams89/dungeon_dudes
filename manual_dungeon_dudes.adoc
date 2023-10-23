@@ -655,7 +655,7 @@ A Ranger is never alone; their bond with the animal kingdom ensures they are alw
 
 |Improved Animal Companion
 |15
-|The first animal companion summoned each encounter does not pass the Ranger's turn.  Adjustments to defensive modifiers provided by companions is improved by 10.  The Ranger may have up to 2 animal companions active at any time.    
+|`passive:` The first animal companion summoned each encounter does not pass the Ranger's turn.  Adjustments to defensive modifiers provided by companions is improved by 10.  The Ranger may have up to 2 animal companions active at any time.    
 
 |Lucky Strike
 |20
