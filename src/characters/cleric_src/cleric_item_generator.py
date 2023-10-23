@@ -41,43 +41,69 @@ class ClericEquipmentGenerator:
         attack, attack_cost_mod = self.generate_value_mod(attack_average,
                                                           ceil(
                                                            attack_average/2.5))
-        '''
         attack: int = max(10, ceil(attack) + 10)
 
-        physical_modifier_avg: int = level
-        physical_modifier, physical_cost_modifier = self.generate_value_mod(
-            physical_modifier_avg, ceil(physical_modifier_avg/5))
-        prefix_key: [str, None] = max(filter(
-                                      lambda key: key < physical_modifier,
-                                      self._weapon_prefix.keys()),
-                                      default=None)
-        if prefix_key is None:
-            prefix: str = ""
+        # Constants in case one-but-not-other modified in conditional
+        holy_cost_modifier: int = 1
+        physical_cost_modifier: int = 1
+
+        if weapon_type == "Mace":
+            physical_modifier_avg: int = level
+            physical_modifier, physical_cost_modifier = self.generate_value_mod(
+                physical_modifier_avg, ceil(physical_modifier_avg/5))
+
+            prefix_key: [str, None] = max(filter(
+                                        lambda key: key < physical_modifier,
+                                        self._weapon_prefix.keys()),
+                                        default=None)
+            if prefix_key is None:
+                prefix: str = ""
+            else:
+                prefix: str = self._weapon_prefix[prefix_key]
+
+            weapon_special: dict = {"Offensive":
+                                    [("Physical", physical_modifier)]}
+
         else:
-            prefix: str = self._weapon_prefix[prefix_key]
+            holy_modifier_avg: int = level
+            holy_modifier, holy_cost_modifier = self.generate_value_mod(
+                holy_modifier_avg, ceil(holy_modifier_avg/5))
+            prefix_key: [str, None] = max(filter(
+                                        lambda key: key < holy_modifier,
+                                        self._weapon_prefix.keys()),
+                                        default=None)
+            if prefix_key is None:
+                prefix: str = ""
+            else:
+                prefix: str = self._weapon_prefix[prefix_key]
+
+            weapon_special: dict = {"Offensive":
+                                    [("Holy", holy_modifier)]}
+
         armor: int = 0
+
         suffix: str = ""
-        suffix_chance: int = randint(1,5)
+        suffix_chance: int = randint(1, 5)
         armor_mod: int = 1
         wrath_mod: int = 1
         if suffix_chance == 5:
-            armor += ceil(gauss(level/2, level/5))
+            armor += ceil(level/2)
             suffix: str = "of Defense"
             armor_mod: float = 1.5
+
         elif suffix_chance > 2:
-            attack += ceil(gauss(level/2, level/5))
+            attack += ceil(level/2)
             suffix: str = "of Wrath"
             wrath_mod: float = 1.5
+
         cost: int = self.generate_value(weapon_base_cost, attack_cost_mod,
-                                        physical_cost_modifier, armor_mod,
-                                        wrath_mod)
+                                        physical_cost_modifier,
+                                        holy_cost_modifier,
+                                        armor_mod, wrath_mod)
         cost = max(cost, 1)
         weapon_name: str = f'{prefix} {weapon_type} {suffix}'.strip()
-        weapon_special: dict = {"Offensive": [("Physical", physical_modifier)]}
         return Weapon(weapon_type, weapon_name, attack, special=weapon_special,
                       armor=armor, cost=cost)
-        '''
-        pass
 
     def generate_armor(self, level: int) -> Armor:
         '''
