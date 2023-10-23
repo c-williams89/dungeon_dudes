@@ -493,7 +493,7 @@ Grounded in both the spiritual and martial, Clerics are a beacon of hope, always
 |Radiance
 |3
 |40 
-|Cleric heals `Holy` damage to **all enemies** with a base of their `Intelligence` + their `Attack_Power`and heals for `Intelligence // 3` hit points 
+|Cleric heals `Holy` damage to **all enemies** with a base of their `Intelligence` + their `Attack_Power` and heals for `Intelligence // 3` hit points 
 
 |Divine Blessing
 |5
