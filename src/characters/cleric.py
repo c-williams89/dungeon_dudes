@@ -70,7 +70,7 @@ class Cleric(Character):
         self._exp_to_next_iter = iter([(40 * i ** 2) for i in range(1, 50)])
         self._exp_to_next: int = next(self._exp_to_next_iter)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
-        self._special: int = 50 * (self.level * 15)
+        self._special: int = 50
         self._special_resource: str = "Mana"
         self._accessory_type: str = "Holy Symbol"
         # self._critical_modifier : int = 1
@@ -155,24 +155,116 @@ class Cleric(Character):
                               self._weapon.damage_type, message)], "")
 
     def heal(self) -> [bool, CombatAction]:
-        pass
+        '''Heals for 50% of Max HP'''
+        special_cost = 20
+        if self._special >= special_cost:
+            damage = 0
+            amount_healed = ((self.hit_points + (self.max_hit_points//2)) %
+                             self.max_hit_points)
+            self.hit_points = (min(self.max_hit_points,
+                                   (self.hit_points + amount_healed)))
+            message: str = (f"{self.name} healed for {amount_healed}")
+            return True, CombatAction([("Heal", amount_healed, "", message)], "")
+        else:
+            self.printer("Ability Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Heal", 0, "", "")], "")
 
     def radiance(self) -> [bool, CombatAction]:
+        '''Deal Holy damage to all enemies for Intelligence + AtkPower'''
+        '''Heal HP by Intelligence//3'''
+        special_cost = 40
         pass
 
     def prayer(self) -> [bool, CombatAction]:
+        '''Protects self with incantation, raise defense modifier to'''
+        '''Holy, Poison, and Physical by 5'''
+        '''Reduce the Damage from the Next Damage Event to 0'''
+        special_cost = 30
         pass
 
     def avenger(self) -> [bool, CombatAction]:
+        '''(Once per Battle) Increase Holy Damage Modifier by 30'''
+        ''' Deal Intelligence * 6 Holy Damage'''
+        special_cost = 100
         pass
 
     def greater_heal(self) -> [bool, CombatAction]:
+        """Heal for 70% of Max HP, Reduce next incoming Damage Event by 50%"""
+        special_cost = 50
         pass
 
     def level_up(self, combat=False):
         pass
 
     ''' Getters and Setters for types and variables'''
+    @property
+    def special(self) -> int:
+        '''Getter for Current Mana'''
+        return self._special
+
+    @property
+    def max_special(self) -> int:
+        '''Getter for Max Mana'''
+        return self._stats.special
+
+    @special.setter
+    def special(self, change):
+        '''Setter for Mana'''
+        if change >= self.max_special:
+            self._special = self.max_special
+        else:
+            self._special = change
+
+    @property
+    def hit_points(self):
+        '''Override Parent Getter for HP'''
+        return self._hit_points
+
+    @hit_points.setter
+    def hit_points(self, value):
+        '''Setter for Hit Points'''
+        if value >= self.max_hit_points:
+            self._hit_points = self.max_hit_points
+        else:
+            self._hit_points = int(value)
+
+    @property
+    def special_resource(self) -> str:
+        '''Getter for Special Resource Name'''
+        return self._special_resource
+
+    @property
+    def accessory_type(self) -> str:
+        '''Getter for Accessory Type for Class'''
+        return self._accessory_type
+
+    @property
+    def accessory_cost(self) -> int:
+        '''Getter for Accessory Cost'''
+        return self._accessory.cost
+
+    @property
+    def accessory_sheet(self) -> Accessory:
+        '''Getter for Accessory Object'''
+        return self._accessory
+
+    @property
+    def accessory(self) -> str:
+        '''Getter for Accessory Name'''
+        try:
+            return self._accessory.name
+        except AttributeError:
+            return "None"
+
+    @property
+    def damage_modifiers(self) -> LimitedDict:
+        '''Getter for Damage Modifiers'''
+        return self._dam_modifiers
+
+    @property
+    def defense_modifiers(self) -> LimitedDict:
+        '''Getter for Defense Modifiers'''
+        return self._def_modifiers
 
     def take_damage(self, damage: int, dmg_type: str, message: str) -> bool:
         '''Processes Damage Events'''
