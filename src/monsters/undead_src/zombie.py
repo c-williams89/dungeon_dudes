@@ -15,6 +15,7 @@ class Zombie(Undead):
         super().__init__('Zombie', level_mod, self.stats_structure)
         self._sub_type: str = "Zombie"
         self._dam_modifiers = LimitedDict(("Physical", "Poison"), default_value=100)
+        self.haunting = 0
     
     def base_att_def_power(self):
         self._attack_power =  self.strength
@@ -30,6 +31,11 @@ class Zombie(Undead):
         '''Getter for Defense Modifiers'''
         return self._def_modifiers
     
+    def update_max_hp(self):
+        bonus_multiplier = self.level // 8
+        bonus_hp =  bonus_multiplier * 20
+        self.stats_structure["Hit Points"][0] + bonus_hp
+
     def get_skills_list(self) -> List[str]:
         return []
     
@@ -38,12 +44,18 @@ class Zombie(Undead):
 
     def attack(self) -> CombatAction:
         '''Attack method for Zombie Horde'''
-        horde_size = (self.level // 8) + 6
+        base_horde = 6
+        horde_size = (self.level // 8) + base_horde
         horde_actions = []
+        if self.haunting == 0:
+            haunt_message: str = ("Undead Haunting cripples Physical defense by 10")
+            horde_actions.append(("Hex", -10, "Physical", haunt_message))
+            self.haunting += 1
         for _ in range(horde_size):
             damage: int = (self.modify_damage(self._attack_power))
-            message: str = f"{self._sub_type} A zombie attacks with for <value> physical damage"
+            message: str = f"{self._sub_type} attacks for <value> physical damage"
             horde_actions.append(("Attack", damage, "Physical", message))
+      
         return CombatAction(horde_actions, "")
     
     def take_turn(self) -> CombatAction:

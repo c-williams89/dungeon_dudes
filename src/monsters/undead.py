@@ -12,7 +12,9 @@ class Undead(Monster):
         super().__init__(name, level_mod, "Undead", stat_structure)
         self.printer = CombatPrint()
         self._def_modifiers = LimitedDict(damage_types, default_value=100)
+        self._def_modifiers["Holy"] -= 50
         self._dam_modifiers = LimitedDict(("Physical", "Ice"), default_value=100)
+        self.resist_death = 0
 
     def modify_damage(self, damage) -> int:
         '''Adds Variance to Damage Events and Calculates Critical Chance'''
@@ -25,11 +27,6 @@ class Undead(Monster):
         damage: int = (self.modify_damage(self._attack_power))
         message: str = f"{self.name} Attacks with for <value> physical damage"
         return CombatAction([("Attack", damage, "Physical", message)], "")
-    
-    #TODO: will have to implement in individual monster type; banshee is diff
-    # def base_att_def_power(self):
-    #     self._attack_power = self.strength
-    #     self._defense_power = self.agility
 
     @property
     def hit_points(self) -> int:
@@ -49,23 +46,31 @@ class Undead(Monster):
         alive = True
         if dmg_type == "Physical":
             damage = damage - (self._defense_power // 2)
-
         damage = int(damage * self._def_modifiers[dmg_type]/100)
+   
         if damage >= self.hit_points:
+            if self.resist_death == 0:
+                self._hit_points = 1
+                self.resist_death += 1
+                message = message.replace('<value>', str(damage))
+                resist_message = "Resist Death saves the Zombie! He has 1 HP left."
+                self.printer(message)
+                self.printer(resist_message)
+                return alive
             alive = False
             message = message.replace('<value>', str(self._hit_points))
             self.printer(message)
             self._hit_points = 0
             return alive
-        damage = max(1, damage)
+       
         self._hit_points -= damage
         message = message.replace('<value>', str(damage))
         self.printer(message)
         return alive
     
-    def resist_death(self, damage: float) -> int:
-        '''First time an event would kill, reduce HP to 1'''
-        pass
+    # def resist_death(self, damage: float) -> int:
+    #     '''First time an event would kill, reduce HP to 1'''
+    #     pass
 
     def take_turn(self) -> CombatAction: # pylint: disable=unused-argument
         '''Takes turn and returns the success of the action and the action'''
