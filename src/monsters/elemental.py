@@ -26,7 +26,6 @@ class Elemental(Monster):
 
     def attack(self) -> CombatAction:
         damage: int = self.damage_modify(self._attack_power)
-        # change for elemental type
         message: str = f"{self.name} Attacks with for <value> elemental damage"
         return CombatAction([("Attack", damage, "Elemental", message)], "")
 
@@ -84,8 +83,13 @@ class Elemental(Monster):
         ''' Elementals heal for 8% of their current hit_points at the
         beginning of each of their turns (rounded up).
         '''
-        return CombatAction([("Heal", round(self._hit_points * 1.08), "Holy")],
-                            "")
+        if self._hit_points == self._max_hit_points:
+            pass
+        #  TODO: adjust for less than total but cannot overheal
+        else:
+            result = round(self._hit_points * 0.08)
+            self._hit_points += result
+            self.printer(f"{self.name} reconstitutes {result} hit points!")
 
     def elemental_immunity(self, damage: str) -> int:
         ''' Elementals are immune to all damage from their type '''
