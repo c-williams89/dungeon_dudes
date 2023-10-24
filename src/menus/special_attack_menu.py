@@ -64,24 +64,22 @@ class SpecialAttackMenu(cmd.Cmd):
                            "Hex": self._encounter.parse_hex,
                            "Battle Cry" : self._encounter.parse_battle_cry,
                            "Identify" : self._encounter.parse_identify}
-        success, actions = list(self._command_dict[number].values())[0]()
+        turn_over, actions = list(self._command_dict[number].values())[0]()
         actions = actions.actions
         action_types = [action[0] for action in actions]
-        if success:
-            for action in actions:
-                if "Escape" in action_types:
-                    self._encounter.escape_flag = True
-                    return True
-                if action[0] == "Heal": # healing logic done within character locally
-                    continue
-                if action[0] != "Attack":
-                    print(action[0])
-                    func_map[action[0]](action, 1)
-                else:
-                    self._encounter.parse_attack(action, 1)
-                    if not self._encounter.combatants_alive:
-                        break
-
+        if "Escape" in action_types:
+            self._encounter.escape_flag = True
+            return True
+        for action in actions:
+            if action[0] == "Heal": # healing logic done within character locally
+                continue
+            if action[0] != "Attack":
+                func_map[action[0]](action, 1)
+            else:
+                self._encounter.parse_attack(action, 1)
+                if not self._encounter.combatants_alive:
+                    break
+        if turn_over:
             return True
         return False
 
@@ -92,6 +90,7 @@ class SpecialAttackMenu(cmd.Cmd):
             if result:
                 self._encounter.player_spl_att_complete = True
                 return True
+            return True
 
     def do_2(self, arg): # pylint: disable=unused-argument
         '''Execute Action 2 if it exists'''
@@ -100,6 +99,7 @@ class SpecialAttackMenu(cmd.Cmd):
             if result:
                 self._encounter.player_spl_att_complete = True
                 return True
+            return True
 
     def do_3(self, arg): # pylint: disable=unused-argument
         '''Execute Action 3 if it exists'''
@@ -108,6 +108,7 @@ class SpecialAttackMenu(cmd.Cmd):
             if result:
                 self._encounter.player_spl_att_complete = True
                 return True
+            return True
 
     def do_4(self, arg): # pylint: disable=unused-argument
         '''Execute Action 4 if it exists'''
@@ -116,6 +117,7 @@ class SpecialAttackMenu(cmd.Cmd):
             if result:
                 self._encounter.player_spl_att_complete = True
                 return True
+            return True
 
     def do_5(self, arg): # pylint: disable=unused-argument
         '''Execute Action 5 if it exists'''
@@ -124,6 +126,7 @@ class SpecialAttackMenu(cmd.Cmd):
             if result:
                 self._encounter.player_spl_att_complete = True
                 return True
+            return True
 
     def do_6(self, arg): # pylint: disable=unused-argument
         '''Execute Action 6 if it exists'''
@@ -132,6 +135,7 @@ class SpecialAttackMenu(cmd.Cmd):
             if result:
                 self._encounter.player_spl_att_complete = True
                 return True
+            return True
 
     def do_back(self, arg): # pylint: disable=unused-argument
         """Back to Encounter Menu."""
