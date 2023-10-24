@@ -65,7 +65,7 @@ class Ogre(Humanoid):
         damage_amt = self.intelligence
         msg: str = (f"{self.name} casts wild magics, dealing <value> "
                     f"{damage_type} damage and attacking again")
-        return CombatAction([("Attack", damage_amt, damage_type, msg), 
+        return CombatAction([("Attack", damage_amt, damage_type, msg),
                             ("Attack", damage_amt, damage_type, msg)],
                             "")
 

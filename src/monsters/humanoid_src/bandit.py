@@ -1,6 +1,6 @@
 '''Bandit Module for Dungeon Dudes'''
 from typing import Dict, Tuple
-from random import choice, randint, randrange
+from random import randint, randrange
 
 from src.dd_data import LimitedDict
 from ..humanoid import Humanoid
