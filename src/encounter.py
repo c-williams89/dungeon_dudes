@@ -1,5 +1,5 @@
 '''Module for the Encounter Class for Dungeon Dudes'''
-from typing import Tuple, Dict
+from typing import Dict
 from random import randint
 from .combatant_abc import Combatant
 from .characters import Character
@@ -80,13 +80,13 @@ class Encounter:
         '''Ensures a modifier is between 0.1 and 2'''
         return max(10, min(mod, 200))
 
-    def turn_order(self) -> Tuple[int]:
+    def turn_order(self) -> bool:
         '''Determines Turn Order from Agility Scores'''
         agility_1 = self.combatant_1.defense_power
         agility_2 = self.combatant_2.agility
         initiative_1 : int = agility_1 + randint(1, max(agility_1, agility_2))
         initiative_2 : int = agility_2 + randint(1, max(agility_1, agility_2))
-        return True if initiative_1 >= initiative_2 else False
+        return initiative_1 >= initiative_2
 
     def parse_heal(self, action: tuple, com_num : int):
         '''Parses Heal Actions'''
