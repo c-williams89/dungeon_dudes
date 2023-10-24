@@ -80,6 +80,7 @@ class Rogue(Character):
         self._evasion_chance: int = 0
         self._auto_potion: bool = False
         self._first_action: bool = True
+        self._enhanced_abilities_on: bool = False
 
     def adjust_offensive_mod(self, modifiers : list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
@@ -170,7 +171,10 @@ class Rogue(Character):
             message : str = (f"{self.name} attacks with {self.weapon} "
                             f"for <value> {self._weapon.damage_type} damage")
         if self.level >=8 and self._surprise_attack_left:
-            damage = int(damage * 1.5)
+            if self._enhanced_abilities_on:
+                damage = int(damage * 1.75)
+            else:
+                damage = int(damage * 1.5)
             self.printer(f"{self.name} Prepares for a surprise attack")
         actions.append(("Attack", damage, self._weapon.damage_type, message))
         if self._poison_coated:
@@ -180,13 +184,14 @@ class Rogue(Character):
             actions.append(("Hex", self.level, "Poision", ""))
         return CombatAction(actions, "")
 
-    def luck(self):
+    def luck(self) -> [bool, CombatAction]:
         '''Empower next ability'''
         self.auto_potion()
         message : str = f"{self.name} uses a luck to empower next ability."
         self._special -= 1
         self._empowered = True
         self.printer(message)
+        return False, CombatAction([("Aura", 0, "Physical", "")], "")
 
     def preparation(self) ->  [bool, CombatAction]:
         '''Analayze the battlefield, gaining 10 physical and poison damage '''\
@@ -195,14 +200,23 @@ class Rogue(Character):
                 '''Empower: Prepartion also Identify the enemy.'''
         self.auto_potion()
         self.printer(f"{self.name} Prepares for the battle")
-        poison_modifier = 10
+        if self._enhanced_abilities_on:
+            physical_modifier = 20
+            poison_modifier = 20
+        else:
+            physical_modifier = 10
+            poison_modifier = 10
+        # Weapon coated in poison
         if self._poison_coated:
             poison_modifier += 5
-        actions : List[tuple] = [("Aura", 10, "Physical", ""),
-                                 ("Aura", poison_modifier, "Poison", "")]
+        actions : List[tuple] = [("Battle Cry", physical_modifier, "Physical", ""),
+                                 ("Battle Cry", poison_modifier, "Poison", "")]
+        # Empowered
         if self._empowered:
             self.printer("Empowered: Identifying the enemy!")
             actions.append(("Identify", 0, "", ""))
+        # Coat weapon in poison
+        self._poison_coated = True
         return True, CombatAction(actions, "")
     
     def use_healing_potion(self) -> Tuple[bool, CombatAction]:
@@ -232,8 +246,12 @@ class Rogue(Character):
         '''50 % chance to avoid 100% of the damage for next two events'''
         self.auto_potion()
         self._evasion_active = True
-        self._evasion_count = 2
-        self._evasion_chance = 50
+        if self._enhanced_abilities_on:
+            self._evasion_count = 3
+            self._evasion_chance = 60
+        else:
+            self._evasion_count = 2
+            self._evasion_chance = 50
         if self._empowered:
             self.printer("Empowered: Increasing evasion number and chance")
             self._evasion_count += 1
@@ -248,8 +266,10 @@ class Rogue(Character):
         '''Once per battle, rogue attacks for damage equal to attack power '''\
         '''+ agility + strength. Consumes surprise attack'''
         self.auto_potion()
-        damage : int = self.modify_damage(self._attack_power + self.agility + self.strength)
-        self._surprise_attack_left = False
+        base_damage = self._attack_power + self.agility + self.strength
+        if self._enhanced_abilities_on:
+            base_damage += self.agility
+        damage : int = self.modify_damage(base_damage)
         message : str = f"{self.name} Ambushes for <value> damage"
         actions : List[tuple] = [("Attack", damage, "Physical", message)]
         if self._poison_coated:
@@ -259,6 +279,8 @@ class Rogue(Character):
                 self._empowered = False
             else:
                 actions.append(self.poison_attack(self.intelligence))
+        self._surprise_attack_left = False
+        self._ambush_left = False
         return True, CombatAction(actions, "")
 
     def increase_luck(self) -> [bool, CombatAction]:
@@ -270,6 +292,8 @@ class Rogue(Character):
         else:
             self.printer(f"{self.name} already has max Luck")
         base_modifier = 0.7
+        if self._enhanced_abilities_on:
+            base_modifier += 0.15
         base_attack = int(base_modifier * self._attack_power)
         damage = self.modify_damage(base_attack)
         message : str = (f"{self.name} attacks with {self.weapon} "
@@ -302,27 +326,6 @@ class Rogue(Character):
         self._first_action = False
         return
 
-    def strengthen(self) ->  [bool, CombatAction]:
-        '''Deal an attack which does half normal damage,'''\
-        '''Your physical damage modifier increased by 0.1 for the remainder of the encounter'''
-        action_type, damage, dmg_type, _ = self.attack().actions[0]
-        damage : int = damage // 2
-        message : str = (f"Makes a calculated strike for <value> {dmg_type} Damage"
-                   f", and strengthens their future physical attacks")
-        return True, CombatAction([(action_type, damage, dmg_type, message),
-                             ("Battle Cry", 10, "Physical", "")], "")
-
-    def rampage(self) -> [bool, CombatAction]:
-        '''Once per battle: Attack this turn with a 100 percent chance to deal a critical strike'''
-        if not self._rampaged:
-            self._rampaged : bool = True
-            damage : int = self.modify_damage(self._attack_power, auto_crit=True)
-            message : str = (f"Rampages, critically striking with {self.weapon}"
-                            f" for <value> {self._weapon.damage_type} damage")
-            return True, CombatAction([("Attack", damage, self._weapon.damage_type, message)], "")
-        self.printer("Ability Failed: Can only use Rampage once per Battle")
-        return False, CombatAction([("Attack", 0, "Physical", "")], "")
-
     def level_up(self, combat=False):
         super().level_up(combat=combat)
         luck_growth_rate : int = 2
@@ -351,6 +354,8 @@ class Rogue(Character):
         self._poison_coated = False
         if self._level >= 20:
             self._auto_potion = True
+        if self._level >= 25:
+            self._enhanced_abilities_on = True
 
     @property
     def special(self) -> int:
@@ -452,8 +457,8 @@ class Rogue(Character):
         '''Gets Skills Learned'''
         skills_list_filter : dict = ({skill_info[0]:skill_info[1] for level_learned, skill_info in
                                self.skills_dict.items() if level_learned <= self.level})
-        if self._rampaged:
-            del skills_list_filter["Rampage"]
+        if not self._ambush_left:
+            del skills_list_filter["Ambush"]
         return skills_list_filter
 
     def get_skills_list(self) -> List[str]:
@@ -473,6 +478,9 @@ class Rogue(Character):
             self._poison_coated = False
             self._empowered = False
             self._evasion_active = False
+            self._surprise_attack_left = True
+            self._first_action = True
+            self._ambush_left = True
             self.printer(f"You have defeated {name}!  Gained {gold} Gold.  Gained {exp} Experience")
             # Healing potion affinity passive
             if self._level >= 5:
