@@ -14,6 +14,11 @@ class Monster(Combatant):
         self._experience_points : int = self._experience_base
         self.base_att_def_power()
 
+
+    def level_up(self):
+        super().level_up()
+        self.base_att_def_power()
+
     @Combatant.experience_points.setter
     def experience_points(self):
         self._experience_points : int = self._experience_base
