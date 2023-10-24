@@ -74,6 +74,9 @@ class EncounterMenu(cmd.Cmd):
         if result:
             return True
         self.player_1_turn : bool = False
+        if self.player_2.hit_points == 0:
+            self.player_2_alive : bool = False
+            return True
         self.loop_back()
 
     def do_special_attack(self, arg):
@@ -85,6 +88,9 @@ class EncounterMenu(cmd.Cmd):
         if self._encounter.player_spl_att_complete:
             self.player_1_turn : bool = False
             self._encounter.player_spl_att_complete: bool = False
+        if self.player_2.hit_points == 0:
+            self.player_2_alive : bool = False
+            return True
         self.loop_back()
 
 
@@ -96,6 +102,9 @@ class EncounterMenu(cmd.Cmd):
             if result:
                 return True
             self.player_1_turn : bool = False
+        if self.player_2.hit_points == 0:
+            self.player_2_alive : bool = False
+            return True
         self.loop_back()
 
     def non_scroll_escape(self, num):
@@ -112,6 +121,7 @@ class EncounterMenu(cmd.Cmd):
             self.player_1.scroll_of_escape -= 1
             self.printer(f"{self.player_1.name} escapes to town with a scroll of escape")
             return True
+        self.loop_back()
 
     def preloop(self):
         '''Displays Menu When Class __init__ is called'''
