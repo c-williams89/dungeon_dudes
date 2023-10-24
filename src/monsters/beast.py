@@ -70,3 +70,7 @@ class Beast(Monster):
     def take_turn(self) -> CombatAction: # pylint: disable=unused-argument
         '''Takes turn and returns the success status of the action and the action'''
         return self.attack()
+
+    def level_up(self):
+        super().level_up()
+        self.base_att_def_power()

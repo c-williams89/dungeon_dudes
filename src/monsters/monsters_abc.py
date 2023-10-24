@@ -18,14 +18,6 @@ class Monster(Combatant):
     def experience_points(self):
         self._experience_points : int = self._experience_base
 
-    def level_up(self):
-        '''Level up a Monster'''
-        super().level_up()
-        if self._level % 2 == 0:
-            self._attack_power += 1
-        else:
-            self._defense_power += 1
-
     def win_battle(self, combatant: Combatant): # pylint: disable=unused-argument
         '''Monsters don't do anything when winning a battle'''
 
