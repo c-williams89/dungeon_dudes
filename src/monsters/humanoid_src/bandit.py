@@ -30,6 +30,9 @@ class Bandit(Humanoid):
         else:
             self._num_bandits = 5
 
+        if self.level > 2:
+            self._healing_potions += 1
+
     @property
     def damage_modifiers(self) -> LimitedDict:
         return self._dam_modifiers
@@ -54,14 +57,21 @@ class Bandit(Humanoid):
         msg: str = "Bandit Rogue attacks for <value> Physical damage"
         damage_amt = int((3 * self.attack_power) / 4)
         return ("Attack", damage_amt, "Physical", msg)
+    
+    def rallying_cry(self):
+        # msg: str = "Bandit Bard strengthens future physical attacks"
+        self.printer("Bandit Bard strengthens future physical attacks")
+        return ("Battle Cry", 10, "Physical", "")
 
     def get_action(self):
-        actions = [self.fireball(),
-                   self.fireball(),
-                   self.dirty_tricks()]
+        actions = [self.fireball,
+                   self.fireball,
+                   self.dirty_tricks]
+        if self.level > 7:
+            actions.append(self.rallying_cry)
         index = randint(0, (len(actions) - 1))
         option = actions.pop(index)
-        return option
+        return option()
     
     def take_turn(self) -> CombatAction:
         damage: int = self.humanoid_damage(self.modify_damage((self.attack_power)))
@@ -71,10 +81,10 @@ class Bandit(Humanoid):
         for _ in range(1, self._num_bandits):
             action_list.append(attack)
         action_list.append(self.get_action())
-        heal = None
+
         if (self.hit_points < (self.max_hit_points / 2)):
             print("We are healing here")
             if randrange(2):
-                self.healing_potion()
+                self.healing_potion("Bandits")
         action = CombatAction(action_list, "")
         return action
