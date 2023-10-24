@@ -22,7 +22,6 @@ class Ogre(Humanoid):
 
     def __init__(self, level_mod: int):
         ogre_type = self.ogre_types[0]
-        # ogre_type: tuple = choice(self.ogre_types)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         self._ogre_type: str = ogre_type[0]
         self._damage_type: str = ogre_type[1]
