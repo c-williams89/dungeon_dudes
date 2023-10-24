@@ -4,7 +4,7 @@ from .monsters_abc import Monster
 from ..combat_action import CombatAction
 from ..dd_data import CombatPrint, LimitedDict, damage_types
 
-
+# NOTE: CombantantABC line 19 to modify starting level
 
 class Humanoid(Monster):
     '''Humanoid Monster Class'''
@@ -15,6 +15,7 @@ class Humanoid(Monster):
         self.printer = CombatPrint()
         self._def_modifiers = LimitedDict(damage_types, default_value=100)
         self._dam_modifiers = LimitedDict("Physical", default_value=100)
+        self._healing_potions = 1
 
     def modify_damage(self, damage) -> int:
         '''Adds variance to damage events and calculates critical chance'''
@@ -43,6 +44,10 @@ class Humanoid(Monster):
         else:
             self._hit_points = int(value)
 
+    @property
+    def healing_potions(self):
+        return self._healing_potions
+
     def take_damage(self, damage: int, dmg_type, message: str) -> bool:
         alive = True
         if dmg_type == "Physical":
@@ -70,7 +75,13 @@ class Humanoid(Monster):
         return int(damage)
 
     def healing_potion(self):
-        self._hit_points = int(self.max_hit_points * .45)
+        if self.healing_potions > 0:
+            health = int(self._hit_points * .45)
+            self._hit_points += health
+            self._healing_potions -= 1
+            self.printer(f"Drank a healing potion and healed {health} hit points")
+            # msg: str = "Drank a healing Potion and healed <value> Hit Points"
+            # return ("Heal", health, "Healing", msg)
 
     def take_turn(self) -> CombatAction:
         return self.attack()
