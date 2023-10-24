@@ -41,6 +41,33 @@ class Zombie(Undead):
     
     def get_skills(self) -> Dict[str, 'function']:
         return {}
+    
+    def take_damage(self, damage: int, dmg_type, message: str) -> bool: # pylint: disable=unused-argument
+        '''Process Damage Events'''
+        alive = True
+        if dmg_type == "Physical":
+            damage = damage - (self._defense_power // 2)
+        damage = int(damage * self._def_modifiers[dmg_type]/100)
+   
+        if damage >= self.hit_points:
+            if self._resist_death:
+                self._hit_points = 1
+                self._resist_death = False
+                message = message.replace('<value>', str(damage))
+                resist_message = "Resist Death saves the Zombie! He has 1 HP left."
+                self.printer(message)
+                self.printer(resist_message)
+                return alive
+            alive = False
+            message = message.replace('<value>', str(self._hit_points))
+            self.printer(message)
+            self._hit_points = 0
+            return alive
+       
+        self._hit_points -= damage
+        message = message.replace('<value>', str(damage))
+        self.printer(message)
+        return alive
 
     def attack(self) -> CombatAction:
         '''Attack method for Zombie Horde'''
@@ -55,7 +82,6 @@ class Zombie(Undead):
             damage: int = (self.modify_damage(self._attack_power))
             message: str = f"{self._sub_type} attacks for <value> physical damage"
             horde_actions.append(("Attack", damage, "Physical", message))
-      
         return CombatAction(horde_actions, "")
     
     def take_turn(self) -> CombatAction:
