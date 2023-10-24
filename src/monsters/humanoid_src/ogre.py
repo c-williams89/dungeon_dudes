@@ -103,7 +103,6 @@ class Ogre(Humanoid):
     def blood_thirster_attack(self):
         actions = []
         actions.append(self.risky_blow())
-        self.printer(actions)
         if randint(0, 100) < 25:
             actions.append(self.frenzy())
             if self.level > 9:
@@ -121,16 +120,20 @@ class Ogre(Humanoid):
             (self.hit_points < int(self.max_hit_points * .25))):
             self._damage += int(self.damage * .25)
 
+    def bloodlust(self):
+        pass
+
 
     def take_turn(self) -> CombatAction:
         '''Create list of normal attack and special attacks and choose one'''
 
 
-
+        self.strategic_thinking()
         action_list = []
         if self.hit_points < int(self.max_hit_points / 2):
             if randint(0, 100) < 75:
-                self.healing_potion(self.ogre_type)
+                if (self.healing_potion(self.ogre_type)):
+                    self.bloodlust()
         if self.ogre_type == "Blood-Thirster":
             actions = [self.attack, self.blood_thirster_attack]
             option = choice(actions)

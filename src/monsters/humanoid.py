@@ -75,11 +75,14 @@ class Humanoid(Monster):
         return int(damage)
 
     def healing_potion(self, character):
+        b_success = False
         if self.healing_potions > 0:
             health = int(self.max_hit_points * .45)
             self._hit_points += health
             self._healing_potions -= 1
             self.printer(f"{character} drank a healing potion and healed {health} hit points")
+            b_success = True
+        return b_success
 
     def take_turn(self) -> CombatAction:
         return self.attack()
