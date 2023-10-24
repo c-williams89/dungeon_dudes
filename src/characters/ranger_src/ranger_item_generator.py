@@ -103,7 +103,7 @@ class RangerEquipmentGenerator:
             choice(list(defensive_suffix.items()))
         modifier_amount : int = 30 + (level * 3)
         mod_1 : int = randint(1, modifier_amount - 2)
-        mod_2 : int = randint(1, modifier_amount - 2 - mod_1)
+        mod_2 : int = randint(1, modifier_amount - 1 - mod_1)
         mod_3 : int = modifier_amount - mod_1 - mod_2
         remaining_resist = list(set(resist_modifiers) - set(modifiers))
         mod_3_resist = choice(remaining_resist)
@@ -156,13 +156,15 @@ class RangerEquipmentGenerator:
         prefix :str = ""
         suffix : str = choice(accessory_element)
         prefix_chance : str = randint(1,5)
+        armor :int = 0
+        attack :int = 0
         attack_cost_mod : int = 1
         if prefix_chance >= 4:
-            armor += level
+            armor += int(level * .5)
             prefix : str = "Fortified"
             attack_cost_mod : float= 1.5
         elif prefix_chance == 3:
-            attack += level
+            attack += int(level * .5)
             prefix : str = "Powerful"
             attack_cost_mod : float = 1.5
 
@@ -170,7 +172,7 @@ class RangerEquipmentGenerator:
                                           attack_cost_mod, prefix_mod)
         cost = max(cost, 1)
         accessory_name : str = f'{prefix} {accessory_name} of {suffix}'.strip()
-        accessory_special = {"Attack": 0, "Armor": 0,
+        accessory_special = {"Attack": attack, "Armor": armor,
                                 "Offensive": [],"Defensive" : []}
         item = Accessory(accessory_type, accessory_name,
                          accessory_special, cost=cost)
