@@ -186,6 +186,9 @@ class Rogue(Character):
 
     def luck(self) -> [bool, CombatAction]:
         '''Empower next ability'''
+        if self._special == 0:
+            self.printer(f"{self.name} exhausted all lucks. Can't perform the action.")
+            return False, CombatAction([("Aura", 0, "Physical", "")], "")
         self.auto_potion()
         message : str = f"{self.name} uses a luck to empower next ability."
         self._special -= 1
