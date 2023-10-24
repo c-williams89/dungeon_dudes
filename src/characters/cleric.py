@@ -1,14 +1,3 @@
-'''Placeholder Module for Cleric Class'''
-from typing import Dict, Tuple, List
-from random import gauss, randint
-from math import floor
-from .character_abc import Character
-from ..combatant_abc import Combatant
-from .equipment import Equipment, Weapon, Armor, Accessory
-from ..dd_data import LimitedDict, damage_types, CombatPrint
-from ..combat_action import CombatAction
-from .cleric_src import ClericEquipmentGenerator
-
 from typing import Dict, Tuple, List
 from random import gauss, randint
 from math import floor
@@ -91,7 +80,7 @@ class Cleric(Character):
         self._smite_damage: int = int(self.intelligence / self._smite_multi)
         self._battle_smite = ("Attack", self._smite_damage, "Holy",
                               f"{self.name}'s Smite deals an " +
-                              "additional <value> damage!")
+                              "additional <value> Holy damage!")
 
     def adjust_offensive_mod(self, modifiers: list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
