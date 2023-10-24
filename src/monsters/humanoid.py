@@ -76,7 +76,7 @@ class Humanoid(Monster):
 
     def healing_potion(self, character):
         if self.healing_potions > 0:
-            health = int(self._hit_points * .45)
+            health = int(self.max_hit_points * .45)
             self._hit_points += health
             self._healing_potions -= 1
             self.printer(f"{character} drank a healing potion and healed {health} hit points")

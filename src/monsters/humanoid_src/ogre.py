@@ -24,6 +24,7 @@ class Ogre(Humanoid):
         ogre_type = choice(self.ogre_types)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         # self._ogre_type: str = ogre_type[0]
+        # self._ogre_type = "Ogre-Magi"
         self._ogre_type = "Blood-Thirster"
         self._damage_type: str = ogre_type[1]
         super().__init__(f"{self._ogre_type} Ogre",
@@ -76,9 +77,8 @@ class Ogre(Humanoid):
         damage_amt = self.intelligence
         msg: str = (f"{self.name} casts wild magics, dealing <value> "
                     f"{damage_type} damage and attacking again")
-        return CombatAction([("Attack", damage_amt, damage_type, msg),
-                            ("Attack", damage_amt, damage_type, msg)],
-                            "")
+        return ("Attack", damage_amt, damage_type, msg)
+
 
     def frenzy(self):
         msg: str = ("Blood-Thirster Ogre goes into a frenzy, dealing <value> "
@@ -101,27 +101,43 @@ class Ogre(Humanoid):
         return ("Attack", damage, "Physical", msg)
         
     def blood_thirster_attack(self):
-        actions = [self.risky_blow()]
+        actions = []
+        actions.append(self.risky_blow())
+        self.printer(actions)
         if randint(0, 100) < 25:
             actions.append(self.frenzy())
             if self.level > 9:
                 if randint(0, 100) < 25:
                     actions.append(self.improved_frenzy())
+                else:
+                    self.printer("Blood-Thirster Ogre's Improved Frenzy was "
+                                 "Unsuccessful")
+        else:
+            self.printer("Blood-Thirster Ogre's Frenzy Unsuccessful")
         return actions
-
-    def ogre_magi_attack(self):
-        pass
 
     def take_turn(self) -> CombatAction:
         '''Create list of normal attack and special attacks and choose one'''
+        action_list = []
         if self.hit_points < int(self.max_hit_points / 2):
             if randint(0, 100) < 75:
                 self.healing_potion(self.ogre_type)
         if self.ogre_type == "Blood-Thirster":
-            action_list = self.blood_thirster_attack()
+            actions = [self.attack, self.blood_thirster_attack]
+            option = choice(actions)
+            if option == self.attack:
+                action_list.append(option())
+                return CombatAction(action_list, "")
+            return CombatAction(option(), "")
         else:
-            # action_list = self.ogre_magi_attack()
-            pass
-
-        action = CombatAction(action_list, "")
-        return action
+            actions = [self.attack, self.wild_magics]
+            option = choice(actions)
+            if option == self.attack:
+                action_list.append(option())
+                if self.level > 4:
+                    action_list.append(self.wild_magics())
+            else:
+                action_list.append(option())
+                if self.level > 4:
+                    action_list.append(self.attack())
+            return CombatAction(action_list, "")
