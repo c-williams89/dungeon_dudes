@@ -22,11 +22,6 @@ class Undead(Monster):
         damage_max = int(damage * 1.75)
         modified: int = randint(damage_min, damage_max)
         return modified
-    
-    def attack(self) -> CombatAction:
-        damage: int = (self.modify_damage(self._attack_power))
-        message: str = f"{self.name} Attacks for <value> physical damage"
-        return CombatAction([("Attack", damage, "Physical", message)], "")
 
     @property
     def hit_points(self) -> int:
