@@ -1,5 +1,6 @@
 '''Murloc Module for Dungeon Dudes'''
 from typing import Dict, Tuple
+from random import randint
 
 from src.dd_data import LimitedDict
 from ..humanoid import Humanoid
@@ -49,9 +50,21 @@ class Murloc(Humanoid):
         msg: str = "Murloc casts Ice Bolt for <value> Ice Damage"
         return("Attack", damage, "Ice", msg)
     
+    def forage(self):
+        self._healing_potions += 1
+        self.printer(f"Murloc has gathered ingredients to make a healing "
+                     f"potion. Murloc tribe now has {self.healing_potions} "
+                     "Healing Potions.")
+        return ("Heal", 0, "Heal", "")
+    
     def get_action(self):
-        actions = []
-        return actions
+        actions = [self.ice_bolt,
+                   self.ice_bolt,
+                   self.forage,
+                   self.forage]
+        index = randint(0, (len(actions) - 1))
+        option = actions.pop(index)
+        return option()
 
     def take_turn(self):
         damage: int = self.humanoid_damage(self.modify_damage(self.attack_power))
@@ -60,6 +73,6 @@ class Murloc(Humanoid):
         action_list = []
         for _ in range(1, self.tribe_size):
             action_list.append(attack)
-        # action_list.append(self.get_action())
+        action_list.append(self.get_action())
         action = CombatAction(action_list, "")
         return action
