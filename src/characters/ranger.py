@@ -62,7 +62,7 @@ class Ranger(Character):
         self._def_modifiers = LimitedDict(self.damage_types, default_value=100)
         self._dam_modifiers = LimitedDict("Physical", default_value=100)
         self._equipment_generator = RangerEquipmentGenerator()
-        super().__init__(name, "Ranger", self.stats_structure, 
+        super().__init__(name, "Ranger", self.stats_structure,
                          self.item_compatibility)
         self._exp_to_next_iter = iter([(40 * i ** 2) for i in range(1, 50)])
         self._exp_to_next :int = next(self._exp_to_next_iter)
@@ -77,7 +77,9 @@ class Ranger(Character):
         self._total_companion :int = 1
         self._improved_animal_companion :bool = False
         self._summoned :int = 0
-        self._trap = [False, (self._attack_power * .50)]
+        self._att_modified :int = 0
+        self._def_modified :int = 0
+        self._trap :list = [False, 0]
 
     def adjust_offensive_mod(self, modifiers : list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
@@ -158,12 +160,6 @@ class Ranger(Character):
                 damage *= 1.5
                 self._focus = False
                 self._special -= 1
-        # Calculate the total attack damage
-        damage += modifier
-        msg = (f"{self.name} attacks with {self.weapon} "
-                      f"for <value> {self._weapon.damage_type} damage")
-        basic_attack = ("Attack", damage, self._weapon.damage_type, msg)
-        combat_list.append(basic_attack)
         # Companions damage
         for key, value in self._companion.items():
             if value[0] is True:
@@ -176,12 +172,22 @@ class Ranger(Character):
             trap_msg :str = f"Steel Trap inflicts {self._trap[1]} damage"
             combat_list.append(("Attack", int(self._trap[1]), 'Physical',
                                 trap_msg))
+        # Calculate the attack damage
+        damage += modifier
+        weapon_type = self._weapon.damage_type
+        # If Quiver is equiped
+        if isinstance(self._accessory, Accessory):
+            weapon_type = self._accessory.element
+            damage = int(damage * 1.33)
+        msg = (f"{self.name} attacks with {self.weapon} "
+                      f"for <value> {weapon_type} damage")
+        basic_attack = ("Attack", damage, weapon_type, msg)
+        combat_list.append(basic_attack)
         return combat_list
 
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
         damage : int = self.modify_damage(self._attack_power)
-
         return CombatAction(damage, "")
 
     def check_summon(self, companion: str):
@@ -191,6 +197,8 @@ class Ranger(Character):
             return True
         # If summoned companions is less than total available summon
         elif self._summoned < self._total_companion:
+            self.printer(f"level {self._level}")
+            self.printer(f"companion total: {self._total_companion}")
             self._companion[companion][0] = True
             self._summoned += 1
         # If summoned companions is equal to the total available summon
@@ -222,7 +230,7 @@ class Ranger(Character):
                 end_turn = True
         modified_damage = damage + floor(max(0, min(damage*.24,
                                      (gauss(damage*.08, damage*.04)))))
-        return end_turn, modified_damage
+        return end_turn, int(modified_damage)
 
     def summon_wolf(self) ->  [bool, CombatAction]:
         '''Summons a Wolf Companion. Whenever the Ranger deals damage, the 
@@ -230,11 +238,13 @@ class Ranger(Character):
         attack'''
         end_turn = True
         base_modifier = 60
+        # Gain Awareness
         self._focus = True
         # Check if the wolf is already summoned
         summoned = self.check_summon('Wolf')
         if summoned:
             self.printer("You already summoned a 'Wolf' companion")
+            end_turn = False
             return end_turn, CombatAction([], "")
         # Calculate Wolf Damage
         end_turn, damage = self.summon_attack_modifier(base_modifier)
@@ -267,23 +277,27 @@ class Ranger(Character):
         summoned = self.check_summon("Bear")
         if summoned:
             self.printer("You already summoned a 'Bear' companion")
+            end_turn = False
             return end_turn, CombatAction([], "")
-
         # Calculate Bear Damage
         end_turn, damage = self.summon_attack_modifier(base_modifier)
         self._companion['Bear'][1] = damage
-        # Calculate Defense Modifier
+        # Calculate Resist Modifier
         resist_type : List[str] = ["Physical"]
         if self._level < 15:
-            defense_modifier = 10
+            resist = 10
         else:
-            defense_modifier = 20
-        aura : List[tuple] = [("Aura", defense_modifier, damage_type, "")
+            resist = 20
+        aura : List[tuple] = [("Aura", resist, damage_type, "")
                                 for damage_type in resist_type]
+        # Calculate Ranger defense modifier
         if self.level >= 25:
-            self._defense_power += self._defense_power * (2 * defense_modifier)
+            self._def_modified = int(self._defense_power *\
+                                      (2 * defense_modifier))
+            self._defense_power += self._def_modified
         else:
-            self._defense_power += self._defense_power * defense_modifier
+            self._def_modified = int(self._defense_power * defense_modifier)
+            self._defense_power += self._def_modified
         self.printer(f"{self.name} summons a Bear companion")
         return end_turn, CombatAction(aura, "")
 
@@ -298,6 +312,7 @@ class Ranger(Character):
             return False, CombatAction([],"")
         # Turn the trap flag on
         self._trap = True
+        self._trap[1] = self._attack_power * .50
         self.printer(f"{self.name} uses steele traps!")
         return True, CombatAction([], "")
 
@@ -313,6 +328,7 @@ class Ranger(Character):
         summoned = self.check_summon("Cat")
         if summoned:
             self.printer("You already summoned a 'Cat' companion")
+            end_turn = False
             return end_turn, CombatAction([],"")
         # Calculate Cat Damage and attack modifier
         end_turn, damage = self.summon_attack_modifier(base_modifier)
@@ -321,41 +337,55 @@ class Ranger(Character):
             self._attack_power += self._attack_power * (2 * attack_modifier)
         else:
             self._attack_power += self._attack_power * attack_modifier
-        # Calculate Defense Modifier
+        # Calculate Resist Modifier
         resist_type : List[str] = ["Lightning", "Fire"]
         if self._level < 15:
-            defense_modifier = 10
+            resist = 10
         else:
-            defense_modifier = 20
-        aura : List[tuple] = [("Aura", defense_modifier, damage_type, "")
+            resist = 20
+        aura : List[tuple] = [("Aura", resist, damage_type, "")
                                 for damage_type in resist_type]
+        # Calculate Ranger's attack modifier
+        if self.level >= 25:
+            self._att_modified = int(self._attack_power *\
+                                      (2 * attack_modifier))
+            self._attack_power += self._att_modified
+        else:
+            self._att_modified = int(self._attack_power * attack_modifier)
+            self._attack_power += self._att_modified
         self.printer(f"{self.name} summons a Cat companion")
         return end_turn, CombatAction(aura, "")
 
-
-    # def summon_clean_up(self):
-    #     for key, value in self._companion.items():
-    #         if key == "Bear":
-    #             self._defense_power = 
+    def summon_clean_up(self):
+        '''Reset the attack power and defense power and companions'''
+        for value in self._companion.values():
+            value[0] = False
+        self._summoned = 0
+        self._attack_power -= self._att_modified
+        self._defense_power -= self._def_modified
 
     def level_up(self, combat=False):
         super().level_up(combat=combat)
         if self._level in self.skills_dict:
             skill : str = self.skills_dict[self._level][0]
             description : str = self.skills_dict[self._level][1].__doc__
-            description : str = "\n".join(line.strip() for line in description.splitlines())
+            description : str = "\n".join(line.strip() \
+                                          for line in description.splitlines())
             if combat:
                 self.printer(f'New Skill - {skill}:', description)
             else:
                 print(f'\nNew Skill - {skill}:', description)
         if self._level in self.passive_skills:
             skill : str = self.passive_skills[self._level][0]
-            description : str = self.passive_skills[self._level][1]
-            description : str = "\n".join(line.strip() for line in description.splitlines())
+            for passive in self.passive_skills[self._level]:
+                description = passive[1]
             if combat:
                 self.printer(f'New Skill - {skill}:', description)
             else:
                 print(f'New Skill - {skill}:', description)
+         # Improved Animal Companion
+        if self._level >= 15:
+            self._total_companion = 2
         self._attack_power += 2
         self._defense_power += 1
 
@@ -428,7 +458,8 @@ class Ranger(Character):
         '''Getter for Defense Modifiers'''
         return self._def_modifiers
 
-    def take_damage(self, damage: int, dmg_type : str, message : str) -> bool: # pylint: disable=unused-argument
+    def take_damage(self, damage: int, dmg_type : str, message : str) -> bool: 
+        # pylint: disable=unused-argument
         '''Processes Damage Events'''
         alive = True
         if dmg_type == "Physical":
@@ -454,26 +485,32 @@ class Ranger(Character):
 
     def get_skills(self) -> Dict[str, 'function']:
         '''Gets Skills Learned'''
-        skills_list_filter : dict = ({skill_info[0]:skill_info[1] for level_learned, skill_info in
-                               self.skills_dict.items() if level_learned <= self.level})
+        skills_list_filter : dict = ({skill_info[0]:skill_info[1]\
+                                      for level_learned, skill_info in
+                               self.skills_dict.items() if level_learned\
+                                <= self.level})
         return skills_list_filter
 
     def get_skills_list(self) -> List[str]:
         '''Returns List of Skills Learned'''
         skills_list_filter : list = ([skill_info[0] for level_learned, skill_info in
-                               self.skills_dict.items() if level_learned <= self.level])
+                               self.skills_dict.items() if level_learned\
+                                <= self.level])
         return skills_list_filter
 
     def win_battle(self, combatant : Combatant):
         '''Instructors for Wining a Battle'''
         if isinstance(combatant, Combatant):
-            exp, gold, name = combatant.experience_points, combatant.gold, combatant.name
+            exp, gold, name = combatant.experience_points, combatant.gold,\
+                combatant.name
             self._battles_won += 1
-            self.printer(f"You have defeated {name}!  Gained {gold} Gold.  Gained {exp} Experience")
+            self.printer(f"You have defeated {name}!  Gained {gold} Gold."
+                         f"Gained {exp} Experience")
             # Focused Regeneration
             if self._level >= 10:
                 current = self.hit_points
-                self.hit_points += floor(self.max_hit_points * .25)
+                self.hit_points += floor(self.max_hit_points * \
+                                         self._special / 100)
                 self.printer(f"You heal {self.hit_points - current} "
                              f"hit points from Focused Regeneration")
             # Lucky Strike
@@ -486,6 +523,7 @@ class Ranger(Character):
                 self.printer(f"You gain {1 + self._summoned} "
                              f"focus points from Lucky Strike")
             self._gold += gold
+            self.summon_clean_up()
             self.gain_experience(exp, combat=True)
 
     def generate_weapon(self) -> Weapon:
