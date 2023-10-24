@@ -171,9 +171,9 @@ class ClericEquipmentGenerator:
 
         modifier_amount: int = 25 + (level * 2.5)
         defense_special = [
-            ("Physical", (modifier_amount // 3)),
-            ("Holy", (modifier_amount // 3)),
-            ("Poison", (modifier_amount // 3))
+            ("Physical", 0 - int(modifier_amount // 3)),
+            ("Holy", 0 - int(modifier_amount // 3)),
+            ("Poison", 0 - int(modifier_amount // 3))
         ]
         modifiers, _ = choice(list(self._def_suffix_maps.items()))
         suffix = "Antioch"
@@ -186,7 +186,7 @@ class ClericEquipmentGenerator:
             damage_types: list = ["Fire", "Ice", "Lightning"]
             new_mod: str = choice([damage_type for damage_type in damage_types
                                   if damage_type not in modifiers])
-            defense_special.append((new_mod, 10 + level))
+            defense_special.append((new_mod, 0 - (10 + level)))
             prefix: str = "Resistant"
             prefix_mod: int = 2
 

@@ -73,8 +73,13 @@ class Cleric(Character):
         self._special: int = 50
         self._special_resource: str = "Mana"
         self._accessory_type: str = "Holy Symbol"
-        # self._critical_modifier : int = 1
         self._avenged: bool = False
+        self._nodamage: bool = False
+        self._halfdamage: bool = False
+        self._retribution: bool = False
+        self._smite_multi: int = 3
+        self._smite_damage: int = int(self.intelligence / self._smite_multi)
+        self._battle_smite = ("Attack", self._smite_damage, "Holy", "")
 
     def adjust_offensive_mod(self, modifiers: list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
@@ -140,61 +145,194 @@ class Cleric(Character):
 
     def modify_damage(self, damage) -> int:
         '''Adds Variance to Damage Events and Calculates Critical Chance'''
-        std_dev_percent: int = 0.08
+        std_dev_percent: int = 0.12
         modified: int = max(floor(gauss(damage,
                                         (std_dev_percent * damage))), 1)
 
         return modified
 
+    def divine_blessing(self) -> None:
+        '''Passive: When you take action in combat, you will recover '''
+        ''' 10percent of your maximium HP when at full Mana, and '''
+        ''' 10percent of your maximum mana when at full Hit Points.'''
+        if self._level >= 5:
+            if self.special == self.max_special:
+                self.hit_points += self.max_hit_points * 0.10
+                self.printer(f"A Blessing! A Blessing from the Lord!",
+                             f"{self.name} recovered ",
+                             f"{self.max_hit_points * 0.10} HP.")
+            if self.hit_points == self.max_hit_points:
+                self.special += self.max_special * 0.10
+                self.printer(f"A Blessing! A Blessing from the Lord!",
+                             f"{self.name} recovered ",
+                             f"{self.max_special * 0.10} Mana.")
+
+    def improved_healing(self, special_cost: int) -> None:
+        '''Passive: When above 50percent Mana, '''
+        '''Heal and Greater heal consume 100percent more Mana '''
+        '''and deal Holy damage equal to the number of HP healed.'''
+        if self.level >= 25 and (self.special > (self.max_special * 0.5)):
+            return ("Attack", special_cost, "Holy", "")
+        else:
+            return ("Attack", 0, "Physical", "")
+
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
-        damage: int = self.modify_damage(self._attack_power)
-        message: str = (f"{self.name} attacks with {self.weapon} "
-                        f"for <value> {self._weapon.damage_type} damage")
+        damage: int = max(1, self.modify_damage(self._attack_power))
+        msg: str = (f"{self.name} attacks with {self.weapon} "
+                    f"for <value> {self._weapon.damage_type} damage")
+        self.divine_blessing()
         return CombatAction([("Attack", damage,
-                              self._weapon.damage_type, message)], "")
+                            self._weapon.damage_type, msg),
+                            self._battle_smite], "")
 
     def heal(self) -> [bool, CombatAction]:
         '''Heals for 50% of Max HP'''
         special_cost = 20
-        if self._special >= special_cost:
-            damage = 0
+        if self.level >= 25 and (self.special > (self.max_special * 0.5)):
+            special_cost *= 2
+
+        if self.special >= special_cost:
             amount_healed = ((self.hit_points + (self.max_hit_points//2)) %
                              self.max_hit_points)
             self.hit_points = (min(self.max_hit_points,
                                    (self.hit_points + amount_healed)))
-            message: str = (f"{self.name} healed for {amount_healed}")
-            return True, CombatAction([("Heal", amount_healed, "", message)], "")
+            msg: str = (f"{self.name} healed {amount_healed} HP",
+                        f"for {special_cost} Mana!")
+            self.special -= special_cost
+            self.printer(msg)
+            self.divine_blessing()
+            improved_healing_atk = self.improved_healing(special_cost)
+            if self.level >= 25:
+                battle_smite = self._battle_smite
+            else:
+                battle_smite = ("Attack", 0, "Physical", "")
+            return True, CombatAction([("Heal", amount_healed, "", ""),
+                                       battle_smite,
+                                       improved_healing_atk], "")
+
         else:
             self.printer("Ability Failed: Not Enough Mana Remaining")
-            return False, CombatAction([("Heal", 0, "", "")], "")
+            return False, CombatAction([("Attack", 0, "Physical", "")], "")
 
     def radiance(self) -> [bool, CombatAction]:
         '''Deal Holy damage to all enemies for Intelligence + AtkPower'''
         '''Heal HP by Intelligence//3'''
         special_cost = 40
-        pass
+        if self.special >= special_cost:
+            damage: int = max(1, self.modify_damage(self.intelligence +
+                                                    self._attack_power))
+            msg: str = (f"{self.name} unleashing Radiance hitting all",
+                        " enemies for <value> Holy damage")
+            self.special -= special_cost
+            self.divine_blessing()
+            return True, CombatAction([("Attack", damage, "Holy", msg),
+                                       self._battle_smite], "")
+
+        else:
+            self.printer("Ability Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Attack", 0, "Physical", "")], "")
 
     def prayer(self) -> [bool, CombatAction]:
         '''Protects self with incantation, raise defense modifier to'''
         '''Holy, Poison, and Physical by 5'''
         '''Reduce the Damage from the Next Damage Event to 0'''
         special_cost = 30
-        pass
+        if self.special >= special_cost:
+            msg: str = (f"{self.name} performs a Prayer, increasing their",
+                        " Holy, Poison, and Physical defenses by 5! Next",
+                        "AttackDamage Calculated will be Zero!")
+            self._nodamage = True
+            self.special -= special_cost
+            return True, CombatAction([("Aura", 5, "Holy", msg),
+                                       ("Aura", 5, "Poison", ""),
+                                       ("Aura", 5, "Physical", "")
+                                       ], "")
+
+        else:
+            self.printer("Ability Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Attack", 0, "Physical", "")], "")
 
     def avenger(self) -> [bool, CombatAction]:
         '''(Once per Battle) Increase Holy Damage Modifier by 30'''
         ''' Deal Intelligence * 6 Holy Damage'''
         special_cost = 100
-        pass
+        if self.special >= special_cost:
+            if self._avenged is False:
+                damage: int = max(1, self.modify_damage(self.intelligence * 6))
+                msg = (f"Avenger Cleric {self.name} unleashes their",
+                       " intelligence for <value> damage. Increases",
+                       " their Holy Damage by 30!")
+                self.divine_blessing()
+                self._avenged = True
+                self.special -= special_cost
+                return True, CombatAction([("Attack", damage, "Holy", msg),
+                                           ("Battle Cry", 30, "Holy", ""),
+                                           self._battle_smite], "")
+            else:
+                self.printer("Ability Failed: Can only use ",
+                             "Avenger once per Battle")
+                return False, CombatAction([("Attack", 0, "Physical", "")], "")
+        else:
+            self.printer("Ability Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Attack", 0, "Physical", "")], "")
 
     def greater_heal(self) -> [bool, CombatAction]:
         """Heal for 70% of Max HP, Reduce next incoming Damage Event by 50%"""
         special_cost = 50
-        pass
+        if self.level >= 25 and (self.special > (self.max_special * 0.5)):
+            special_cost *= 2
+
+        if self.special >= special_cost:
+            amount_healed = ((self.hit_points + (self.max_hit_points * 0.7)) %
+                             self.max_hit_points)
+            self.hit_points = (min(self.max_hit_points,
+                                   (self.hit_points + amount_healed)))
+            msg: str = (f"{self.name} greatly healed {amount_healed} HP",
+                        f"for {special_cost} Mana!")
+            self.special -= special_cost
+            self.printer(msg)
+            self._halfdamage = True
+            self.divine_blessing()
+            improved_healing_atk = self.improved_healing(special_cost)
+            if self.level >= 25:
+                battle_smite = self._battle_smite
+            else:
+                battle_smite = ("Attack", 0, "Physical", "")
+            return True, CombatAction([("Heal", amount_healed, "", msg),
+                                       battle_smite,
+                                       improved_healing_atk], "")
+
+        else:
+            self.printer("Ability Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Attack", 0, "Physical", "")], "")
 
     def level_up(self, combat=False):
-        pass
+        super().level_up(combat=combat)
+        if self._level in self.skills_dict:
+            skill: str = self.skills_dict[self._level][0]
+            msg: str = self.skills_dict[self._level][1].__doc__
+            msg: str = "\n".join(line.strip() for line in msg.splitlines())
+            if combat:
+                self.printer(f'New Skill - {skill}:', msg)
+            else:
+                print(f'\nNew Skill - {skill}:', msg)
+        if self._level in self.passive_skills:
+            skill: str = self.passive_skills[self._level][0]
+            msg: str = self.passive_skills[self._level][1]
+            msg: str = "\n".join(line.strip() for line in msg.splitlines())
+            if combat:
+                self.printer(f'New Skill - {skill}:', msg)
+            else:
+                print(f'New Skill - {skill}:', msg)
+
+        self._attack_power += 1
+        if self.agility % 2 == 0:
+            self._defense_power += 1
+        if self.level == 20:
+            self._smite_multi = 2
+        self.intelligence += 1
+        self.max_special += 15
 
     ''' Getters and Setters for types and variables'''
     @property
@@ -266,27 +404,89 @@ class Cleric(Character):
         '''Getter for Defense Modifiers'''
         return self._def_modifiers
 
-    def take_damage(self, damage: int, dmg_type: str, message: str) -> bool:
+    def take_damage(self, damage: int, dmg_type: str, msg: str) -> bool:
         '''Processes Damage Events'''
-        pass
+        alive = True
+        dmg_modifier = 0
+
+        ''' Armor of Faith Passive '''
+        if dmg_type == "Physical" or dmg_type == "Holy":
+            damage = damage - (self._defense_power // 2)
+
+        ''' Retribution Passive '''
+        if self.level >= 10:
+            dmg_modifier = int(self.level // 5)
+            if self._retribution is False:
+                CombatAction([("Battle Cry", int(self.level // 10),
+                               "Holy", "")], "")
+            self._retribution = True
+
+        damage = int(damage * self._def_modifiers[dmg_type]/100) - dmg_modifier
+
+        if self._halfdamage is True:
+            damage = damage // 2
+            self.printer(f"{self.name} is affected by their Great Heal!",
+                         "Damage was cut in Half!")
+            self._halfdamage = False
+
+        elif self._nodamage is True:
+            damage = 0
+            self.printer(f"Whoa! {self.name} is livin on a prayer! Damage was",
+                         "nullified by the Prayer ability!")
+            self._nodamage = False
+
+        if damage >= self.hit_points:
+            msg = msg.replace('<value>', str(self._hit_points))
+            self._hit_points = 0
+            self.printer(msg)
+            self.character_death(combat=True)
+            alive = False
+            return alive
+
+        if damage != 0:  # for _nodamage
+            damage = max(1, damage)
+        self._hit_points -= damage
+        msg = msg.replace('<value>', str(damage))
+        self.printer(msg)
+        return alive
 
     def get_skills(self) -> Dict[str, 'function']:
         '''Gets Skills Learned'''
-        skills_list_filter: dict = ({skill_info[0]: skill_info[1] for level_learned, skill_info in
-                                     self.skills_dict.items() if level_learned <= self.level})
+        skill_list: dict = ({skill_info[0]: skill_info[1]
+                             for level_learned, skill_info in
+                             self.skills_dict.items()
+                             if level_learned <= self.level})
         if self._avenged:
-            del skills_list_filter["Avenger"]
-        return skills_list_filter
+            del skill_list["Avenger"]
+        return skill_list
 
     def get_skills_list(self) -> List[str]:
         '''Returns List of Skills Learned'''
-        skills_list_filter: list = ([skill_info[0] for level_learned, skill_info in
-                                     self.skills_dict.items() if level_learned <= self.level])
-        return skills_list_filter
+        skill_list: list = ([skill_info[0]
+                             for level_learned, skill_info in
+                             self.skills_dict.items()
+                             if level_learned <= self.level])
+        return skill_list
 
     def win_battle(self, combatant: Combatant):
-        '''Instructors for Winning a Battle'''
-        pass
+        '''Instructors for Wining a Battle'''
+        if isinstance(combatant, Combatant):
+            exp, gold, name = combatant.experience_points, \
+                combatant.gold, combatant.name
+            self._battles_won += 1
+            self._avenged = False
+            self._nodamage = False
+            self._halfdamage = False
+            self._retribution = False
+            self.printer(f"You have defeated {name}!  Gained {gold} Gold.",
+                         f" Gained {exp} Experience")
+
+            # Whenever you defeat an enemy, do stuff here
+            # if self._level >= N:
+            #       do that stuff
+
+            self._gold += gold
+            self.gain_experience(exp, combat=True)
 
     def generate_weapon(self) -> Weapon:
         '''Generates a suitable Weapon Equipment Item based on level'''
