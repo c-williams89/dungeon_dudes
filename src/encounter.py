@@ -1,5 +1,5 @@
 '''Module for the Encounter Class for Dungeon Dudes'''
-from typing import Tuple, Dict
+from typing import Dict
 from random import randint
 from .combatant_abc import Combatant
 from .characters import Character
