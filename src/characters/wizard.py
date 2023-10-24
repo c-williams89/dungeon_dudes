@@ -48,17 +48,19 @@ class Wizard(Character):
         self._accessory : Accessory = None
         self._def_modifiers = LimitedDict(self.damage_types, default_value=100)
         self._dam_modifiers = LimitedDict(("Fire", "Lightning", "Ice"), default_value=100)
-        
-        # TODO: Create equipment generator for wizard
         self._equipment_generator = WizardEquipmentGenerator()
         super().__init__(name, "Wizard", self.stats_structure, self.item_compatibility)
         self._exp_to_next_iter = iter([(50 * i ** 2) for i in range(1, 50)])
         self._exp_to_next : int = next(self._exp_to_next_iter)
         self._hit_points : int = self.stats_structure["Hit Points"][0]
-        self._special : int = 1
+        self._special : int = 50
         self._special_resource : str = "Mana"
         self._accessory_type : str = "Arcane Orb"
         self._stored_damage : int = 0
+        self._damage_taken :int = 0
+        self._is_on_fire : bool = False
+        self._is_frozen : bool = False
+        self._reflect : bool = False
 
     def adjust_offensive_mod(self, modifiers : list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
@@ -118,26 +120,35 @@ class Wizard(Character):
         self._attack_power = self.intelligence
         self._defense_power = self.agility // 2
 
-    # def modify_damage(self, damage, auto_crit = False) -> int:
-    #     '''Adds Variance to Damage Events and Calculates Critical Chance'''
-    #     std_dev_percent : int = damage * ()
-    #     modified : int = max(floor(gauss(damage, (std_dev_percent * damage))), 1)
-    #     if auto_crit:
-    #         self.printer("Critical Hit!")
-    #         return modified * self._critical_modifier
-    #     elif self._critical_modifier != 1:
-    #         if randint(1,10) == 10:
-    #             self.printer("Critical Hit!")
-    #             return modified * self._critical_modifier
-
-    #     return modified
+       
     
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
-        damage : int = self.modify_damage(self._attack_power)
+        damage : int = self._attack_power
         message : str = (f"{self.name} attacks with {self.weapon} "
                          f"for <value> {self._weapon.damage_type} damage")
-        return CombatAction([("Attack", damage, self._weapon.damage_type, message)], "")
+        attack_action = [("Attack", damage, self._weapon.damage_type, message)]
+        
+        if self._is_on_fire:
+            burning_damage : int = self.intelligence  # Calculate the damage for the burning effect
+            burn_message : str = (f"{self.name}'s fireball continues to burn")
+            burning_effect = ("Attack", burning_damage, "Fire", burn_message)
+            attack_action.append(burning_effect)
+        
+        if self._is_frozen:
+            frozen_damage : int = self.intelligence
+            freeze_message : str = (f"{self.name}'s blizzard continues to freeze all enemies")
+            freeze_effect = ("Attack", frozen_damage, "Ice", freeze_message)
+            attack_action.append(freeze_effect)
+        
+        if self._reflect:
+            reflect_damage : int = self._stored_damage
+            reflect_message : str = (f"{self.name} uses reflect to attack the enemy with lightning")
+            reflect_effect = ("Attack", reflect_damage, "Lightning", reflect_message)
+            attack_action.append(reflect_effect)
+        
+        return CombatAction(attack_action, "")
+            
     
     def fire_ball(self) -> [bool, CombatAction]:
         '''Wizard launches a fireball at their enemy dealing Fire damage based 
@@ -145,15 +156,14 @@ class Wizard(Character):
         based on their Intelligence x1 the following round'''
         if self._special >= 20:
             initial_damage = 3 * self.intelligence  # Calculate the initial fireball damage
-            burning_damage = self.intelligence  # Calculate the damage for the burning effect
+            self._is_on_fire = True
             message = f"{self.name} throws a fireball, dealing {initial_damage} Fire damage."
-            self._special -= 20  # Reduce mana for using fireball
+            # Reduce mana for using fireball
+            self._special -= 20  
             # Create a CombatAction for the initial fireball attack
             fireball_action = CombatAction([("Attack", initial_damage, "Fire", message)], "")
-            # Create a CombatAction for the burning effect
-            burning_effect = ("Attack", burning_damage, "Fire", f"{self.name}'s fireball continues to burn.")
             # Return a list with the initial fireball action and the burning effect
-            return True, CombatAction([fireball_action, burning_effect], "")
+            return True, fireball_action
         # If the Wizard doesn't have enough special for the fireball, return False and an empty action
         return False, CombatAction([], "")
           
@@ -162,9 +172,10 @@ class Wizard(Character):
         # Verify Wizard has enough mana
         if self._special >= 30:
             message : str = f"{self.name} uses Blink to escape the battle and return to town."
+            blink_effect = CombatAction([("Escape", 0, "Physical", message)], "")
             # Reduce mana after using "Blink"
             self._special -= 30
-            return True, CombatAction([("Escape", 0, "", message)])
+            return True, blink_effect
         # If the Wizard doesn't have enough special for blink, return False and an empty action
         return False, CombatAction([], "")
         
@@ -174,14 +185,14 @@ class Wizard(Character):
         if self._special >= 40:
             # Calculate amount of damage dealt
             blizzard_damage = self.intelligence
+            self._is_frozen = True
             message = f"{self.name} summons a blizzard, dealing {blizzard_damage} Ice damage to all enemies."
             # Reduce mana after spell is cast
             self._special -= 40
             # Create combat action
             blizzard_action = CombatAction([("Attack", blizzard_damage, "Ice", message)], "")
-            # Create lasting effect to apply for the remainder of the battle
-            frost_bite = ("Attack", blizzard_damage, "Ice", f"{self.name}'s blizzard continues to freeze.")
-            return True, CombatAction([blizzard_action, frost_bite], "")
+           
+            return True, blizzard_action
         # If wizard does not have enough mana for blizzard return False
         return False, CombatAction([], "")
     
@@ -205,17 +216,17 @@ class Wizard(Character):
         a % of the damage equal to the Wizard’s level (rounded up) is stored.
         This stored damage is added to the Wizard’s next damaging attack as Lightning damage.'''
         # Verify wizard has enough mana
-        if self._special >= 30:  
-            stored_damage_percentage = ceil(self.level)  # Calculate the stored damage percentage based on the Wizard's level (rounded up)
-            message = f"{self.name} activates Reflect Damage. {stored_damage_percentage}% of incoming damage will be stored for the next attack."
+        if self._special >= 30:
+            self._reflect = True
+            self._stored_damage = round((self._damage_taken/self.level) * 100)  # Calculate the stored damage percentage based on the Wizard's level (rounded up)
+            message = f"{self.name} activates Reflect Damage. {self._stored_damage}% of incoming damage will be stored for the next attack."
+            reflect_action = CombatAction([("Aura", 0, "Holy", message)], "")
             # Reduce mana for using reflect_damage
             self._special -= 30  
-            # self._stored_damage = stored_damage_percentage NOTE: Not sure if I need this attr
-            # Create a message and action for activating the Reflect Damage ability
-            reflect_damage_action = CombatAction([("Attack", stored_damage_percentage, "Lightning", message)], "")
-            return True, reflect_damage_action
+            return True, reflect_action
         # If the Wizard doesn't have enough mana, return False
         return False, CombatAction([], "")
+        
     
     def mana_burn(self) -> [bool, CombatAction]:
         '''Consume all your remaining mana to do Fire, Ice, and Lightning
@@ -325,7 +336,7 @@ class Wizard(Character):
             if self._special > 0:
                 message = message.replace('<value>', str(damage))
                 self.printer(message)
-                self.trigger_heroism(damage)
+                # self.trigger_heroism(damage)
                 return alive
             else:
                 message = message.replace('<value>', str(self._hit_points))
@@ -336,9 +347,11 @@ class Wizard(Character):
                 return alive
         damage = max(1, damage)
         self._hit_points -= damage
+        self._damage_taken = damage
         message = message.replace('<value>', str(damage))
         self.printer(message)
-        return alive
+        return alive, damage
+        
     
     def win_battle(self, combatant : Combatant):
         '''Instructors for Wining a Battle'''
