@@ -96,7 +96,7 @@ class EncounterMenu(cmd.Cmd):
             if result:
                 return True
             self.player_1_turn : bool = False
-            self.loop_back()
+        self.loop_back()
 
     def non_scroll_escape(self, num):
         '''Escapes to Town when triggered by something other than scroll'''
