@@ -9,6 +9,16 @@ from ..dd_data import LimitedDict, damage_types, CombatPrint
 from ..combat_action import CombatAction
 from .cleric_src import ClericEquipmentGenerator
 
+from typing import Dict, Tuple, List
+from random import gauss, randint
+from math import floor
+from .character_abc import Character
+from ..combatant_abc import Combatant
+from .equipment import Equipment, Weapon, Armor, Accessory
+from ..dd_data import LimitedDict, damage_types, CombatPrint
+from ..combat_action import CombatAction
+from .cleric_src import ClericEquipmentGenerator
+
 
 class Cleric(Character):
     '''Cleric Class for Dungeon Dudes'''
