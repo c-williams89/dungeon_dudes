@@ -9,7 +9,7 @@ class Golem(Monster):
 
     def __init__(self, name: str, level_mod: int, stat_structure: dict):
         self._gold = level_mod * 6
-        super()._init__(name, level_mod, "Golem", stat_structure)
+        super().__init__(name, level_mod, "Golem", stat_structure)
         self.printer = CombatPrint
         self._def_modifiers = LimitedDict(damage_types, default_value=100)
         self._dam_modifiers = LimitedDict("Physical", default_value=100)
@@ -68,7 +68,11 @@ class Golem(Monster):
         self.printer(message)
         return alive
 
-    def golem_special(self):
+    def splinter(self):
+        '''for stone golem splinter special'''
+        pass
+
+    def sum_parts(self):
         '''attack/defense power reduced by 15% for ever 25% loss of max HP'''
         if self.max_hit_points == 0:
             return # We don't divide by zero here
@@ -78,6 +82,8 @@ class Golem(Monster):
         multiplier = 1 - (0.15 * debuff_stack)
         self.attack_power *= multiplier
         self.defense_power *= multiplier
+
+        self.splinter()
 
     def take_turn(self) -> CombatAction:
         '''Take turn and return success status of action, and the action'''
