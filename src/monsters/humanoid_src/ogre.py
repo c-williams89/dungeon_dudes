@@ -116,8 +116,17 @@ class Ogre(Humanoid):
             self.printer("Blood-Thirster Ogre's Frenzy Unsuccessful")
         return actions
 
+    def strategic_thinking(self):
+        if ((self.hit_points > int(self.max_hit_points * .75)) or \
+            (self.hit_points < int(self.max_hit_points * .25))):
+            self._damage += int(self.damage * .25)
+
+
     def take_turn(self) -> CombatAction:
         '''Create list of normal attack and special attacks and choose one'''
+
+
+
         action_list = []
         if self.hit_points < int(self.max_hit_points / 2):
             if randint(0, 100) < 75:
