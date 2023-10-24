@@ -9,47 +9,78 @@ from ..dd_data import LimitedDict, damage_types, CombatPrint
 from ..combat_action import CombatAction
 from .rogue_src import RogueEquipmentGenerator
 
-class Fighter(Character):
-    '''Fighter Character Class'''
-    stats_structure : Dict[str, Tuple[int]]= {"Hit Points": (100, 25), "Strength": (13, 2),
-                        "Agility" : (10, 1), "Intelligence" : (5, 0), "Special": (1,0)}
-    item_compatibility : list = ["Sword", "Axe", "Mace", "Heavy", "Shield"]
+class Rogue(Character):
+    '''Rogue Character Class'''
+    stats_structure : Dict[str, Tuple[int]]= {"Hit Points": (75, 18),
+                                              "Strength": (10, 1),
+                                              "Agility" : (12, 2),
+                                              "Intelligence" : (5, 1),
+                                              "Special": (1, 0)}
+    item_compatibility : list = ["Dagger", "Medium", "Thieves Tools"]
     def __init__(self, name : str):
         self.damage_types = damage_types
 
         self.skills_dict : Dict[int, List[str, 'function']]= {
-            3 : ["Whirlwind", self.whirlwind],
-            10 : ["Fortify", self.fortify],
-            13 : ["Weaken", self.weaken],
-            17 : ["Strengthen", self.strengthen],
-            25 : ["Rampage", self.rampage]
+            1 : ["Luck", self.luck],
+            3 : ["Preparation", self.preparation],
+            10 : ["Evansion", self.evasion],
+            13 : ["Ambush", self.ambush],
+            17 : ["Increase Luck", self.increase_luck],
         }
-        critical_strikes = '''Passive: Your physical damage attack and abilities have a'''\
-            '''10% to deal double damage.'''
-        second_wind = '''Passive: You heal for 25 percent of your Maximum Hit Points '''\
-            '''whenever you defeat an enemy'''
-        improved_critical = '''Passive: Your Critical Strikes now do x3 Damage (was x2)'''
+        thieves_tricks = '''Passive: Rogues gain 30% more gold from '''\
+            '''winning a battle.'''
+        healing_potion_affinity = '''Passive: Using a Healing_Potion '''\
+             '''during combat also gives the Rogue time to coat their '''\
+                 '''weapon in poison.  Rogues have a percentage chance '''\
+                    '''equal to their level * 1.5 to find a '''\
+                        '''Healing_Potion after winning a battle.'''
+        surprise_attack = '''Passive: The first Attack each turn a Rogue '''\
+            '''does deals 50% increased damage and lowers the enemies '''\
+                '''Poison defensive modifier by an amount equal to the '''\
+                    '''Rogue’s level.'''
+        auto_potion = '''Passive: Rogues automatically consume a '''\
+            '''Healing_Potion on their first action in combat.  If the '''\
+                '''Rogue is at maximum hit points, no "Healing_Potion" '''\
+                    '''is consumed but the Rogue gains all other benefits '''\
+                        '''of Healing Potion Affinity'''
+        enhanced_abilities = '''Passive: Base modifier adjustment of '''\
+            '''Preparation is increased to 20, Surprise Attack now '''\
+                '''increases damage 75%, Evasion has a base avoidance '''\
+                    '''chance of 60% and lasts for 3 damage events. '''\
+                        '''Ambush now deals additional damage equal to '''\
+                            '''the Rogue’s agility, Increased Luck now '''\
+                                '''does 85% of Normal Damage.'''
         self.passive_skills = {
-           5 : ["Critical Strikes", critical_strikes],
-           8 : ["Second Wind", second_wind],
-           20: ["Improved Critical Strikes", improved_critical]
+            1: ["Theives Tricks", thieves_tricks],
+            5: ["Healing Potion Affinity", healing_potion_affinity],
+            8: ["Surprise Attack", surprise_attack],
+            20: ["Auto-Potion", auto_potion],
+            25: ["Enhanced Abilities", enhanced_abilities]
         }
         self.printer = CombatPrint()
         self._weapon : Weapon = None
         self._armor : Armor = None
         self._accessory : Accessory = None
         self._def_modifiers = LimitedDict(self.damage_types, default_value=100)
-        self._dam_modifiers = LimitedDict("Physical", default_value=100)
+        self._dam_modifiers = LimitedDict(("Physical", "Poision"), default_value=100)
         self._equipment_generator = RogueEquipmentGenerator()
-        super().__init__(name, "Fighter", self.stats_structure, self.item_compatibility)
-        self._exp_to_next_iter = iter([(40 * i ** 2) for i in range(1, 50)])
+        super().__init__(name, "Rogue", self.stats_structure, self.item_compatibility)
+        self._exp_to_next_iter = iter([(35 * i ** 2) for i in range(1, 50)])
         self._exp_to_next : int = next(self._exp_to_next_iter)
         self._hit_points : int = self.stats_structure["Hit Points"][0]
         self._special : int = 1
-        self._special_resource : str = "Heroism"
-        self._accessory_type : str = "Shield"
-        self._critical_modifier : int = 1
-        self._rampaged : bool = False
+        self._special_resource : str = "Luck"
+        self._accessory_type : str = "Thieves Tool"
+        self._empowered : bool = False
+        self._poison_coated : bool = False
+        self._surprise_attack_left : bool = True
+        self._ambush_left : bool = True
+        self._evasion_active: bool = False
+        self._evasion_count: int = 0
+        self._evasion_chance: int = 0
+        self._auto_potion: bool = False
+        self._first_action: bool = True
+        self._enhanced_abilities_on: bool = False
 
     def adjust_offensive_mod(self, modifiers : list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
@@ -88,98 +119,216 @@ class Fighter(Character):
             att_dif, def_dif = self.att_def_dif(item, self._weapon)
             self.adjust_offensive_mod(item.damage_modifiers)
             if isinstance(self._weapon, Weapon):
-                self.adjust_offensive_mod(self._weapon.damage_modifiers, remove=True)    
+                self.adjust_offensive_mod(self._weapon.damage_modifiers,
+                                          remove=True)    
         elif isinstance(item, Armor):
             att_dif, def_dif = self.att_def_dif(item, self._armor)
             self.adjust_defensive_mod(item.defense_modifiers)
             if isinstance(self._armor, Armor):
-                self.adjust_defensive_mod(self._armor.defense_modifiers, remove=True)    
+                self.adjust_defensive_mod(self._armor.defense_modifiers,
+                                          remove=True)    
         elif isinstance(item, Accessory):
             att_dif, def_dif = self.att_def_dif(item, self._accessory)
             self.adjust_offensive_mod(item.damage_modifiers)
             self.adjust_defensive_mod(item.defense_modifiers)
             if isinstance(self._accessory, Accessory):
-                self.adjust_offensive_mod(self._accessory.damage_modifiers, remove=True)
-                self.adjust_defensive_mod(self._accessory.defense_modifiers, remove=True)
+                self.adjust_offensive_mod(self._accessory.damage_modifiers,
+                                          remove=True)
+                self.adjust_defensive_mod(self._accessory.defense_modifiers,
+                                          remove=True)
         self._attack_power += att_dif
         self._defense_power += def_dif
 
     def base_att_def_power(self):
         '''Base attack and defense power'''
-        self._attack_power = self.strength
+        self._attack_power = self.strength + self.agility
         self._defense_power = self.agility // 2
 
-    def modify_damage(self, damage, auto_crit = False) -> int:
-        '''Adds Variance to Damage Events and Calculates Critical Chance'''
-        std_dev_percent : int = 0.08
-        modified : int = max(floor(gauss(damage, (std_dev_percent * damage))), 1)
-        if auto_crit:
-            self.printer("Critical Hit!")
-            return modified * self._critical_modifier
-        elif self._critical_modifier != 1:
-            if randint(1,10) == 10:
-                self.printer("Critical Hit!")
-                return modified * self._critical_modifier
+    def modify_damage(self, damage) -> int:
+        '''Adds Variance to Damage Events'''
+        return damage + floor(max(0, min(damage * 0.24, gauss(damage * 0.08, 
+                                                              damage * 0.04))))
 
-        return modified
+    def poison_attack(self, base_damage) -> Tuple[str, int, str, str]:
+        '''Returns a tuple for poison damage'''
+        modified: int = self.modify_damage(base_damage)
+        message : str = (f"{self.weapon} is coated with poison, "
+                        "inflicting additional <value> poison damage")
+        return ("Attack", modified, "Poison", message)
 
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
-        damage : int = self.modify_damage(self._attack_power)
+        self.auto_potion()
+        actions : List[tuple] = []
+        if self._empowered:
+            damage : int = self.modify_damage(int(self._attack_power * 1.24))
+            message : str = (f"{self.name} attacks with {self.weapon} "
+                             "for <value> EMPOWERED "
+                             f"{self._weapon.damage_type} damage")
+            self._empowered = False
+        else:
+            damage : int = self.modify_damage(self._attack_power)
+            message : str = (f"{self.name} attacks with {self.weapon} "
+                            f"for <value> {self._weapon.damage_type} damage")
+        if self.level >=8 and self._surprise_attack_left:
+            if self._enhanced_abilities_on:
+                damage = int(damage * 1.75)
+            else:
+                damage = int(damage * 1.5)
+            self.printer(f"{self.name} Prepares for a surprise attack")
+        actions.append(("Attack", damage, self._weapon.damage_type, message))
+        if self._poison_coated:
+            actions.append(self.poison_attack(self.intelligence))
+        if self.level >= 8 and self._surprise_attack_left:
+            self._surprise_attack_left = False
+            actions.append(("Hex", self.level, "Poision", ""))
+        return CombatAction(actions, "")
+
+    def luck(self) -> [bool, CombatAction]:
+        '''Empower next ability'''
+        self.auto_potion()
+        message : str = f"{self.name} uses a luck to empower next ability."
+        self._special -= 1
+        self._empowered = True
+        self.printer(message)
+        return False, CombatAction([("Aura", 0, "Physical", "")], "")
+
+    def preparation(self) ->  [bool, CombatAction]:
+        '''Analayze the battlefield, gaining 10 physical and poison damage '''\
+        '''modifiers, and coating weapon in poison. Increase damage '''\
+            '''modifiers by 5 if the weapon is arealdy coated. '''\
+                '''Empower: Prepartion also Identify the enemy.'''
+        self.auto_potion()
+        self.printer(f"{self.name} Prepares for the battle")
+        if self._enhanced_abilities_on:
+            physical_modifier = 20
+            poison_modifier = 20
+        else:
+            physical_modifier = 10
+            poison_modifier = 10
+        # Weapon coated in poison
+        if self._poison_coated:
+            poison_modifier += 5
+        actions : List[tuple] = [("Battle Cry", physical_modifier, "Physical", ""),
+                                 ("Battle Cry", poison_modifier, "Poison", "")]
+        # Empowered
+        if self._empowered:
+            self.printer("Empowered: Identifying the enemy!")
+            actions.append(("Identify", 0, "", ""))
+        # Coat weapon in poison
+        self._poison_coated = True
+        return True, CombatAction(actions, "")
+    
+    def use_healing_potion(self) -> Tuple[bool, CombatAction]:
+        '''Uses a Healing Potion and Returns the Current Combat Action'''
+        printer = CombatPrint()
+        success = True
+        if self.hit_points == self.max_hit_points:
+            printer("Cannot Use Healing Potion, already at Max Health")
+            success = False
+        elif self._healing_potion == 0:
+            printer("Cannot Use Healing Potion, No Healing Potions Left")
+            success = False
+        if not success:
+            return success, CombatAction([("Heal", 0, "Holy", "")], "")
+        current = self.hit_points
+        heal_amount = int(self.max_hit_points * 0.45)
+        self.hit_points += heal_amount
+        self._healing_potion -= 1
+        printer(f'Drank a healing Potion and healed {self.hit_points - current} Hit Points')
+        # Healing Potion Affinity passive
+        if self.level >= 5:
+            printer(f'Coated {self.weapon} in poison')
+            self._poison_coated = True
+        return success, CombatAction([("Heal", heal_amount, "Holy")],"")
+
+    def evasion(self) ->  [bool, CombatAction]:
+        '''50 % chance to avoid 100% of the damage for next two events'''
+        self.auto_potion()
+        self._evasion_active = True
+        if self._enhanced_abilities_on:
+            self._evasion_count = 3
+            self._evasion_chance = 60
+        else:
+            self._evasion_count = 2
+            self._evasion_chance = 50
+        if self._empowered:
+            self.printer("Empowered: Increasing evasion number and chance")
+            self._evasion_count += 1
+            self._evasion_chance += 10
+            self._empowered = False
+        message : str = (f"{self.name} Prepares to evade next "
+                         f"{self._evasion_count} damage events with "
+                         f"{self._evasion_chance} % chance)")
+        return True, CombatAction([("Aura", 0, "Physical", message)], "")
+
+    def ambush(self) -> [bool, CombatAction]:
+        '''Once per battle, rogue attacks for damage equal to attack power '''\
+        '''+ agility + strength. Consumes surprise attack'''
+        self.auto_potion()
+        base_damage = self._attack_power + self.agility + self.strength
+        if self._enhanced_abilities_on:
+            base_damage += self.agility
+        damage : int = self.modify_damage(base_damage)
+        message : str = f"{self.name} Ambushes for <value> damage"
+        actions : List[tuple] = [("Attack", damage, "Physical", message)]
+        if self._poison_coated:
+            if self._empowered:
+                self.printer("Empowered: Dealing x3 times the base poison damage")
+                actions.append(self.poison_attack(self.intelligence * 3))
+                self._empowered = False
+            else:
+                actions.append(self.poison_attack(self.intelligence))
+        self._surprise_attack_left = False
+        self._ambush_left = False
+        return True, CombatAction(actions, "")
+
+    def increase_luck(self) -> [bool, CombatAction]:
+        '''Deal an attack with 70 % base damage, and gets 1 Luck'''
+        self.auto_potion()
+        if self._special < self.max_special:
+            self.printer(f"{self.name} Prays to gain a luck")
+            self._special += 1
+        else:
+            self.printer(f"{self.name} already has max Luck")
+        base_modifier = 0.7
+        if self._enhanced_abilities_on:
+            base_modifier += 0.15
+        base_attack = int(base_modifier * self._attack_power)
+        damage = self.modify_damage(base_attack)
         message : str = (f"{self.name} attacks with {self.weapon} "
-                         f"for <value> {self._weapon.damage_type} damage")
-        return CombatAction([("Attack", damage, self._weapon.damage_type, message)], "")
+                        f"for <value> {self._weapon.damage_type} damage")
+        actions : List[tuple] = [("Attack", damage, "Physical", message)]
+        if self._poison_coated:
+            actions.append(self.poison_attack(self.intelligence))
+        return True, CombatAction(actions, "")
 
-    def whirlwind(self) ->  [bool, CombatAction]:
-        '''Does Physical damage based 75% attack_power to All enemies'''
-        damage : int = (2* self._accessory.item_stats[1]) + int((0.75 * self._defense_power))
-        damage : int = self.modify_damage(damage)
-        message : str = f"{self.name} unleashing a whirlwind hitting all enemies for <value> Physical damage"
-        return True, CombatAction([("Attack", damage, "Physical", message)], "")
-
-    def fortify(self) ->  [bool, CombatAction]:
-        '''Increase resist to physical and all elemental sources by 0.15 '''\
-        '''for the remainder of the encounter'''
-        resist_types : List[str] = ["Physical", "Fire", "Ice", "Lightning"]
-        aura : List[tuple] = [("Aura", 15, damage_type, "") for damage_type in resist_types]
-        self.printer(f"{self.name} Defends and braces against the Elements")
-        return True, CombatAction(aura, "")
-
-    def weaken(self) ->  [bool, CombatAction]:
-        '''Deal an attack which does half normal damage, Opponents' '''\
-        '''physical mitigation modifier is reduced by 0.1 for the remainder of the encounter.'''
-        action_type, damage, dmg_type, _ = self.attack().actions[0]
-        damage : int = damage // 2
-        message : str = (f"Makes a calculated strike for <value> {dmg_type} Damage"
-                   f", and weakens the target's physical mitigation")
-        return True, CombatAction([(action_type, damage, dmg_type, message),
-                                   ("Hex", 10, "Physical", "")], "")
-
-    def strengthen(self) ->  [bool, CombatAction]:
-        '''Deal an attack which does half normal damage,'''\
-        '''Your physical damage modifier increased by 0.1 for the remainder of the encounter'''
-        action_type, damage, dmg_type, _ = self.attack().actions[0]
-        damage : int = damage // 2
-        message : str = (f"Makes a calculated strike for <value> {dmg_type} Damage"
-                   f", and strengthens their future physical attacks")
-        return True, CombatAction([(action_type, damage, dmg_type, message),
-                             ("Battle Cry", 10, "Physical", "")], "")
-
-    def rampage(self) -> [bool, CombatAction]:
-        '''Once per battle: Attack this turn with a 100 percent chance to deal a critical strike'''
-        if not self._rampaged:
-            self._rampaged : bool = True
-            damage : int = self.modify_damage(self._attack_power, auto_crit=True)
-            message : str = (f"Rampages, critically striking with {self.weapon}"
-                            f" for <value> {self._weapon.damage_type} damage")
-            return True, CombatAction([("Attack", damage, self._weapon.damage_type, message)], "")
-        self.printer("Ability Failed: Can only use Rampage once per Battle")
-        return False, CombatAction([("Attack", 0, "Physical", "")], "")
+    def auto_potion(self):
+        '''Execute Auto Potion passive'''
+        if not self._auto_potion:
+            return
+        if not self._first_action:
+            return
+        if self.hit_points == self.max_hit_points:
+            self.printer("Auto-Potion applied: Coating weapon in poison")
+            self._poison_coated = True
+            self._first_action = False
+            return
+        if self._healing_potion == 0:
+            self.printer("Auto-Potion Failed: No Healing Potions Left")
+            self._first_action = False
+            return
+        current = self.hit_points
+        heal_amount = int(self.max_hit_points * 0.45)
+        self.hit_points += heal_amount
+        self._healing_potion -= 1
+        self.printer(f"Drank a Healing Potioin and heald {self.hit_points - current} Hit Points")
+        self._first_action = False
+        return
 
     def level_up(self, combat=False):
         super().level_up(combat=combat)
-        heroism_growth_rate : int = 4
-        crit_multiplier_increases = [5, 20]
+        luck_growth_rate : int = 2
         if self._level in self.skills_dict:
             skill : str = self.skills_dict[self._level][0]
             description : str = self.skills_dict[self._level][1].__doc__
@@ -196,14 +345,17 @@ class Fighter(Character):
                 self.printer(f'New Skill - {skill}:', description)
             else:
                 print(f'New Skill - {skill}:', description)
-        if self._level in crit_multiplier_increases:
-            self._critical_modifier += 1
-        if self._level % heroism_growth_rate == 0:
+        if self._level % luck_growth_rate == 0:
             self._stats.special += 1
             self.special += 1
-        self._attack_power += 2
+        self._attack_power += 3
         if self.agility % 2 == 0:
             self._defense_power += 1
+        self._poison_coated = False
+        if self._level >= 20:
+            self._auto_potion = True
+        if self._level >= 25:
+            self._enhanced_abilities_on = True
 
     @property
     def special(self) -> int:
@@ -274,33 +426,27 @@ class Fighter(Character):
         '''Getter for Defense Modifiers'''
         return self._def_modifiers
 
-    def trigger_heroism(self, damage: int):
-        '''Triggers Heroism to Prevent Character Death'''
-        self._special -= 1
-        self._hit_points = self.max_hit_points // 4
-        self.printer(f"Incoming Damage {damage} greater than current Hit Points: {self.hit_points}")
-        self.printer(f"Heroism Consumed, {self._special} remaining.",
-            f"Hit Points set to: {self._hit_points}")
-
     def take_damage(self, damage: int, dmg_type : str, message : str) -> bool: # pylint: disable=unused-argument
         '''Processes Damage Events'''
         alive = True
         if dmg_type == "Physical":
             damage = damage - (self._defense_power // 2)
         damage = int(damage * self._def_modifiers[dmg_type]/100)
+        if damage > 1 and self._evasion_active:
+            if randint(0, 99) < self._evasion_chance:    
+                self.printer(f"{self.name} succssfully evaded incoming {damage} damage")
+                self._evasion_count -= 1
+                if self._evasion_count == 0:
+                    self._evasion_active = False
+                    self._evasion_chance = 0
+                return alive
         if damage >= self.hit_points:
-            if self._special > 0:
-                message = message.replace('<value>', str(damage))
-                self.printer(message)
-                self.trigger_heroism(damage)
-                return alive
-            else:
-                message = message.replace('<value>', str(self._hit_points))
-                self._hit_points = 0
-                self.printer(message)
-                self.character_death(combat=True)
-                alive = False
-                return alive
+            message = message.replace('<value>', str(self._hit_points))
+            self._hit_points = 0
+            self.printer(message)
+            self.character_death(combat=True)
+            alive = False
+            return alive
         damage = max(1, damage)
         self._hit_points -= damage
         message = message.replace('<value>', str(damage))
@@ -311,8 +457,8 @@ class Fighter(Character):
         '''Gets Skills Learned'''
         skills_list_filter : dict = ({skill_info[0]:skill_info[1] for level_learned, skill_info in
                                self.skills_dict.items() if level_learned <= self.level})
-        if self._rampaged:
-            del skills_list_filter["Rampage"]
+        if not self._ambush_left:
+            del skills_list_filter["Ambush"]
         return skills_list_filter
 
     def get_skills_list(self) -> List[str]:
@@ -324,14 +470,25 @@ class Fighter(Character):
     def win_battle(self, combatant : Combatant):
         '''Instructors for Wining a Battle'''
         if isinstance(combatant, Combatant):
-            exp, gold, name = combatant.experience_points, combatant.gold, combatant.name
+            exp = combatant.experience_points
+            # Thieves Tricks - 30 % more gold from winning a battle
+            gold = combatant.gold + int(combatant.gold * 0.3)
+            name = combatant.name
             self._battles_won += 1
-            self._rampaged = False
+            self._poison_coated = False
+            self._empowered = False
+            self._evasion_active = False
+            self._surprise_attack_left = True
+            self._first_action = True
+            self._ambush_left = True
             self.printer(f"You have defeated {name}!  Gained {gold} Gold.  Gained {exp} Experience")
-            if self._level >= 8:
-                current = self.hit_points
-                self.hit_points += floor(self.max_hit_points * .25)
-                self.printer(f"You heal {self.hit_points - current} hit points from Second Wind")
+            # Healing potion affinity passive
+            if self._level >= 5:
+                random_int = randint(0, 99) * 10
+                chance_for_potion = self.level * 15
+                if random_int < chance_for_potion:
+                    self.printer("Lucky! You found a healing potion!")
+                    self.healing_potion = self.healing_potion + 1
             self._gold += gold
             self.gain_experience(exp, combat=True)
 
@@ -346,9 +503,3 @@ class Fighter(Character):
     def generate_accessory(self) -> Accessory:
         '''Generates a suitable Armor Equipment Item based on level'''
         return self._equipment_generator.generate_accessory(self._level)
-
-class Rogue:
-    '''Rogue Class for Dungeon Dudes'''
-    def __init__(self, name):
-        pass
-    
