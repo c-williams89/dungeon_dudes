@@ -29,6 +29,7 @@ class FireElemental(Elemental):
             ("Fire", (self._damage_type)), default_value=100)
         self._reconstitute_value = 0
         self._special_count = 0
+        self._max_hit_points = self._hit_points
 
     def base_att_def_power(self):
         self._attack_power = self.strength + self.intelligence
@@ -50,10 +51,19 @@ class FireElemental(Elemental):
 
     def get_skills_list(self) -> list:
         '''Get List of Skills Learned'''
-        special_skills = {"Lesser": "Explode",
-                          "Greater": "Improved Reconstitute"}
-        return [f'{self._damage_type} Empowerment',
-                special_skills[self._griffon_type]]
+        skills_list = ["burning_strike", "immolate"]
+        if self._level >= 5:
+            skills_list.append("scorched_earth")
+            skills_list.append("explode")
+        if self._level >= 11:
+            skills_list.append("improved_reconstitute")
+        return skills_list
+
+    def attack(self) -> CombatAction:
+        '''Attack method for Fire Elemental '''
+        damage: int = self.damage_modify(self._attack_power)
+        message: str = f"{self.name} attacks with for <value> fire damage"
+        return CombatAction([("Attack", damage, "Fire", message)], "")
 
     def explode(self) -> CombatAction:
         ''' Once per battle: The Fire Elemental Explodes, dealing damage to
@@ -61,13 +71,16 @@ class FireElemental(Elemental):
             hit_points and dealing an equal amount of Fire damage to their
             opponent.
         '''
-        self._hit_points = self._hit_points
-        pass
+        # TODO: add once per battle flag
+        if self._level >= 5:
+            self._max_hit_points = self._hit_points
+            pass
 
     def improved_reconstitute(self) -> CombatAction:
         ''' passive: Greater Fire Elemental Reconstitute Healing is based on
             max_hit_points instead of current hit_points '''
-        pass
+        if self._level >= 11:
+            pass
 
     def burning_strike(self) -> CombatAction:
         ''' passive: Fire Elemental Attack increase their Fire damage offensive
@@ -87,7 +100,9 @@ class FireElemental(Elemental):
         ''' Once per Combat: Fire Elemental lights the area blaze, dealing 33%
             attack_power based Fire damage every time the Fire Elemental takes
             an action for the remainder of combat. '''
-        pass
+        # TODO: add once per battle flag
+        if self._level >= 5:
+            pass
 
     def take_turn(self) -> CombatAction:
         ''' Fire Elemental has a 75% to Attack each turn and a 25% chance to
@@ -95,9 +110,5 @@ class FireElemental(Elemental):
             Burning Strikes. When Burning Strikes reaches maximum benefit, Fire
             Elementals have a 75% chance to return a random skill, and a 25%
             chance to Attack. '''
-        # if self > level_11:
-        # do improved reconstitute
-        # else:
-        # do reconstitute
-        options = [self.attack, self.special_skill]
+        options = [self.attack]
         return choice(options)()

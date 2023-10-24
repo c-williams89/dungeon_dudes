@@ -71,13 +71,14 @@ class Elemental(Monster):
     def damage_check(self, damage: str, dmg_type: str) -> int:
         ''' Helper function for calculating damage '''
         # if damage type matches elemental type
-        if self.type == dmg_type:
+        if self._elemental_type == dmg_type:
             # call elemental_immunity
             return self.elemental_immunity(damage)
         # call elemental_vulnerability
         result = self.elemental_vulnerability(dmg_type)
         if result is True:
             return damage * 1.50
+        return damage
 
     def elemental_reconstitute(self) -> int:
         ''' Elementals heal for 8% of their current hit_points at the
@@ -109,7 +110,9 @@ class Elemental(Monster):
         }
 
         vulnerable = vulnerabilities.get(dmg_type)
-        if self.type == vulnerable:
+        if vulnerable is None:
+            return False
+        if self._elemental_type == vulnerable:
             return True
 
     def take_turn(self) -> CombatAction:  # pylint: disable=unused-argument
