@@ -79,7 +79,9 @@ class Cleric(Character):
         self._retribution: bool = False
         self._smite_multi: int = 3
         self._smite_damage: int = int(self.intelligence / self._smite_multi)
-        self._battle_smite = ("Attack", self._smite_damage, "Holy", "")
+        self._battle_smite = ("Attack", self._smite_damage, "Holy",
+                              f"{self.name}'s Smite deals an " +
+                              "additional <value> damage!")
 
     def adjust_offensive_mod(self, modifiers: list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
@@ -157,30 +159,33 @@ class Cleric(Character):
         ''' 10percent of your maximum mana when at full Hit Points.'''
         if self._level >= 5:
             if self.special == self.max_special:
-                self.hit_points += self.max_hit_points * 0.10
+                self.hit_points += int(self.max_hit_points * 0.10)
                 self.printer(f"A Blessing! A Blessing from the Lord!",
-                             f"{self.name} recovered ",
-                             f"{self.max_hit_points * 0.10} HP.")
+                             f"{self.name} recovered",
+                             f"{int(self.max_hit_points * 0.10)} HP",
+                             "from Divine Blessing!")
             if self.hit_points == self.max_hit_points:
-                self.special += self.max_special * 0.10
+                self.special += int(self.max_special * 0.10)
                 self.printer(f"A Blessing! A Blessing from the Lord!",
-                             f"{self.name} recovered ",
-                             f"{self.max_special * 0.10} Mana.")
+                             f"{self.name} recovered",
+                             f"{int(self.max_special * 0.10)} Mana",
+                             "from Divine Blessing!")
 
     def improved_healing(self, special_cost: int) -> None:
         '''Passive: When above 50percent Mana, '''
         '''Heal and Greater heal consume 100percent more Mana '''
         '''and deal Holy damage equal to the number of HP healed.'''
         if self.level >= 25 and (self.special > (self.max_special * 0.5)):
-            return ("Attack", special_cost, "Holy", "")
+            msg: str = "Holy Damage of <value> caused by Improved Healing!"
+            return ("Attack", self.modify_damage(special_cost), "Holy", msg)
         else:
-            return ("Attack", 0, "Physical", "")
+            return ("Heal", 0, "Holy", "")
 
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
         damage: int = max(1, self.modify_damage(self._attack_power))
-        msg: str = (f"{self.name} attacks with {self.weapon} "
-                    f"for <value> {self._weapon.damage_type} damage")
+        msg: str = (f"{self.name} attacks with {self.weapon} " +
+                    f"for <value> {self._weapon.damage_type} damage!")
         self.divine_blessing()
         return CombatAction([("Attack", damage,
                             self._weapon.damage_type, msg),
@@ -193,27 +198,31 @@ class Cleric(Character):
             special_cost *= 2
 
         if self.special >= special_cost:
-            amount_healed = ((self.hit_points + (self.max_hit_points//2)) %
-                             self.max_hit_points)
-            self.hit_points = (min(self.max_hit_points,
-                                   (self.hit_points + amount_healed)))
-            msg: str = (f"{self.name} healed {amount_healed} HP",
-                        f"for {special_cost} Mana!")
-            self.special -= special_cost
-            self.printer(msg)
-            self.divine_blessing()
-            improved_healing_atk = self.improved_healing(special_cost)
-            if self.level >= 25:
-                battle_smite = self._battle_smite
+            current = self.hit_points
+            heal_amount = int(self.max_hit_points * 0.45)
+            self.hit_points += heal_amount
+            amount_healed = self.hit_points - current
+            if amount_healed > 0:
+                msg: str = (f"{self.name} healed {amount_healed} HP" +
+                            f" for {special_cost} Mana!")
+                self.special -= special_cost
+                self.printer(msg)
+                self.divine_blessing()
+                improved_healing_atk = self.improved_healing(special_cost)
+                if self.level >= 25:
+                    battle_smite = self._battle_smite
+                else:
+                    battle_smite = ("Heal", 0, "Holy", "")
+                return True, CombatAction([("Heal", amount_healed, "", ""),
+                                           battle_smite,
+                                           improved_healing_atk], "")
             else:
-                battle_smite = ("Attack", 0, "Physical", "")
-            return True, CombatAction([("Heal", amount_healed, "", ""),
-                                       battle_smite,
-                                       improved_healing_atk], "")
+                self.printer("Heal Failed: Already at Full Health!")
+                return False, CombatAction([("Heal", 0, "Holy", "")], "")
 
         else:
-            self.printer("Ability Failed: Not Enough Mana Remaining")
-            return False, CombatAction([("Attack", 0, "Physical", "")], "")
+            self.printer("Heal Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Heal", 0, "Holy", "")], "")
 
     def radiance(self) -> [bool, CombatAction]:
         '''Deal Holy damage to all enemies for Intelligence + AtkPower'''
@@ -222,16 +231,21 @@ class Cleric(Character):
         if self.special >= special_cost:
             damage: int = max(1, self.modify_damage(self.intelligence +
                                                     self._attack_power))
-            msg: str = (f"{self.name} unleashing Radiance hitting all",
-                        " enemies for <value> Holy damage")
+            healed = self.intelligence//3
+            amt_healed = ((self.hit_points + (healed)) %
+                          self.max_hit_points)
+            self.hit_points = (min(self.max_hit_points,
+                                   (self.hit_points + amt_healed)))
+            msg: str = (f"{self.name} unleashing Radiance hitting all" +
+                        f" enemies for <value> Holy dmg. Heals {healed}!")
             self.special -= special_cost
             self.divine_blessing()
             return True, CombatAction([("Attack", damage, "Holy", msg),
                                        self._battle_smite], "")
 
         else:
-            self.printer("Ability Failed: Not Enough Mana Remaining")
-            return False, CombatAction([("Attack", 0, "Physical", "")], "")
+            self.printer("Radiance Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Heal", 0, "Holy", "")], "")
 
     def prayer(self) -> [bool, CombatAction]:
         '''Protects self with incantation, raise defense modifier to'''
@@ -239,19 +253,19 @@ class Cleric(Character):
         '''Reduce the Damage from the Next Damage Event to 0'''
         special_cost = 30
         if self.special >= special_cost:
-            msg: str = (f"{self.name} performs a Prayer, increasing their",
-                        " Holy, Poison, and Physical defenses by 5! Next",
-                        "AttackDamage Calculated will be Zero!")
+            msg: str = (f"{self.name} performs a Prayer, increasing their" +
+                        " defenses by 5! Next Damage will be Zero!")
             self._nodamage = True
             self.special -= special_cost
-            return True, CombatAction([("Aura", 5, "Holy", msg),
-                                       ("Aura", 5, "Poison", ""),
-                                       ("Aura", 5, "Physical", "")
+            self.printer(msg)
+            return True, CombatAction([("Aura", -5, "Holy", ""),
+                                       ("Aura", -5, "Poison", ""),
+                                       ("Aura", -5, "Physical", "")
                                        ], "")
 
         else:
-            self.printer("Ability Failed: Not Enough Mana Remaining")
-            return False, CombatAction([("Attack", 0, "Physical", "")], "")
+            self.printer("Prayer Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Heal", 0, "Holy", "")], "")
 
     def avenger(self) -> [bool, CombatAction]:
         '''(Once per Battle) Increase Holy Damage Modifier by 30'''
@@ -260,9 +274,9 @@ class Cleric(Character):
         if self.special >= special_cost:
             if self._avenged is False:
                 damage: int = max(1, self.modify_damage(self.intelligence * 6))
-                msg = (f"Avenger Cleric {self.name} unleashes their",
-                       " intelligence for <value> damage. Increases",
-                       " their Holy Damage by 30!")
+                msg = (f"Avenger Cleric {self.name} unleashes their" +
+                       " wrinkly-brain intellect powers for <value> damage. " +
+                       "Increases their Holy Damage by 30!")
                 self.divine_blessing()
                 self._avenged = True
                 self.special -= special_cost
@@ -270,12 +284,12 @@ class Cleric(Character):
                                            ("Battle Cry", 30, "Holy", ""),
                                            self._battle_smite], "")
             else:
-                self.printer("Ability Failed: Can only use ",
+                self.printer("Avenger Failed: Can only use ",
                              "Avenger once per Battle")
-                return False, CombatAction([("Attack", 0, "Physical", "")], "")
+                return False, CombatAction([("Heal", 0, "Holy", "")], "")
         else:
-            self.printer("Ability Failed: Not Enough Mana Remaining")
-            return False, CombatAction([("Attack", 0, "Physical", "")], "")
+            self.printer("Avenger Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Heal", 0, "Holy", "")], "")
 
     def greater_heal(self) -> [bool, CombatAction]:
         """Heal for 70% of Max HP, Reduce next incoming Damage Event by 50%"""
@@ -284,28 +298,31 @@ class Cleric(Character):
             special_cost *= 2
 
         if self.special >= special_cost:
-            amount_healed = ((self.hit_points + (self.max_hit_points * 0.7)) %
-                             self.max_hit_points)
-            self.hit_points = (min(self.max_hit_points,
-                                   (self.hit_points + amount_healed)))
-            msg: str = (f"{self.name} greatly healed {amount_healed} HP",
-                        f"for {special_cost} Mana!")
-            self.special -= special_cost
-            self.printer(msg)
-            self._halfdamage = True
-            self.divine_blessing()
-            improved_healing_atk = self.improved_healing(special_cost)
-            if self.level >= 25:
-                battle_smite = self._battle_smite
+            current = self.hit_points
+            heal_amount = int(self.max_hit_points * 0.45)
+            self.hit_points += heal_amount
+            amount_healed = self.hit_points - current
+            if amount_healed > 0:
+                msg: str = (f"{self.name} greatly healed {amount_healed} HP" +
+                            f" for {special_cost} Mana!")
+                self.special -= special_cost
+                self.printer(msg)
+                self._halfdamage = True
+                self.divine_blessing()
+                improved_healing_atk = self.improved_healing(special_cost)
+                if self.level >= 25:
+                    battle_smite = self._battle_smite
+                else:
+                    battle_smite = ("Heal", 0, "Holy", "")
+                return True, CombatAction([("Heal", amount_healed, "", msg),
+                                           battle_smite,
+                                           improved_healing_atk], "")
             else:
-                battle_smite = ("Attack", 0, "Physical", "")
-            return True, CombatAction([("Heal", amount_healed, "", msg),
-                                       battle_smite,
-                                       improved_healing_atk], "")
-
+                self.printer("Greater Heal Failed: Already at Full Health!")
+                return False, CombatAction([("Heal", 0, "Holy", "")], "")
         else:
-            self.printer("Ability Failed: Not Enough Mana Remaining")
-            return False, CombatAction([("Attack", 0, "Physical", "")], "")
+            self.printer("Greater Heal Failed: Not Enough Mana Remaining")
+            return False, CombatAction([("Heal", 0, "Holy", "")], "")
 
     def level_up(self, combat=False):
         super().level_up(combat=combat)
@@ -329,10 +346,8 @@ class Cleric(Character):
         self._attack_power += 1
         if self.agility % 2 == 0:
             self._defense_power += 1
-        if self.level == 20:
+        if self.level is 20:
             self._smite_multi = 2
-        self.intelligence += 1
-        self.max_special += 15
 
     ''' Getters and Setters for types and variables'''
     @property
@@ -430,7 +445,7 @@ class Cleric(Character):
             self._halfdamage = False
 
         elif self._nodamage is True:
-            damage = 0
+            damage = -1337
             self.printer(f"Whoa! {self.name} is livin on a prayer! Damage was",
                          "nullified by the Prayer ability!")
             self._nodamage = False
@@ -443,8 +458,10 @@ class Cleric(Character):
             alive = False
             return alive
 
-        if damage != 0:  # for _nodamage
+        if damage != -1337:  # for _nodamage
             damage = max(1, damage)
+        else:
+            damage = 0
         self._hit_points -= damage
         msg = msg.replace('<value>', str(damage))
         self.printer(msg)
@@ -480,10 +497,6 @@ class Cleric(Character):
             self._retribution = False
             self.printer(f"You have defeated {name}!  Gained {gold} Gold.",
                          f" Gained {exp} Experience")
-
-            # Whenever you defeat an enemy, do stuff here
-            # if self._level >= N:
-            #       do that stuff
 
             self._gold += gold
             self.gain_experience(exp, combat=True)
