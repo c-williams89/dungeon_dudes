@@ -59,8 +59,13 @@ class Bandit(Humanoid):
         return ("Attack", damage_amt, "Physical", msg)
     
     def rallying_cry(self):
-        # msg: str = "Bandit Bard strengthens future physical attacks"
         self.printer("Bandit Bard strengthens future physical attacks")
+        return ("Battle Cry", 10, "Physical", "")
+    
+    def bless(self):
+        self.printer("Bandit Cleric blesses the band, increasing damage modifier "
+                     "and healing the band")
+        self.hit_points += int(self.max_hit_points / 2)
         return ("Battle Cry", 10, "Physical", "")
 
     def get_action(self):
@@ -69,6 +74,9 @@ class Bandit(Humanoid):
                    self.dirty_tricks]
         if self.level > 7:
             actions.append(self.rallying_cry)
+        if self.level > 14:
+            actions.append(self.bless)
+
         index = randint(0, (len(actions) - 1))
         option = actions.pop(index)
         return option()
@@ -83,7 +91,6 @@ class Bandit(Humanoid):
         action_list.append(self.get_action())
 
         if (self.hit_points < (self.max_hit_points / 2)):
-            print("We are healing here")
             if randrange(2):
                 self.healing_potion("Bandits")
         action = CombatAction(action_list, "")
