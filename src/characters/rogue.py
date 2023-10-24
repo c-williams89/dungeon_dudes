@@ -181,7 +181,7 @@ class Rogue(Character):
             actions.append(self.poison_attack(self.intelligence))
         if self.level >= 8 and self._surprise_attack_left:
             self._surprise_attack_left = False
-            actions.append(("Hex", self.level, "Poision", ""))
+            actions.append(("Hex", self.level, "Poison", ""))
         return CombatAction(actions, "")
 
     def luck(self) -> [bool, CombatAction]:
@@ -202,7 +202,8 @@ class Rogue(Character):
             '''modifiers by 5 if the weapon is arealdy coated. '''\
                 '''Empower: Prepartion also Identify the enemy.'''
         self.auto_potion()
-        self.printer(f"{self.name} Prepares for the battle")
+        self.printer((f"{self.name} Prepares for the battle: "
+                      f"Physical + Poison Damage UP, Coats Weapon in Poison"))
         if self._enhanced_abilities_on:
             physical_modifier = 20
             poison_modifier = 20
@@ -241,7 +242,7 @@ class Rogue(Character):
         printer(f'Drank a healing Potion and healed {self.hit_points - current} Hit Points')
         # Healing Potion Affinity passive
         if self.level >= 5:
-            printer(f'Coated {self.weapon} in poison')
+            printer(f'Healing Potion Affinity Passive: Coated {self.weapon} in poison')
             self._poison_coated = True
         return success, CombatAction([("Heal", heal_amount, "Holy")],"")
 
@@ -260,10 +261,10 @@ class Rogue(Character):
             self._evasion_count += 1
             self._evasion_chance += 10
             self._empowered = False
-        message : str = (f"{self.name} Prepares to evade next "
-                         f"{self._evasion_count} damage events with "
-                         f"{self._evasion_chance} % chance)")
-        return True, CombatAction([("Aura", 0, "Physical", message)], "")
+        self.printer((f"{self.name} Prepares to evade next "
+                     f"{self._evasion_count} damage events with "
+                     f"{self._evasion_chance} % chance"))
+        return True, CombatAction([("Aura", 0, "Physical", "")], "")
 
     def ambush(self) -> [bool, CombatAction]:
         '''Once per battle, rogue attacks for damage equal to attack power '''\
@@ -282,6 +283,7 @@ class Rogue(Character):
                 self._empowered = False
             else:
                 actions.append(self.poison_attack(self.intelligence))
+        self._empowered = False
         self._surprise_attack_left = False
         self._ambush_left = False
         return True, CombatAction(actions, "")
@@ -299,8 +301,9 @@ class Rogue(Character):
             base_modifier += 0.15
         base_attack = int(base_modifier * self._attack_power)
         damage = self.modify_damage(base_attack)
-        message : str = (f"{self.name} attacks with {self.weapon} "
-                        f"for <value> {self._weapon.damage_type} damage")
+        message : str = (f"{self.name} quickly attacks "
+                        f"for <value> {self._weapon.damage_type} damage "
+                        f"while praying")
         actions : List[tuple] = [("Attack", damage, "Physical", message)]
         if self._poison_coated:
             actions.append(self.poison_attack(self.intelligence))
@@ -312,20 +315,21 @@ class Rogue(Character):
             return
         if not self._first_action:
             return
+        self.printer("Auto-Potion Passive Activated!")
         if self.hit_points == self.max_hit_points:
-            self.printer("Auto-Potion applied: Coating weapon in poison")
+            self.printer("Auto-Potion: Coating weapon in poison")
             self._poison_coated = True
             self._first_action = False
             return
         if self._healing_potion == 0:
-            self.printer("Auto-Potion Failed: No Healing Potions Left")
+            self.printer("Auto-Potion: No Healing Potions Left")
             self._first_action = False
             return
         current = self.hit_points
         heal_amount = int(self.max_hit_points * 0.45)
         self.hit_points += heal_amount
         self._healing_potion -= 1
-        self.printer(f"Drank a Healing Potioin and heald {self.hit_points - current} Hit Points")
+        self.printer(f"Drank a Healing Potioin and healed {self.hit_points - current} Hit Points")
         self._first_action = False
         return
 
@@ -436,13 +440,21 @@ class Rogue(Character):
             damage = damage - (self._defense_power // 2)
         damage = int(damage * self._def_modifiers[dmg_type]/100)
         if damage > 1 and self._evasion_active:
-            if randint(0, 99) < self._evasion_chance:    
+            if randint(0, 99) < self._evasion_chance:
                 self.printer(f"{self.name} succssfully evaded incoming {damage} damage")
                 self._evasion_count -= 1
                 if self._evasion_count == 0:
+                    self.printer("Losing focus. Evansion fades off")
                     self._evasion_active = False
                     self._evasion_chance = 0
                 return alive
+            else:
+                self.printer(f"{self.name} Failed to evade...")
+                self._evasion_count -= 1
+                if self._evasion_count == 0:
+                    self.printer("Losing focus. Evansion fades off")
+                    self._evasion_active = False
+                    self._evasion_chance = 0
         if damage >= self.hit_points:
             message = message.replace('<value>', str(self._hit_points))
             self._hit_points = 0
@@ -475,6 +487,7 @@ class Rogue(Character):
         if isinstance(combatant, Combatant):
             exp = combatant.experience_points
             # Thieves Tricks - 30 % more gold from winning a battle
+            self.printer("Thieves Trick Passive: Gaining 30% more gold")
             gold = combatant.gold + int(combatant.gold * 0.3)
             name = combatant.name
             self._battles_won += 1
@@ -485,15 +498,15 @@ class Rogue(Character):
             self._first_action = True
             self._ambush_left = True
             self.printer(f"You have defeated {name}!  Gained {gold} Gold.  Gained {exp} Experience")
+            self._gold += gold
+            self.gain_experience(exp, combat=True)
             # Healing potion affinity passive
             if self._level >= 5:
                 random_int = randint(0, 99) * 10
                 chance_for_potion = self.level * 15
                 if random_int < chance_for_potion:
-                    self.printer("Lucky! You found a healing potion!")
+                    self.printer("Healing Potion Affinity Passive: Lucky! You found a healing potion!")
                     self.healing_potion = self.healing_potion + 1
-            self._gold += gold
-            self.gain_experience(exp, combat=True)
 
     def generate_weapon(self) -> Weapon:
         '''Generates a suitable Weapon Equipment Item based on level'''
