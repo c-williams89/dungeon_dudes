@@ -15,7 +15,7 @@ class Murloc(Humanoid):
                                               "Special": (0, 0)}
     
     def __init__(self, level_mod: int):
-        self._tribe_size = 4
+
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         self._damage_type = "Physical"
         super().__init__("Murloc Tribe",
@@ -25,6 +25,15 @@ class Murloc(Humanoid):
                                            "Ice",
                                            "Poison",
                                            "Holy"), default_value=100)
+        
+        if self.level < 10:
+            self._tribe_size = 4
+        else:
+            self._tribe_size = 5
+        
+        self._damage = self.humanoid_damage(self.modify_damage(self.intelligence))
+        self._msg = "Murloc attacks, dealing <value> physical damage"
+        self._base_attack = ("Attack", self.damage, "Physical", self._msg)
 
     @property
     def damage_modifiers(self):
@@ -37,6 +46,14 @@ class Murloc(Humanoid):
     @property
     def tribe_size(self):
         return self._tribe_size
+    
+    @property
+    def damage(self):
+        return self._damage
+    
+    @property
+    def base_attack(self):
+        return self._base_attack
 
     def get_skills(self):
         return {}
@@ -49,6 +66,7 @@ class Murloc(Humanoid):
         damage = self.humanoid_damage(self.modify_damage(self.intelligence))
         msg: str = "Murloc casts Ice Bolt for <value> Ice Damage"
         return("Attack", damage, "Ice", msg)
+        # return self.base_attack
     
     def forage(self):
         self._healing_potions += 1
@@ -57,22 +75,28 @@ class Murloc(Humanoid):
                      "Healing Potions.")
         return ("Heal", 0, "Heal", "")
     
+    def poisons(self):
+        if randint(0, 9) < 3:
+            self.printer("Murloc Rogue has coated Murloc Weapons in Poison")
+            msg:str = "Murloc attacks, dealing <value> Poison damage"
+            self._base_attack = ("Attack", int(self.damage * 1.3), "Poison", msg)
+        return("", 0, "", "")
+    
     def get_action(self):
         actions = [self.ice_bolt,
-                   self.ice_bolt,
-                   self.forage,
+                #    self.ice_bolt,
+                #    self.forage,
                    self.forage]
+        if self.level > 2:
+            actions.append(self.poisons)
         index = randint(0, (len(actions) - 1))
         option = actions.pop(index)
         return option()
 
     def take_turn(self):
-        damage: int = self.humanoid_damage(self.modify_damage(self.attack_power))
-        msg: str = "Murloc attacks, dealing <value> physical damage"
-        attack = ("Attack", damage, "Physical", msg)
         action_list = []
         for _ in range(1, self.tribe_size):
-            action_list.append(attack)
+            action_list.append(self.base_attack)
         action_list.append(self.get_action())
         action = CombatAction(action_list, "")
         return action
