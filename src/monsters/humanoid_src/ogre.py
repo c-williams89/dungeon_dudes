@@ -14,16 +14,17 @@ For ogre magi, special attack is wild magics
 class Ogre(Humanoid):
     '''Ogre Module'''
     stats_structure: Dict[str, Tuple[int]] = {"Hit Points": (75, 20),
-                                              "Strength": (5, 1),
+                                              "Strength": (18, 3),
                                               "Agility": (10, 3),
                                               "Intelligence": (7, 1),
                                               "Special": (0,0)}
     ogre_types = [("Blood-Thirster", "Physical"), ("Ogre-Magi", "Physical")]
 
     def __init__(self, level_mod: int):
-        ogre_type = self.ogre_types[0]
+        ogre_type = choice(self.ogre_types)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
-        self._ogre_type: str = ogre_type[0]
+        # self._ogre_type: str = ogre_type[0]
+        self._ogre_type = "Blood-Thirster"
         self._damage_type: str = ogre_type[1]
         super().__init__(f"{self._ogre_type} Ogre",
                          level_mod,
@@ -33,6 +34,7 @@ class Ogre(Humanoid):
                                           default_value=100)
         self._special_count = 0
         self._two_minds = False
+        self._damage = self.humanoid_damage(self.modify_damage(self.strength))
 
     @property
     def damage_modifiers(self):
@@ -42,12 +44,21 @@ class Ogre(Humanoid):
     def defense_modifiers(self):
         return self._def_modifiers
     
-    def get_skills(self): 
+    @property
+    def damage(self):
+        return self._damage
+
+    @property
+    def ogre_type(self):
+        return self._ogre_type
+    
+    def get_skills(self):
         return {}
     
     def get_skills_list(self) -> list:
         special_skills = {"Blood-Thirster": "Risky Blow",
                           "Ogre-Magi": "Wild Magics"}
+        return special_skills
 
     def risky_blow(self) -> CombatAction:
         msg: str = ("Blood-Thirster Ogre performs a risky blow, dealing "
@@ -55,8 +66,8 @@ class Ogre(Humanoid):
         risky_chance = randint(0, 10)
         damage: int = 0
         if ((risky_chance % 2) == 0):
-            damage = int(2 * (self.humanoid_damage(self.modify_damage(self.hit_points))))
-        return CombatAction([("Attack", damage, "Risky Blow", msg)], "")
+            damage = int(2 * self.damage)
+        return("Attack", damage, "Physical", msg)
     
     def wild_magics(self):
         self._two_minds = True
@@ -69,11 +80,15 @@ class Ogre(Humanoid):
                             ("Attack", damage_amt, damage_type, msg)],
                             "")
 
-    def frenzy(self) -> CombatAction:
-        pass
+    def frenzy(self):
+        msg: str = ("Blood-Thirster Ogre goes into a frenzy, dealing <value> "
+                    "damage")
+        return("Attack", self.damage, "Physical", msg)
 
     def improved_frenzy(self):
-        pass
+        msg: str = ("Blood-Thirster Ogre goes into an Improved Frenzy, dealing"
+                    " <value> damage.")
+        return("Attack", self.damage, "Physical", msg)
 
     def special_skill(self):
         if self._ogre_type == "Blood-Thirster":
@@ -82,15 +97,31 @@ class Ogre(Humanoid):
     
     def attack(self):
         damage: int = self.humanoid_damage(self.modify_damage(self._attack_power))
-        message: str = f"{self.name} Attacks with for <value> physical damage"
-        if self._two_minds:
-            return CombatAction([("Attack", damage, "Physical", message),
-                                 ("Attack", damage, "Physical", message)],
-                                 "")
-        else:
-            return CombatAction([("Attack", damage, "Physical", message)], "")
+        msg: str = f"{self.name} Attacks with for <value> physical damage"
+        return ("Attack", damage, "Physical", msg)
+        
+    def blood_thirster_attack(self):
+        actions = [self.risky_blow()]
+        if randint(0, 100) < 25:
+            actions.append(self.frenzy())
+            if self.level > 9:
+                if randint(0, 100) < 25:
+                    actions.append(self.improved_frenzy())
+        return actions
+
+    def ogre_magi_attack(self):
+        pass
 
     def take_turn(self) -> CombatAction:
         '''Create list of normal attack and special attacks and choose one'''
-        options = [self.attack, self.special_skill]
-        return choice(options)()
+        if self.hit_points < int(self.max_hit_points / 2):
+            if randint(0, 100) < 75:
+                self.healing_potion(self.ogre_type)
+        if self.ogre_type == "Blood-Thirster":
+            action_list = self.blood_thirster_attack()
+        else:
+            # action_list = self.ogre_magi_attack()
+            pass
+
+        action = CombatAction(action_list, "")
+        return action
