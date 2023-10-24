@@ -9,6 +9,7 @@ class WizardEquipmentGenerator:
     def __init__(self):
         self._defensive_suffix_mapping : Dict[tuple, str]= defensive_suffix_mapping
         self._weapons : list = ["Staff", "Wand"]
+        self._elemental_types = ["Fire", "Ice", "Lightning"]
         self._weapon_prefix : Dict[int, str] = {
             10: "Sharpened", 20: "Rending", 30: "Brutal", 40: "Deadly", 50 : "Devastating"
         }
@@ -34,6 +35,14 @@ class WizardEquipmentGenerator:
         '''
         weapon_base_cost : int = level * 3
         weapon_type : str = choice(self._weapons)
+        element_type : str = choice(self._elemental_types)
+        elemental_descriptor : str = ""
+        if element_type == "Fire":
+            elemental_descriptor = "Raging"
+        elif element_type == "Ice":
+            elemental_descriptor == "Inescapable"
+        else:
+            elemental_descriptor == "Thunderous"
 
         attack_average : int = level
         attack, attack_cost_mod = self.generate_value_mod(attack_average,
@@ -50,23 +59,20 @@ class WizardEquipmentGenerator:
         else:
             prefix : str = self._weapon_prefix[prefix_key]
         armor : int = 0
-        suffix : str = ""
         suffix_chance : int = randint(1,5)
         armor_mod : int = 1
         wrath_mod : int = 1
         if suffix_chance == 5:
             armor += ceil(gauss(level/2, level/5))
-            suffix : str = "of Defense"
             armor_mod : float = 1.5
         elif suffix_chance > 2:
             attack += ceil(gauss(level/2, level/5))
-            suffix : str = "of Wrath"
             wrath_mod : float = 1.5
         cost : int = self.generate_value(weapon_base_cost, attack_cost_mod,
                                     physical_cost_modifier, armor_mod, wrath_mod)
         cost = max(cost, 1)
-        weapon_name : str = f'{prefix} {weapon_type} {suffix}'.strip()
-        weapon_special : dict = {"Offensive": [("Physical", physical_modifier)]}
+        weapon_name : str = f'{prefix} {weapon_type} of {elemental_descriptor} {element_type}'.strip()
+        weapon_special : dict = {"Offensive": [(element_type, physical_modifier)]}
         return Weapon(weapon_type, weapon_name, attack, special=weapon_special,
                       armor=armor, cost=cost)
 

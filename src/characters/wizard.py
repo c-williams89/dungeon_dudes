@@ -119,12 +119,20 @@ class Wizard(Character):
         '''Base attack and defense power'''
         self._attack_power = self.intelligence
         self._defense_power = self.agility // 2
-
-       
-    
+        
+    def modify_damage(self, damage) -> int:
+        '''Adds Variance to Damage Events and Calculates Critical Chance'''
+        max_mana = self._stats.special
+        current_mana = self._special
+        mana_dev = current_mana/max_mana
+        modified : float = (damage * (mana_dev/2) - 0.15)
+        
+        return modified
+        
+  
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
-        damage : int = self._attack_power
+        damage : int = self.modify_damage(self._attack_power)
         message : str = (f"{self.name} attacks with {self.weapon} "
                          f"for <value> {self._weapon.damage_type} damage")
         attack_action = [("Attack", damage, self._weapon.damage_type, message)]
@@ -237,25 +245,45 @@ class Wizard(Character):
             base_fire_damage = ceil(0.5 * self.special)
             base_lightning_damage = ceil(0.5 * self.special)
             base_ice_damage = ceil(0.5 * self.special)
-            # Calculate the total damage for the action
-            total_damage = base_fire_damage + base_ice_damage + base_lightning_damage
             # Create a message indicating the mana burn action
-            message = f"{self.name} consumes all remaining mana to perform a Mana Burn attack."
+            self.printer(f"{self.name} consumes all remaining mana to perform a Mana Burn attack.")
             # Create a list of actions for each damage type
             actions = [
-                ("Attack", base_fire_damage, "Fire", "Fire damage from Mana Burn."),
-                ("Attack", base_ice_damage, "Ice", "Ice damage from Mana Burn."),
-                ("Attack", base_lightning_damage, "Lightning", "Lightning damage from Mana Burn.")
+                ("Attack", base_fire_damage, "Fire", "<value> Fire damage from Mana Burn."),
+                ("Attack", base_ice_damage, "Ice", "<value> Ice damage from Mana Burn."),
+                ("Attack", base_lightning_damage, "Lightning", "<value> Lightning damage from Mana Burn.")
             ]
             # Create a CombatAction with the actions and the message
-            mana_burn_action = CombatAction([(actions, total_damage, message)])
+            mana_burn_action = CombatAction(actions, "")
             # Consume all remaining mana
-            self.special = 0
+            self._special = 0
             # Return True to indicate a successful Mana Burn and the CombatAction
             return True, mana_burn_action
         # If the Wizard has no remaining mana, return False 
         return False, CombatAction([], "")
     
+    def level_up(self, combat=False):
+        super().level_up(combat=combat)
+        if self._level in self.skills_dict:
+            skill : str = self.skills_dict[self._level][0]
+            description : str = self.skills_dict[self._level][1].__doc__
+            description : str = "\n".join(line.strip() for line in description.splitlines())
+            if combat:
+                self.printer(f'New Skill - {skill}:', description)
+            else:
+                print(f'\nNew Skill - {skill}:', description)
+        if self._level in self.passive_skills:
+            skill : str = self.passive_skills[self._level][0]
+            description : str = self.passive_skills[self._level][1]
+            description : str = "\n".join(line.strip() for line in description.splitlines())
+            if combat:
+                self.printer(f'New Skill - {skill}:', description)
+            else:
+                print(f'New Skill - {skill}:', description)
+        
+        self._attack_power += 2
+        self._defense_power += 1
+        
     @property
     def special(self) -> int:
         '''Getter for current Mana'''
@@ -328,23 +356,23 @@ class Wizard(Character):
 
     def take_damage(self, damage: int, dmg_type : str, message : str) -> bool: # pylint: disable=unused-argument
         '''Processes Damage Events'''
+        mana_percentage = self._special/self._stats.special * 100
         alive = True
-        if dmg_type == "Physical":
-            damage = damage - (self._defense_power // 2)
+        if dmg_type != "Physical":
+            damage = damage - round(self.intelligence/5)
+        
+        if dmg_type == "Physical" and mana_percentage > 50:
+            damage = round(damage - (damage * 0.15))
+        
         damage = int(damage * self._def_modifiers[dmg_type]/100)
+        
         if damage >= self.hit_points:
-            if self._special > 0:
-                message = message.replace('<value>', str(damage))
-                self.printer(message)
-                # self.trigger_heroism(damage)
-                return alive
-            else:
-                message = message.replace('<value>', str(self._hit_points))
-                self._hit_points = 0
-                self.printer(message)
-                self.character_death(combat=True)
-                alive = False
-                return alive
+            message = message.replace('<value>', str(self._hit_points))
+            self._hit_points = 0
+            self.printer(message)
+            self.character_death(combat=True)
+            alive = False
+            return alive
         damage = max(1, damage)
         self._hit_points -= damage
         self._damage_taken = damage
@@ -359,12 +387,13 @@ class Wizard(Character):
             exp, gold, name = combatant.experience_points, combatant.gold, combatant.name
             self._battles_won += 1
             self.printer(f"You have defeated {name}!  Gained {gold} Gold.  Gained {exp} Experience")
-            if self._level >= 8:
-                current = self.hit_points
-                self.hit_points += floor(self.max_hit_points * .25)
-                self.printer(f"You heal {self.hit_points - current} hit points from Second Wind")
+            if self._level >= 5 and self._special < self._stats.special:
+                current = self._special
+                self._special += round(self._stats.special * 0.15)
+                self.printer(f"You regained {self._special - current} mana from Mana Regeneration")
             self._gold += gold
             self.gain_experience(exp, combat=True)
+            
     
     def get_skills(self) -> Dict[str, 'function']:
         '''Gets Skills Learned'''
@@ -390,3 +419,6 @@ class Wizard(Character):
     def generate_accessory(self) -> Accessory:
         '''Generates a suitable Armor Equipment Item based on level'''
         return self._equipment_generator.generate_accessory(self._level)
+
+    def use_healing_potion(self) -> Tuple[bool, CombatAction]:
+        return super().use_healing_potion()
