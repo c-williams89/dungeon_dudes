@@ -82,7 +82,7 @@ class Rogue(Character):
         self._evasion_active: bool = False
         self._evasion_count: int = 0
         self._evasion_chance: int = 0
-        self._auto_potion: bool = False
+        self._auto_potion_active: bool = False
         self._first_action: bool = True
         self._enhanced_abilities_on: bool = False
 
@@ -320,7 +320,7 @@ class Rogue(Character):
 
     def auto_potion(self):
         '''Execute Auto Potion passive'''
-        if not self._auto_potion:
+        if not self._auto_potion_active:
             return
         if not self._first_action:
             return
@@ -372,7 +372,7 @@ class Rogue(Character):
             self._defense_power += 1
         self._poison_coated = False
         if self._level >= 20:
-            self._auto_potion = True
+            self._auto_potion_active = True
         if self._level >= 25:
             self._enhanced_abilities_on = True
 
@@ -444,6 +444,56 @@ class Rogue(Character):
     def defense_modifiers(self) -> LimitedDict:
         '''Getter for Defense Modifiers'''
         return self._def_modifiers
+
+    @property
+    def empowered(self) -> bool:
+        '''Getter for Empowered status'''
+        return self._empowered
+
+    @property
+    def poison_coated(self) -> bool:
+        '''Getter for Poison coating status'''
+        return self._poison_coated
+
+    @property
+    def surprise_attack_left(self) -> bool:
+        '''Getter for Surprise attack status'''
+        return self._surprise_attack_left
+
+    @property
+    def ambush_left(self) -> bool:
+        '''Getter for Ambush status'''
+        return self._ambush_left
+
+    @property
+    def evasion_active(self) -> bool:
+        '''Getter for Evasion status'''
+        return self._evasion_active
+
+    @property
+    def evasion_count(self) -> int:
+        '''Getter for Evasion count'''
+        return self._evasion_count
+
+    @property
+    def evasion_chance(self) -> int:
+        '''Getter for Evasion Chance'''
+        return self._evasion_chance
+
+    @property
+    def auto_potion_active(self) -> bool:
+        '''Getter for Auto Potioin status'''
+        return self._auto_potion_active
+
+    @property
+    def first_action(self) -> bool:
+        '''Getter for First Action status'''
+        return self._first_action
+
+    @property
+    def enhanced_abilities_on(self) -> bool:
+        '''Getter for Enhanced Abilities status'''
+        return self._enhanced_abilities_on
 
     def take_damage(self, damage: int,
                     dmg_type: str,
