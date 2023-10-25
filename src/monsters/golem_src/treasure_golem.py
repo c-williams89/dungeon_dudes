@@ -25,6 +25,7 @@ class TreasureGolem(Golem):
         self._gem_rain_active = False
         self._gold_to_iron_flag = False
         self._next_attack_bonus = self._attack_power
+        self._experience_points = 5 * (10 * (level_mod - 1))
 
     @property
     def damage_modifiers(self) -> LimitedDict:
