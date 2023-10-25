@@ -13,13 +13,10 @@ class Zombie(Undead):
     def __init__(self, level_mod: int):
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         super().__init__('Zombie', level_mod, self.stats_structure)
+        self._hit_points += self.update_max_hp()
         self._sub_type: str = "Zombie"
         self._dam_modifiers = LimitedDict(("Physical", "Poison"), default_value=100)
         self.haunting = 0
-    
-    def base_att_def_power(self):
-        self._attack_power =  self.strength
-        self._defense_power = self.agility
 
     @property
     def damage_modifiers(self) -> LimitedDict:
@@ -31,16 +28,47 @@ class Zombie(Undead):
         '''Getter for Defense Modifiers'''
         return self._def_modifiers
     
-    def update_max_hp(self):
+    def base_att_def_power(self):
+        self._attack_power =  self.strength
+        self._defense_power = self.agility
+        
+    def update_max_hp(self) -> int:
         bonus_multiplier = self.level // 8
         bonus_hp =  bonus_multiplier * 20
-        self.stats_structure["Hit Points"][0] + bonus_hp
+        return bonus_hp
 
     def get_skills_list(self) -> List[str]:
         return []
     
     def get_skills(self) -> Dict[str, 'function']:
         return {}
+    
+    def take_damage(self, damage: int, dmg_type, message: str) -> bool: # pylint: disable=unused-argument
+        '''Process Damage Events'''
+        alive = True
+        if dmg_type == "Physical":
+            damage = damage - (self._defense_power // 2)
+        damage = int(damage * self._def_modifiers[dmg_type]/100)
+   
+        if damage >= self.hit_points:
+            if self._resist_death:
+                self._hit_points = 1
+                self._resist_death = False
+                message = message.replace('<value>', str(damage))
+                resist_message = "Resist Death saves the Zombie! He has 1 HP left."
+                self.printer(message)
+                self.printer(resist_message)
+                return alive
+            alive = False
+            message = message.replace('<value>', str(self._hit_points))
+            self.printer(message)
+            self._hit_points = 0
+            return alive
+       
+        self._hit_points -= damage
+        message = message.replace('<value>', str(damage))
+        self.printer(message)
+        return alive
 
     def attack(self) -> CombatAction:
         '''Attack method for Zombie Horde'''
@@ -55,7 +83,6 @@ class Zombie(Undead):
             damage: int = (self.modify_damage(self._attack_power))
             message: str = f"{self._sub_type} attacks for <value> physical damage"
             horde_actions.append(("Attack", damage, "Physical", message))
-      
         return CombatAction(horde_actions, "")
     
     def take_turn(self) -> CombatAction:
