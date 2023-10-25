@@ -71,13 +71,13 @@ class FrostElemental(Elemental):
         else:
             self._defense_power += 1
         if self.level >= 5:
-            self._options.append("blizzard")
+            self._options.append(self.blizzard)
         if self.level >= 10:
-            self._options.append("frost_splinter")
+            self._options.append(self.frost_splinter)
         if self.level >= 15:
-            self._options.append("improved_blizzard")
+            self._options.append(self.improved_blizzard)
         if self.level >= 20:
-            self._options.append("improved_frost_splinter")
+            self._options.append(self.improved_frost_splinter)
 
     def attack(self) -> CombatAction:
         '''Attack method for Fire Elemental '''
