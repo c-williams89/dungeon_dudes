@@ -152,7 +152,8 @@ class FrostElemental(Elemental):
             25% chance to Attack.
         '''
         self.elemental_reconstitute()
-        if randint(1, 100) <= 40:
-            return choice(self._options)()
-        else:
-            return self.attack()
+        # if randint(1, 100) <= 40:
+        #     return choice(self._options)()
+        # else:
+        #     return self.attack()
+        return self.attack()

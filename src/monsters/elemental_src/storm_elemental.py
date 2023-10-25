@@ -139,7 +139,8 @@ class StormElemental(Elemental):
             to return a random non-Attack action.
         '''
         self.elemental_reconstitute()
-        if randint(1, 100) <= 25:
-            return choice(self._options)()
-        # TODO: after self._static_shock_count == 5
+        # if randint(1, 100) <= 25:
+        #     return choice(self._options)()
+        # # TODO: after self._static_shock_count == 5
+        # return self.attack()
         return self.attack()

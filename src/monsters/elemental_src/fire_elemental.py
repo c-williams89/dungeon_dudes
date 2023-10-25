@@ -68,7 +68,8 @@ class FireElemental(Elemental):
                 20: 100}
             if randint(1, 100) <= tier_3.get(level_mod):
                 return elemental_types[2]
-            return elemental_types[1]
+            else:
+                return elemental_types[1]
         if level_mod >= 20:
             return elemental_types[2]
         if level_mod >= 25:
@@ -94,7 +95,6 @@ class FireElemental(Elemental):
         self._options.append("immolate")
 
     def level_up(self):
-        ''' Level up functionality '''
         super().level_up()
         if self.level % 2 == 0:
             self._attack_power += 1
@@ -102,6 +102,7 @@ class FireElemental(Elemental):
             self._defense_power += 1
         if self.level >= 5:
             self._options.append(self.explode)
+            self._options.append(self.scorched_earth)
         if self.level >= 11:
             self.elemental_reconstitute = self.improved_reconstitute
 
@@ -184,8 +185,8 @@ class FireElemental(Elemental):
             Elementals have a 75% chance to return a random skill, and a 25%
             chance to Attack. '''
         self.elemental_reconstitute()
-
-        if randint(1, 100) <= 25:
-            return choice(self._options)(), self.scorched_earth_trigger()
-        # TODO: switch skill/attack for burning_strike counter
-        return self.attack(), self.scorched_earth_trigger()
+        # if randint(1, 100) <= 25:
+        #     return choice(self._options)(), self.scorched_earth_trigger()
+        # # TODO: switch skill/attack for burning_strike counter
+        # return self.attack(), self.scorched_earth_trigger()
+        return self.attack()
