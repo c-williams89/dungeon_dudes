@@ -45,6 +45,7 @@ class Bandit(Humanoid):
 
     @property
     def num_bandits(self):
+        '''Getter for size of the band of bandits'''
         return self._num_bandits
 
     def take_damage(self, damage: int, dmg_type, message: str) -> bool:
@@ -61,6 +62,7 @@ class Bandit(Humanoid):
         return skills_list
 
     def fireball(self) -> Tuple:
+        '''Returns tuple for Fireball attack'''
         damage: int = self.humanoid_damage(
             self.modify_damage(self.intelligence))
         msg: str = ("Bandit Sorcerer casts fireball, dealing <value> "
@@ -68,21 +70,28 @@ class Bandit(Humanoid):
         return ("Attack", damage, "Fire", msg)
 
     def dirty_tricks(self) -> Tuple:
+        '''Returns tuple for Dirty Tricks attack'''
         msg: str = "Bandit Rogue attacks for <value> Physical damage"
         damage_amt = int((3 * self.attack_power) / 4)
         return ("Attack", damage_amt, "Physical", msg)
 
     def rallying_cry(self):
+        '''Returns tuple for Rallying Cry action'''
         self.printer("Bandit Bard strengthens future physical attacks")
         return ("Battle Cry", 10, "Physical", "")
 
     def bless(self):
+        '''Returns tuple for Battle Cry action'''
         self.printer("Bandit Cleric blesses the band, increasing damage "
                      "modifier and healing the band")
         self.hit_points += int(self.max_hit_points / 2)
         return ("Battle Cry", 10, "Physical", "")
 
     def get_action(self):
+        '''Creates a list of actions based on level of the Band of Bandits,
+        chooses a random action and returns the tuple of the corresponding
+        action
+        '''
         actions = [self.fireball,
                    self.fireball,
                    self.dirty_tricks]
@@ -96,6 +105,9 @@ class Bandit(Humanoid):
         return option()
 
     def turn_options(self):
+        '''Creates a list of action tuples based on the number of bandits.
+        1 Action and n-1 Attacks.
+        '''
         damage: int = self.humanoid_damage(
             self.modify_damage((self.attack_power)))
         msg: str = "Bandit attacks, dealing <value> physical damage"
@@ -108,12 +120,17 @@ class Bandit(Humanoid):
         return action_list
 
     def escape(self):
+        '''Returns tuple for Escape Action'''
         return ("Escape", 0, "", "")
 
     def take_turn(self) -> CombatAction:
+        '''Takes a turn for the Monster. Determines whether to consume a
+        healing potion based on health, then creates list of options and
+        selects an option based on health and weighted choice.
+        '''
         action_list = []
 
-        if (self.hit_points < (self.max_hit_points / 2)):
+        if self.hit_points < (self.max_hit_points / 2):
             if randrange(2):
                 self.healing_potion()
 
@@ -122,13 +139,13 @@ class Bandit(Humanoid):
             if self.healing_potions:
                 option_list.append(self.healing_potion)
                 option = choices(option_list, weights=(25, 25, 50), k=1)
-                if option != self.turn_options:
+                if option.__name__ != "turn_options":
                     action_list.append(option())
                 else:
                     action_list = option()
             else:
                 option = choices(option_list, weights=(25, 75), k=1)
-                if option != self.turn_options:
+                if option.__name__ != "turn_options":
                     action_list.append(option())
                 else:
                     action_list = option()
