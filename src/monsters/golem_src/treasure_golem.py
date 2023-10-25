@@ -22,8 +22,6 @@ class TreasureGolem(Golem):
         self._sub_type: str = "Treasure Golem"
         self._gold = level_mod * 20
         self._dam_modifiers = LimitedDict("Physical", default_value=100)
-        self._experience_base = 5
-        self.experience_points = level_mod * 10
         self._gem_rain_active = False
         self._gold_to_iron_flag = False
         self._next_attack_bonus = self._attack_power

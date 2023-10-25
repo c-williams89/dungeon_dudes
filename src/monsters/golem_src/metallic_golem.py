@@ -34,7 +34,6 @@ class MetallicGolem(Golem):
                                     "Special": (0, 0)}
             self._gold = 0
             self._experience_base = 100
-            self.experience_points = level_mod * 25
 
         for metal_t, dam_t in self.metal_types:
             if metal_t == metal_type:
