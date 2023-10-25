@@ -1,3 +1,4 @@
+'''Module for Dungeon Dudes Rogue class Equipment'''
 from random import gauss, choice, randint
 from math import ceil
 from typing import Dict

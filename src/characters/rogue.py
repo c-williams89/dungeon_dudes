@@ -513,13 +513,12 @@ class Rogue(Character):
                     self._evasion_active = False
                     self._evasion_chance = 0
                 return alive
-            else:
-                self.printer(f"{self.name} Failed to evade...")
-                self._evasion_count -= 1
-                if self._evasion_count == 0:
-                    self.printer("Losing focus. Evasion fades off")
-                    self._evasion_active = False
-                    self._evasion_chance = 0
+            self.printer(f"{self.name} Failed to evade...")
+            self._evasion_count -= 1
+            if self._evasion_count == 0:
+                self.printer("Losing focus. Evasion fades off")
+                self._evasion_active = False
+                self._evasion_chance = 0
         if damage >= self.hit_points:
             message = message.replace('<value>', str(self._hit_points))
             self._hit_points = 0
