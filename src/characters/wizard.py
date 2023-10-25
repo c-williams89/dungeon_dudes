@@ -1,7 +1,6 @@
 """Module for the Dungeon Dudes Wizard Class"""
 from typing import Dict, Tuple, List
-from random import gauss, randint
-from math import floor, ceil
+from math import ceil
 from .character_abc import Character
 from ..combatant_abc import Combatant
 from .equipment import Equipment, Weapon, Armor, Accessory
@@ -217,7 +216,6 @@ class Wizard(Character):
 
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
-        attack_type = ["Fire", "Lightning", ]
         damage: int = self.modify_damage(self._attack_power)
         message: str = (f"{self.name} attacks with {self.weapon} "
                         f"for <value> {self._weapon.damage_type} damage")
@@ -257,8 +255,8 @@ class Wizard(Character):
 
             self._last_element_att = "Fire"
 
-            if (self._is_on_fire or self._is_frozen or 
-                self._last_element_att == 'Lightning' and self._level >= 10):
+            if (self._is_on_fire or self._is_frozen or
+               self._last_element_att == 'Lightning' and self._level >= 10):
                 initial_damage = round(initial_damage * 1.25)
 
             message = (f"{self.name} throws a fireball, dealing "
@@ -266,7 +264,7 @@ class Wizard(Character):
 
             # Reduce mana for using fireball
             self._special -= 20
-            
+
             # Create a CombatAction for the initial fireball attack
             fireball_action = CombatAction([("Attack", initial_damage,
                                              "Fire", message)], "")
@@ -305,10 +303,10 @@ class Wizard(Character):
         if self._special >= 40:
             # Calculate amount of damage dealt
             blizzard_damage = self.intelligence
-            
+
             self._last_element_att = "Ice"
-            if (self._is_on_fire or self._is_frozen or 
-                self._last_element_att == 'Lightning' and self._level >= 10):
+            if (self._is_on_fire or self._is_frozen or
+               self._last_element_att == 'Lightning' and self._level >= 10):
                 blizzard_damage = round(blizzard_damage * 1.25)
             message = (f"{self.name} summons a blizzard, dealing "
                        f"{blizzard_damage} Ice damage to all enemies.")
@@ -330,9 +328,9 @@ class Wizard(Character):
         if self._special >= 50:
             # Calculate the Lightning damage based on Intelligence
             lightning_damage = self.intelligence * 5
-            
-            if (self._is_on_fire or self._is_frozen or 
-                (self._last_element_att == 'Lightning' and self._level >= 10)):
+
+            if (self._is_on_fire or self._is_frozen or
+               (self._last_element_att == 'Lightning' and self._level >= 10)):
                 lightning_damage = round(lightning_damage * 1.25)
             message = (f"{self.name} strikes their opponent with Lightning, "
                        f"dealing {lightning_damage} Lightning damage.")
