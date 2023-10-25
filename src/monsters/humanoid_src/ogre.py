@@ -65,10 +65,11 @@ class Ogre(Humanoid):
         msg: str = ("Blood-Thirster Ogre performs a risky blow, dealing "
                     "<value> physical damage")
         risky_chance = randint(0, 10)
-        damage: int = 0
         if ((risky_chance % 2) == 0):
             damage = int(2 * self.damage)
-        return("Attack", damage, "Physical", msg)
+            return("Attack", damage, "Physical", msg)
+        self.printer("Blood-Thirster Ogre missed with Risky Blow")
+        return("Miss", 0, "Miss", "")
     
     def wild_magics(self):
         self._two_minds = True

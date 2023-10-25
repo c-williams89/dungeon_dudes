@@ -16,6 +16,8 @@ class Humanoid(Monster):
         self._def_modifiers = LimitedDict(damage_types, default_value=100)
         self._dam_modifiers = LimitedDict("Physical", default_value=100)
         self._healing_potions = 1
+        if level_mod > 4:
+            self._healing_potions += 1
 
     def modify_damage(self, damage) -> int:
         '''Adds variance to damage events and calculates critical chance'''
