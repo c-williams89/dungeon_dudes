@@ -71,6 +71,11 @@ class Murloc(Humanoid):
     def get_skills_list(self):
         skills_list = ["Ice Bolt", "Forage"]
         return skills_list
+    
+    def take_damage(self, damage: int, dmg_type, message: str) -> bool:
+        if "all enemies" in message.lower():
+            damage *= self.tribe_size
+            super().take_damage(damage, dmg_type, message)
 
     def get_base_att(self):
         if self.poisoned:

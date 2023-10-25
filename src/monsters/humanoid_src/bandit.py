@@ -36,10 +36,19 @@ class Bandit(Humanoid):
     @property
     def damage_modifiers(self) -> LimitedDict:
         return self._dam_modifiers
-    
+
     @property
     def defense_modifiers(self) -> LimitedDict:
         return self._def_modifiers
+    
+    @property
+    def num_bandits(self):
+        return self._num_bandits
+
+    def take_damage(self, damage: int, dmg_type, message: str) -> bool:
+        if "all enemies" in message.lower():
+            damage *= self.num_bandits
+            super().take_damage(damage, dmg_type, message)
 
     def get_skills(self) ->Dict[str, 'function']:
         return {}
@@ -80,7 +89,7 @@ class Bandit(Humanoid):
         index = randint(0, (len(actions) - 1))
         option = actions.pop(index)
         return option()
-    
+
     def take_turn(self) -> CombatAction:
         damage: int = self.humanoid_damage(self.modify_damage((self.attack_power)))
         msg: str = "Bandit attacks, dealing <value> physical damage"
