@@ -278,8 +278,11 @@ class Ranger(Character):
             else:
                 end_turn = True
         elif self._level >= 25:
-            damage = self._attack_power * ((modifier + bonus_modifier) / 100)
-            self.printer(f"Summoned: {self._summoned}")
+            if self._summoned >= 2:
+                damage = self._attack_power *\
+                    ((modifier + bonus_modifier) / 100)
+            else:
+                damage = self._attack_power * (modifier / 100)
             if self._summoned <= self._total_companion:
                 end_turn = False
             else:
