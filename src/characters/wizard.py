@@ -61,6 +61,7 @@ class Wizard(Character):
         self._is_on_fire : bool = False
         self._is_frozen : bool = False
         self._reflect : bool = False
+        self._last_element_att : str = ""
 
     def adjust_offensive_mod(self, modifiers : list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
@@ -120,13 +121,17 @@ class Wizard(Character):
         self._attack_power = self.intelligence
         self._defense_power = self.agility // 2
         
-    def modify_damage(self, damage) -> int:
+    def modify_damage(self, damage, spell_type=None) -> int:
         '''Adds Variance to Damage Events and Calculates Critical Chance'''
         max_mana = self._stats.special
         current_mana = self._special
         mana_dev = current_mana/max_mana
         modified : float = (damage * (mana_dev/2) - 0.15)
         
+        if self.level >= 10:
+            if spell_type and spell_type != self._last_element_att:
+                modified *= 1.25
+                
         return modified
         
   
@@ -165,6 +170,7 @@ class Wizard(Character):
         if self._special >= 20:
             initial_damage = 3 * self.intelligence  # Calculate the initial fireball damage
             self._is_on_fire = True
+            self._last_element_att = "Fire"
             message = f"{self.name} throws a fireball, dealing {initial_damage} Fire damage."
             # Reduce mana for using fireball
             self._special -= 20  
@@ -194,6 +200,7 @@ class Wizard(Character):
             # Calculate amount of damage dealt
             blizzard_damage = self.intelligence
             self._is_frozen = True
+            self._last_element_att = "Ice"
             message = f"{self.name} summons a blizzard, dealing {blizzard_damage} Ice damage to all enemies."
             # Reduce mana after spell is cast
             self._special -= 40
@@ -210,6 +217,7 @@ class Wizard(Character):
         # Verify wizard has enough mana
         if self._special >= 50:  
             lightning_damage = self.intelligence * 5  # Calculate the Lightning damage based on Intelligence
+            self._last_element_att = "Lightning"
             message = f"{self.name} strikes their opponent with Lightning, dealing {lightning_damage} Lightning damage."
             # Reduce mana for using lightning_bolt
             self._special -= 50  
