@@ -25,7 +25,7 @@ class Rogue(Character):
         self.skills_dict: Dict[int, List[str, 'function']] = {
             1: ["Luck", self.luck],
             3: ["Preparation", self.preparation],
-            10: ["Evansion", self.evasion],
+            10: ["Evasion", self.evasion],
             13: ["Ambush", self.ambush],
             17: ["Increase Luck", self.increase_luck],
         }
@@ -207,8 +207,6 @@ class Rogue(Character):
             '''modifiers by 5 if the weapon is arealdy coated. '''\
             '''Empower: Prepartion also Identify the enemy.'''
         self.auto_potion()
-        self.printer((f"{self.name} Prepares for the battle: "
-                      f"Physical + Poison Damage UP, Coats Weapon in Poison"))
         if self._enhanced_abilities_on:
             physical_modifier = 20
             poison_modifier = 20
@@ -218,6 +216,10 @@ class Rogue(Character):
         # Weapon coated in poison
         if self._poison_coated:
             poison_modifier += 5
+        # Coat weapons in poison
+        self._poison_coated = True
+        self.printer((f"{self.name} Prepares for the battle: "
+                      f"Physical + Poison Damage UP, Coats Weapon in Poison"))
         actions: List[tuple] = [("Battle Cry", physical_modifier,
                                  "Physical", ""),
                                 ("Battle Cry", poison_modifier, "Poison", "")]
@@ -225,8 +227,6 @@ class Rogue(Character):
         if self._empowered:
             self.printer("Empowered: Identifying the enemy!")
             actions.append(("Identify", 0, "", ""))
-        # Coat weapon in poison
-        self._poison_coated = True
         return True, CombatAction(actions, "")
 
     def use_healing_potion(self) -> Tuple[bool, CombatAction]:
@@ -509,7 +509,7 @@ class Rogue(Character):
                               f"incoming {damage} damage"))
                 self._evasion_count -= 1
                 if self._evasion_count == 0:
-                    self.printer("Losing focus. Evansion fades off")
+                    self.printer("Losing focus. Evasion fades off")
                     self._evasion_active = False
                     self._evasion_chance = 0
                 return alive
@@ -517,7 +517,7 @@ class Rogue(Character):
                 self.printer(f"{self.name} Failed to evade...")
                 self._evasion_count -= 1
                 if self._evasion_count == 0:
-                    self.printer("Losing focus. Evansion fades off")
+                    self.printer("Losing focus. Evasion fades off")
                     self._evasion_active = False
                     self._evasion_chance = 0
         if damage >= self.hit_points:
