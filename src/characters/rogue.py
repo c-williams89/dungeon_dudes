@@ -1,5 +1,5 @@
 '''Module for the Dungeon Dudes Rogue Class'''
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Callable
 from random import gauss, randint
 from math import floor
 from .character_abc import Character
@@ -12,17 +12,17 @@ from .rogue_src import RogueEquipmentGenerator
 
 class Rogue(Character):
     '''Rogue Character Class'''
-    stats_structure: Dict[str, Tuple[int]] = {"Hit Points": (75, 18),
-                                              "Strength": (10, 1),
-                                              "Agility": (12, 2),
-                                              "Intelligence": (5, 1),
-                                              "Special": (1, 0)}
+    stats_structure: Dict[str, Tuple[int, int]] = {"Hit Points": (75, 18),
+                                                   "Strength": (10, 1),
+                                                   "Agility": (12, 2),
+                                                   "Intelligence": (5, 1),
+                                                   "Special": (1, 0)}
     item_compatibility: list = ["Dagger", "Medium", "Thieves Tools"]
 
     def __init__(self, name: str):
         self.damage_types = damage_types
 
-        self.skills_dict: Dict[int, List[str, 'function']] = {
+        self.skills_dict: Dict[int, List] = {
             1: ["Luck", self.luck],
             3: ["Preparation", self.preparation],
             10: ["Evasion", self.evasion],
@@ -109,7 +109,7 @@ class Rogue(Character):
                     self._def_modifiers[modifier[0]] -= modifier[1]
 
     @staticmethod
-    def att_def_dif(new: Equipment, old: [Equipment, None]) -> Tuple[int, int]:
+    def att_def_dif(new: Equipment, old: Equipment) -> Tuple[int, int]:
         '''Gets the Attack Defense Difference when Equipping new Items'''
         if isinstance(old, Equipment):
             att_dif: int = new.item_stats[0] - old.item_stats[0]
@@ -163,17 +163,19 @@ class Rogue(Character):
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
         self.auto_potion()
-        actions: List[tuple] = []
+        actions: List[Tuple[str, int, str, str]] = []
+        damage: int = 0
+        message: str = ""
         if self._empowered:
-            damage: int = self.modify_damage(int(self._attack_power * 1.24))
-            message: str = (f"{self.name} attacks with {self.weapon} "
-                            "for <value> EMPOWERED "
-                            f"{self._weapon.damage_type} damage")
+            damage = self.modify_damage(int(self._attack_power * 1.24))
+            message = (f"{self.name} attacks with {self.weapon} "
+                       "for <value> EMPOWERED "
+                       f"{self._weapon.damage_type} damage")
             self._empowered = False
         else:
-            damage: int = self.modify_damage(self._attack_power)
-            message: str = (f"{self.name} attacks with {self.weapon} "
-                            f"for <value> {self._weapon.damage_type} damage")
+            damage = self.modify_damage(self._attack_power)
+            message = (f"{self.name} attacks with {self.weapon} "
+                       f"for <value> {self._weapon.damage_type} damage")
         if self.level >= 8 and self._surprise_attack_left:
             if self._enhanced_abilities_on:
                 damage = int(damage * 1.75)
@@ -188,7 +190,7 @@ class Rogue(Character):
             actions.append(("Hex", self.level, "Poison", ""))
         return CombatAction(actions, "")
 
-    def luck(self) -> [bool, CombatAction]:
+    def luck(self) -> Tuple[bool, CombatAction]:
         '''Empower next ability'''
         if self._special == 0:
             self.printer((f"{self.name} exhausted all lucks. "
@@ -201,7 +203,7 @@ class Rogue(Character):
         self.printer(message)
         return False, CombatAction([("Aura", 0, "Physical", "")], "")
 
-    def preparation(self) -> [bool, CombatAction]:
+    def preparation(self) -> Tuple[bool, CombatAction]:
         '''Analayze the battlefield, gaining 10 physical and poison damage '''\
             '''modifiers, and coating weapon in poison. Increase damage '''\
             '''modifiers by 5 if the weapon is arealdy coated. '''\
@@ -220,9 +222,12 @@ class Rogue(Character):
         self._poison_coated = True
         self.printer((f"{self.name} Prepares for the battle: "
                       f"Physical + Poison Damage UP, Coats Weapon in Poison"))
-        actions: List[tuple] = [("Battle Cry", physical_modifier,
-                                 "Physical", ""),
-                                ("Battle Cry", poison_modifier, "Poison", "")]
+        actions: List[Tuple[str, int, str, str]] = [("Battle Cry",
+                                                     physical_modifier,
+                                                     "Physical", ""),
+                                                    ("Battle Cry",
+                                                     poison_modifier,
+                                                     "Poison", "")]
         # Empowered
         if self._empowered:
             self.printer("Empowered: Identifying the enemy!")
@@ -252,9 +257,9 @@ class Rogue(Character):
             printer(("Healing Potion Affinity Passive: "
                      f"Coated {self.weapon} in poison"))
             self._poison_coated = True
-        return success, CombatAction([("Heal", heal_amount, "Holy")], "")
+        return success, CombatAction([("Heal", heal_amount, "Holy", "")], "")
 
-    def evasion(self) -> [bool, CombatAction]:
+    def evasion(self) -> Tuple[bool, CombatAction]:
         '''50 % chance to avoid 100% of the damage for next two events'''
         self.auto_potion()
         self._evasion_active = True
@@ -274,7 +279,7 @@ class Rogue(Character):
                       f"{self._evasion_chance} % chance"))
         return True, CombatAction([("Aura", 0, "Physical", "")], "")
 
-    def ambush(self) -> [bool, CombatAction]:
+    def ambush(self) -> Tuple[bool, CombatAction]:
         '''Once per battle, rogue attacks for damage equal to attack power '''\
             '''+ agility + strength. Consumes surprise attack'''
         self.auto_potion()
@@ -283,7 +288,8 @@ class Rogue(Character):
             base_damage += self.agility
         damage: int = self.modify_damage(base_damage)
         message: str = f"{self.name} Ambushes for <value> damage"
-        actions: List[tuple] = [("Attack", damage, "Physical", message)]
+        actions: List[Tuple[str, int, str, str]] = [("Attack", damage,
+                                                     "Physical", message)]
         if self._poison_coated:
             if self._empowered:
                 self.printer(("Empowered: Dealing x3 times the base "
@@ -297,7 +303,7 @@ class Rogue(Character):
         self._ambush_left = False
         return True, CombatAction(actions, "")
 
-    def increase_luck(self) -> [bool, CombatAction]:
+    def increase_luck(self) -> Tuple[bool, CombatAction]:
         '''Deal an attack with 70 % base damage, and gets 1 Luck'''
         self.auto_potion()
         if self._special < self.max_special:
@@ -313,7 +319,8 @@ class Rogue(Character):
         message: str = (f"{self.name} quickly attacks "
                         f"for <value> {self._weapon.damage_type} damage "
                         f"while praying")
-        actions: List[tuple] = [("Attack", damage, "Physical", message)]
+        actions: List[Tuple[str, int, str, str]] = [("Attack", damage,
+                                                     "Physical", message)]
         if self._poison_coated:
             actions.append(self.poison_attack(self.intelligence))
         return True, CombatAction(actions, "")
@@ -378,17 +385,17 @@ class Rogue(Character):
 
     @property
     def special(self) -> int:
-        '''Getter for Current Heroism'''
+        '''Getter for Current Luck'''
         return self._special
 
     @property
     def max_special(self) -> int:
-        '''Getter for Max Heroism'''
+        '''Getter for Max Luck'''
         return self._stats.special
 
     @special.setter
     def special(self, change):
-        '''Setter for Heroism'''
+        '''Setter for Luck'''
         if change >= self.max_special:
             self._special = self.max_special
         else:
