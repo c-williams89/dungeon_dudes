@@ -6,41 +6,39 @@ from ..golem import Golem
 from ...dd_data import LimitedDict
 from ...combat_action import CombatAction
 
+
 class StoneGolem(Golem):
     '''StoneGolem Module'''
-    stats_structure : Dict[str, Tuple[int]] = {"Hit Points": (75, 17), 
-                                               "Strength": (18, 4),
-                                               "Agility" : (10, 2), 
-                                               "Intelligence" : (0, 0), 
-                                               "Special" : (0,0)}
+    stats_structure: Dict[str, Tuple[int]] = {"Hit Points": (75, 17),
+                                              "Strength": (18, 4),
+                                              "Agility": (10, 2),
+                                              "Intelligence": (0, 0),
+                                              "Special": (0, 0)}
     stone_types = [("Granite", "Physical"), ("Obsidian", "Physical")]
-    # stone_types = ["Granite", "Obsidian"]
-    # weight = [0.75, 0.25]
+    weight = [0.75, 0.25]
 
-    def __init__(self, level_mod : int):
-        # stone_type = choices(self.stone_types, self.weight, k=1)[0]
-        # self._stone_type = stone_type
-        stone_type : tuple = choice(self.stone_types)
-        self._hit_points : int = self.stats_structure["Hit Points"][0]
-        self._stone_type : str = stone_type[0]
-        self._damage_type : str = stone_type[1]
+    def __init__(self, level_mod: int):
+        stone_type = choices(self.stone_types, self.weight, k=1)[0]
+        self._stone_type = stone_type
+        self._hit_points: int = self.stats_structure["Hit Points"][0]
+        self._stone_type: str = stone_type[0]
+        self._damage_type: str = stone_type[1]
         super().__init__(f'{self._stone_type} Golem',
                          level_mod, self.stats_structure)
-        self._sub_type : float = stone_type[1]
-        self._dam_modifiers = LimitedDict("Physical",  default_value=100)
+        self._sub_type: float = stone_type[1]
+        self._dam_modifiers = LimitedDict("Physical", default_value=100)
         self.splintered = False
-        self.use_shards = False
         self.absorbed_heat = False
         self.hardened = False
         self.used_lightning_rod = False
-        self.used_thermal_core = False
+        self.thermal_core_used = False
         self.ignited = False
 
     @property
     def damage_modifiers(self) -> LimitedDict:
         '''Getter for damage modifiers'''
         return self._dam_modifiers
-    
+
     @property
     def defense_modifiers(self) -> LimitedDict:
         '''getter for defense modifiers'''
@@ -49,9 +47,9 @@ class StoneGolem(Golem):
     def get_skills(self) -> Dict[str, 'function']:
         '''get skills learned'''
         return {}
-    
+
     def get_skills_list(self) -> list:
-        '''get list of skills learned'''
+        '''get list of skills learnedMetallic'''
         skills_list = []
         # granite golem skills
         if self._stone_type == "Granite":
@@ -67,11 +65,11 @@ class StoneGolem(Golem):
     def grounded(self, dmg_type: str) -> int:
         '''Stone Golems are immune to lightning'''
         if dmg_type == "Lightning":
-            msg : str = "Stone Golems are immune to lightning!"
+            msg: str = "Stone Golems are immune to lightning!"
             self.printer(msg)
             return 0
         return 1
-    
+
     def ignore_pain(self, damage: int) -> int:
         '''
         ignore 2 damage from every incoming attack event
@@ -84,8 +82,9 @@ class StoneGolem(Golem):
         '''improves physical damage offensive mod if hit by fire'''
         self.absorbed_heat = True
         if dmg_type == "Fire":
-            self._dam_modifiers["Physical"] = min(50, self._dam_modifiers["Physical"] + 10)
-    
+            self._dam_modifiers["Physical"] = \
+                min(50, self._dam_modifiers["Physical"] + 10)
+
     def sum_parts(self):
         '''modify sum of their parts'''
         super().sum_parts()
@@ -97,78 +96,87 @@ class StoneGolem(Golem):
     def splinter(self) -> CombatAction:
         '''splinter off a lesser golem when sum of their parts is triggered'''
         self.splintered = True
-        self.use_shards = True
-        splinter_dmg : int = self.golem_damage(self.modify_damage(self.attack_power * 0.33))
-        msg : str = ("A lesser golem splinters off and attacks, dealing <value>"
-                    " physical damage")
+        splinter_dmg: int = \
+            self.golem_damage(self.modify_damage(self.attack_power * 0.33))
+        msg: str = ("A lesser golem splinters off and attacks, dealing "
+                    "<value> physical damage")
         return CombatAction([("Attack", splinter_dmg, "Physical", msg)], "")
 
     def exploding_shards(self) -> CombatAction:
         '''
-        When preforming their first Attack after summoning a Splinter, Stone 
-        Golems throw off shards of rock, dealing an additional 100% 
-        attack_power based Physical damage.  If Absorb Heat has triggered this 
+        When preforming their first Attack after summoning a Splinter, Stone
+        Golems throw off shards of rock, dealing an additional 100%
+        attack_power based Physical damage.  If Absorb Heat has triggered this
         encounter, the Exploding Shards also explode for 50% attack_power based
         Fire damage.
         '''
-        actions = []
         if self.splintered:
-            shard_dmg: int = self.golem_damage(self.modify_damage(self.attack_power))
+            shard_dmg: int = \
+                self.golem_damage(self.modify_damage(self.attack_power))
             shard_msg: str = ("The attack explodes into shards, dealing "
-                            "<value> extra physical damage")
-            actions.append(("Attack", shard_dmg, "Physical", shard_msg))
+                              "<value> extra physical damage")
 
             if self.absorbed_heat:
-                heat_dmg: int = self.golem_damage(self.modify_damage(self.attack_power * 0.5))
-                heat_msg: str = ("The shards are superheated, dealing <value>"
-                                " fire damage")
-                actions.append(("Attack", heat_dmg, "Fire", heat_msg))
+                heat_dmg: int = \
+                    self.golem_damage(self.modify_damage(self.attack_power * 0.5))
+                heat_msg: str = ("The shards are superheated, dealing <value> "
+                                 "fire damage")
                 self.absorbed_heat = False
-
-            self.splintered = False
-            return CombatAction(actions, "")
+                self.splintered = False
+                return CombatAction([("Attack", shard_dmg, "Physical",
+                                      shard_msg),
+                                     ("Attack", heat_dmg, "Fire",
+                                      heat_msg)], "")
 
     def lightning_rod(self) -> CombatAction:
         '''one-time use: calls lightning bolt every time an action is taken'''
         if not self.used_lightning_rod:
-            self.used_lightning_rod : bool = True
-            msg : str = "Granite Golem becomes a lightning rod, calling down bolts of electricity with each action."
-            return CombatAction([("Status Effect", "Lightning Rod", "Special", msg)], "")
+            self.used_lightning_rod: bool = True
+            msg: str = ("Granite Golem becomes a lightning rod, calling down "
+                        "bolts of electricity with each action.")
+            return CombatAction([("Status Effect", "Lightning Rod",
+                                  "Special", msg)], "")
 
     # obsidian golem
     def harden(self):
         '''Improves defensive Physical modifier when taking an action'''
-        self._def_modifiers["Physical"] = min(self._def_modifiers["Physical"] + 5, 40)
+        self._def_modifiers["Physical"] = \
+            min(self._def_modifiers["Physical"] + 5, 40)
         self.hardened = True
 
     def improved_absorb_heat(self, dmg_type: str):
         '''Enhanced version of absorb_heat for Obsidian Golems'''
         if dmg_type == "Fire":
-            self._dam_modifiers["Physical"] = min(self._dam_modifiers["Physical"] + 10, 70)
+            self._dam_modifiers["Physical"] = \
+                min(self._dam_modifiers["Physical"] + 10, 70)
             self.defense_power *= 0.95
             self.attack_power *= 1.10
             self.hardened = False
-    
+
     def thermal_core(self) -> CombatAction:
         '''Ignites the Obsidian Golem, affecting actions and incoming damage'''
         if not self.thermal_core_used:
-                self.thermal_core_used = True
-                self.ignite_flag = True
-                msg : str = "Obsidian Golem's core overheats, adding fire damage to its actions and making it vulnerable to additional fire damage."
-                return CombatAction([("Status Effect", "Thermal Core", "Special", msg)], "")
+            self.thermal_core_used = True
+            self.ignited = True
+            msg: str = ("Obsidian Golem's core overheats, adding fire "
+                        "damage to its actions and making it vulnerable to"
+                        " additional fire damage.")
+            return CombatAction([("Status Effect", "Thermal Core", "Special",
+                                  msg)], "")
 
     def attack(self) -> CombatAction:
-        '''Stone Golem attack deals physical damage based on its attack power'''      
-        damage : int = self.golem_damage(self.modify_damage(self._attack_power))
-        message : str = f"{self.name} Attacks for <value> physical damage"
+        '''Stone Golem attack deals physical damage based on attack power'''
+        damage: int = self.golem_damage(self.modify_damage(self._attack_power))
+        message: str = f"{self.name} Attacks for <value> physical damage"
         # Check for splinter
         if self.splintered:
-            splinter_dmg : int = self.golem_damage(self.modify_damage(self.attack_power * 0.33))
-            splinter_msg : str = ("The lesser golem attacks for an additional"
-                                    " <value> physical damage")
+            splinter_dmg: int = \
+                self.golem_damage(self.modify_damage(self.attack_power * 0.33))
+            splinter_msg: str = ("The lesser golem attacks for an additional"
+                                 " <value> physical damage")
             return CombatAction([("Attack", damage, "Physical", message),
-                                 ("Attack", splinter_dmg, self._damage_type, splinter_msg)]
-                                 , "")
+                                 ("Attack", splinter_dmg, self._damage_type,
+                                  splinter_msg)], "")
         # Check for exploding shards
         self.exploding_shards()
         # Check for thermal core
@@ -177,7 +185,7 @@ class StoneGolem(Golem):
             damage += add_fire_dmg
         return CombatAction([("Attack", damage, "Physical", message)], "")
 
-    def take_damage(self, damage: int, dmg_type: str, message : str) -> bool:
+    def take_damage(self, damage: int, dmg_type: str, message: str) -> bool:
         # Stone Golems are immune to lightning damage
         damage *= self.grounded(dmg_type)
         # Ignore a certain amount of damage based on level
@@ -187,11 +195,11 @@ class StoneGolem(Golem):
             self.absorb_heat(dmg_type)
         return super().take_damage(damage, dmg_type, message)
 
-    def special_skill(self) -> CombatAction:
+    def special_skill(self):
         '''return special attack per golem type'''
         if self._stone_type == "Granite":
             return self.lightning_rod()
-        elif self._stone_type == "Obsidian":
+        if self._stone_type == "Obsidian":
             return self.thermal_core()
 
     def take_turn(self) -> CombatAction:
@@ -201,6 +209,6 @@ class StoneGolem(Golem):
             if self.level >= 15:
                 options.append(self.lightning_rod)
         if self._stone_type == "Obsidian":
-            if self.level >=15:
+            if self.level >= 15:
                 options.append(self.thermal_core)
         return choice(options)()
