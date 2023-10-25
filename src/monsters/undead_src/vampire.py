@@ -15,7 +15,6 @@ class Vampire(Undead):
 
     def __init__(self, level_mod: int):
         vampire_type: str = "Vampire"
-        
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         self._vampire_type: str = vampire_type
         super().__init__(f"{self._vampire_type}", level_mod, self.stats_structure)

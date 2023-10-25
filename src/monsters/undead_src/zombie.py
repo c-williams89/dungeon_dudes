@@ -13,13 +13,10 @@ class Zombie(Undead):
     def __init__(self, level_mod: int):
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         super().__init__('Zombie', level_mod, self.stats_structure)
+        self._hit_points += self.update_max_hp()
         self._sub_type: str = "Zombie"
         self._dam_modifiers = LimitedDict(("Physical", "Poison"), default_value=100)
         self.haunting = 0
-    
-    def base_att_def_power(self):
-        self._attack_power =  self.strength
-        self._defense_power = self.agility
 
     @property
     def damage_modifiers(self) -> LimitedDict:
@@ -31,10 +28,14 @@ class Zombie(Undead):
         '''Getter for Defense Modifiers'''
         return self._def_modifiers
     
-    def update_max_hp(self):
+    def base_att_def_power(self):
+        self._attack_power =  self.strength
+        self._defense_power = self.agility
+        
+    def update_max_hp(self) -> int:
         bonus_multiplier = self.level // 8
         bonus_hp =  bonus_multiplier * 20
-        self.stats_structure["Hit Points"][0] + bonus_hp
+        return bonus_hp
 
     def get_skills_list(self) -> List[str]:
         return []
