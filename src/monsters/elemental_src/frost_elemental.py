@@ -20,6 +20,7 @@ class FrostElemental(Elemental):
         elemental_type: tuple = self.spawn_elemental(
             level_mod, self.elemental_types)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
+        self._max_hit_points: int = self._hit_points
         self._elemental_type: str = elemental_type[0]
         self._damage_type: str = elemental_type[1]
         super().__init__(self._elemental_type, level_mod, self.stats_structure)
@@ -27,7 +28,7 @@ class FrostElemental(Elemental):
         self._dam_modifiers = LimitedDict(
             ("Ice", (self._damage_type)), default_value=100)
         self._special_count = 0
-        self._max_hit_points = self._hit_points
+        self._brittle_count = 0
         self._options = [self.attack]
 
     def spawn_elemental(self, level_mod: int, elemental_types: list):
@@ -40,6 +41,10 @@ class FrostElemental(Elemental):
             if random() <= lord_chance:
                 return elemental_types[1]
         return elemental_types[0]
+
+    def base_att_def_power(self):
+        self._attack_power = self.strength + self.intelligence
+        self._defense_power = self.agility
 
     @property
     def damage_modifiers(self) -> LimitedDict:
@@ -76,7 +81,13 @@ class FrostElemental(Elemental):
         if self._level >= 20:
             self._options.append("improved_frost_splinter")
 
-    def brittle_strikes(self) -> CombatAction:
+    def attack(self) -> CombatAction:
+        '''Attack method for Fire Elemental '''
+        damage: int = self.damage_modify(self._attack_power)
+        message: str = f"{self.name} attacks with for <value> Ice damage"
+        return CombatAction([("Attack", damage, "Ice", message)], "")
+
+    def brittle_strikes(self):
         ''' passive: Frost Elemental Attack reduces their opponents defensive
             modifier to Ice by 5 in addition to the damage dealt.  This effect
             is capped at a reduction of 25.
@@ -101,7 +112,7 @@ class FrostElemental(Elemental):
         pass
 
     def improved_freeze(self) -> CombatAction:
-        ''' passive:  After the defensive Physical  modifier for Freeze reaches
+        ''' passive:  After the defensive Physical modifier for Freeze reaches
             its maximum effect, subsequent casts of Freeze deal twice as much
             damage.
         '''

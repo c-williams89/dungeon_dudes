@@ -1,5 +1,5 @@
 ''' Module for the Dungeon Dudes Elemental Monster '''
-from random import randint
+from random import randint, gauss
 from .monsters_abc import Monster
 from ..combat_action import CombatAction
 from ..dd_data import CombatPrint, LimitedDict, damage_types
@@ -31,9 +31,7 @@ class Elemental(Monster):
 
     def damage_modify(self, damage) -> int:
         ''' Adds Variance to Damage Events and Calculates Critical Chance '''
-        damage_min = int(damage * .95)
-        damage_max = int(damage * 1.05)
-        modified: int = randint(damage_min, damage_max)
+        modified: int = gauss(damage, .1)
         return modified
 
     @property
