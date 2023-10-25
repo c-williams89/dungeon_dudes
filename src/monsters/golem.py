@@ -10,7 +10,7 @@ class Golem(Monster):
     def __init__(self, name: str, level_mod: int, stat_structure: dict):
         self._gold = level_mod * 6
         super().__init__(name, level_mod, "Golem", stat_structure)
-        self.printer = CombatPrint
+        self.printer = CombatPrint()
         self._def_modifiers = LimitedDict(damage_types, default_value=100)
         self._dam_modifiers = LimitedDict("Physical", default_value=100)
 
@@ -28,7 +28,7 @@ class Golem(Monster):
 
     def base_att_def_power(self):
         self._attack_power = self.strength
-        self._defense_power = self.agility
+        self._defense_power = self.agility * 2
 
     @property
     def hit_points(self):
@@ -43,17 +43,31 @@ class Golem(Monster):
         else:
             self._hit_points = int(value)
 
+    def sum_parts(self):
+        '''attack/defense power reduced by 15% for ever 25% loss of max HP'''
+        if self.max_hit_points == 0:
+            return # We don't divide by zero here
+        
+        health_percent = (self._hit_points / self.max_hit_points) * 100
+        debuff_stack = 4 - int(health_percent // 25)
+        multiplier = 1 - (0.15 * debuff_stack)
+        self._attack_power = round(self._attack_power * multiplier)
+        self._defense_power = round(self._defense_power * multiplier)
+
     def take_damage(self, damage: int, dmg_type: str, message: str) -> bool:
         '''Process damage events'''
         alive = True
         if dmg_type == "Poison":
             damage = 0
-            print(f"{self.name} is immune to poison damage!")
+            msg : str = "Golems are immune to poison!"
+            self.printer(msg)
         elif dmg_type == "Physical":
             damage = damage - (self._defense_power // 2)
             damage = int(damage * self._def_modifiers[dmg_type] / 100)
         else:
             damage = int(damage * self._def_modifiers[dmg_type] / 100)
+
+        self.sum_parts()
 
         if damage >= self.hit_points:
             alive = False
@@ -67,23 +81,9 @@ class Golem(Monster):
         message = message.replace('<value>', str(damage))
         self.printer(message)
         return alive
-
-    def splinter(self):
-        '''for stone golem splinter special'''
-        pass
-
-    def sum_parts(self):
-        '''attack/defense power reduced by 15% for ever 25% loss of max HP'''
-        if self.max_hit_points == 0:
-            return # We don't divide by zero here
-        
-        health_percent = (self._hit_points / self.max_hit_points) * 100
-        debuff_stack = 4 - int(health_percent // 25)
-        multiplier = 1 - (0.15 * debuff_stack)
-        self.attack_power *= multiplier
-        self.defense_power *= multiplier
-
-        self.splinter()
+    
+    def golem_damage(self, damage : float) -> int:
+        return int(damage)
 
     def take_turn(self) -> CombatAction:
         '''Take turn and return success status of action, and the action'''
