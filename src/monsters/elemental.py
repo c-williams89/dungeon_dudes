@@ -26,7 +26,6 @@ class Elemental(Monster):
 
     def attack(self) -> CombatAction:
         damage: int = self.damage_modify(self._attack_power)
-        # change for elemental type
         message: str = f"{self.name} Attacks with for <value> elemental damage"
         return CombatAction([("Attack", damage, "Elemental", message)], "")
 
@@ -71,20 +70,26 @@ class Elemental(Monster):
     def damage_check(self, damage: str, dmg_type: str) -> int:
         ''' Helper function for calculating damage '''
         # if damage type matches elemental type
-        if self.type == dmg_type:
+        if self._elemental_type == dmg_type:
             # call elemental_immunity
             return self.elemental_immunity(damage)
         # call elemental_vulnerability
         result = self.elemental_vulnerability(dmg_type)
         if result is True:
             return damage * 1.50
+        return damage
 
     def elemental_reconstitute(self) -> int:
-        ''' Elementals heal for 8% of their current hit_points at the 
+        ''' Elementals heal for 8% of their current hit_points at the
         beginning of each of their turns (rounded up).
         '''
-        return CombatAction([("Heal", round(self._hit_points * 1.08), "Holy")],
-                            "")
+        if self._hit_points == self._max_hit_points:
+            pass
+        #  TODO: adjust for less than total but cannot overheal
+        else:
+            result = round(self._hit_points * 0.08)
+            self._hit_points += result
+            self.printer(f"{self.name} reconstitutes {result} hit points!")
 
     def elemental_immunity(self, damage: str) -> int:
         ''' Elementals are immune to all damage from their type '''
@@ -98,7 +103,7 @@ class Elemental(Monster):
             ice vuln to lightning
             lightning vuln to fire
 
-            dmg_type, str -- 
+            dmg_type, str --
 
             returns, bool -- true if elemental type is vulnerable to dmg_type
         '''
@@ -109,7 +114,9 @@ class Elemental(Monster):
         }
 
         vulnerable = vulnerabilities.get(dmg_type)
-        if self.type == vulnerable:
+        if vulnerable is None:
+            return False
+        if self._elemental_type == vulnerable:
             return True
 
     def take_turn(self) -> CombatAction:  # pylint: disable=unused-argument
