@@ -61,11 +61,11 @@ class RangerEquipmentGenerator:
         if suffix_chance == 5:
             armor += int(level * 0.5)
             suffix: str = "of Defense"
-            mod: float = level * 1.5
+            mod: float = 1.5
         elif suffix_chance > 2:
             attack += int(level * 0.5)
             suffix: str = "of Wrath"
-            mod: float = level * 1.5
+            mod: float = 1.5
         cost: int = self.generate_value(weapon_base_cost,
                                         attack_cost_mod,
                                         physical_cost_modifier, mod)
