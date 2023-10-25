@@ -19,7 +19,6 @@ class FireElemental(Elemental):
                        ("Fire Elemental Lord", "Fire")]
 
     def __init__(self, level_mod: int):
-        # TODO: if set name based off level somewhere
         # elemental_type: tuple = choice(self.elemental_types)
         elemental_type: tuple = self.spawn_elemental(
             level_mod, self.elemental_types)
@@ -49,32 +48,37 @@ class FireElemental(Elemental):
         if level_mod <= 5:
             print(f'{elemental_types[0]}')
             return elemental_types[0]
-        if level_mod in range(6, 10):
-            if random() < 20:
+        if level_mod in range(6, 11):
+            tier_2 = {6: .2,
+                      7: .4,
+                      8: .6,
+                      9: .8,
+                      10: 1}
+            if random() <= tier_2.get(level_mod):
                 return elemental_types[1]
             else:
                 return elemental_types[0]
-    # if random() < .20
-    # dict{6: 20,
-    #   7: 40,
-    #   8: 60,
-    #   9: 80
-    #   10: 100
-    # }
-    # dict{11: 10,
-    #   12: 20,
-    #   13: 30,
-    #   14: 40,
-    #   15: 50,
-    #   16: 60,
-    #   17: 70,
-    #   18: 80,
-    #   19: 90,
-    #   20: 100
-    # }
-    # if self._level >= 25:
-    #   if random() < .01 is True:
-    #
+        if level_mod in range(11, 21):
+            tier_3 = {
+                11: .1,
+                12: .2,
+                13: .3,
+                14: .4,
+                15: .5,
+                16: .6,
+                17: .7,
+                18: .8,
+                19: .9,
+                20: 1}
+            if random() <= tier_3.get(level_mod):
+                return elemental_types[2]
+            else:
+                return elemental_types[1]
+        if level_mod >= 20:
+            return elemental_types[2]
+        elif level_mod >= 25:
+            if random() <= .01:
+                return elemental_types[3]
 
     @property
     def damage_modifiers(self) -> LimitedDict:
