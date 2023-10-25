@@ -1,3 +1,4 @@
+"""Module to genrate items for wizard at specific levels"""
 from random import gauss, choice, randint
 from math import ceil
 from typing import Dict
@@ -158,7 +159,7 @@ class WizardEquipmentGenerator:
             prefix = "Fortified"
 
         # Adjust the cost range as needed
-        cost = randint(level * 2, level * 4)  
+        cost = randint(level * 2, level * 4)
         cost = max(cost, 1)
 
         accessory_name = f'{prefix} {accessory_name} of {damage_type}'.strip()
