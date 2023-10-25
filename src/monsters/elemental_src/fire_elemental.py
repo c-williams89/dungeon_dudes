@@ -53,7 +53,8 @@ class FireElemental(Elemental):
                       10: 100}
             if randint(1, 100) <= tier_2.get(level_mod):
                 return elemental_types[1]
-            return elemental_types[0]
+            else:
+                return elemental_types[0]
         if level_mod in range(11, 21):
             tier_3 = {
                 11: 10,
@@ -68,10 +69,11 @@ class FireElemental(Elemental):
                 20: 100}
             if randint(1, 100) <= tier_3.get(level_mod):
                 return elemental_types[2]
-            return elemental_types[1]
+            else:
+                return elemental_types[1]
         if level_mod >= 20:
             return elemental_types[2]
-        if level_mod >= 25:
+        elif level_mod >= 25:
             if randint(1, 100) <= 1:
                 return elemental_types[3]
 
@@ -94,15 +96,14 @@ class FireElemental(Elemental):
         self._options.append("immolate")
 
     def level_up(self):
-        ''' Level up functionality '''
         super().level_up()
         if self.level % 2 == 0:
             self._attack_power += 1
         else:
             self._defense_power += 1
         if self.level >= 5:
-            self._options.append("explode")
-            self._options.append("scorched_earth")
+            self._options.append(self.explode)
+            self._options.append(self.scorched_earth)
         if self.level >= 11:
             self.elemental_reconstitute = self.improved_reconstitute
 
