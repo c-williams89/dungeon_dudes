@@ -49,11 +49,11 @@ class Ranger(Character):
                     '''companions is doubled and companions deal additional'''\
                     ''' 10% of the Ranger's attack power'''
         self.passive_skills = {
-            1: ["Awareness", awareness],
+            1: [["Awareness", awareness]],
             10: [["Improved Awareness", improved_awareness],
                  ["Focused Regeneration", focused_regen]],
-            20: ["Lucky Strike", lucky_strike],
-            25: ["Improved Animal Companion 2", improved_animal_companion]
+            20: [["Lucky Strike", lucky_strike]],
+            25: [["Improved Animal Companion 2", improved_animal_companion]]
         }
         self.printer = CombatPrint()
         self._weapon : Weapon = None
@@ -392,7 +392,7 @@ class Ranger(Character):
         return True, CombatAction([("Attack", int(damage),
                                     "Physical", msg)], "")
 
-    def summon_cat(self):
+    def summon_cat(self)  ->  [bool, CombatAction]:
         '''Summon a Cat Companion. Whenever the Ranger deals damage, the \
         Cat attacks, dealing Physical Damage based on 75% of the Ranger's \
         attack '''
@@ -460,13 +460,14 @@ class Ranger(Character):
             else:
                 print(f'\nNew Skill - {skill}:', description)
         if self._level in self.passive_skills:
-            skill : str = self.passive_skills[self._level][0]
-            for passive in self.passive_skills[self._level]:
+            passives : str = self.passive_skills[self._level]
+            for passive in passives:
+                skill = passive[0]
                 description = passive[1]
-            if combat:
-                self.printer(f'New Skill - {skill}:', description)
-            else:
-                print(f'New Skill - {skill}:', description)
+                if combat:
+                    self.printer(f'New Skill - {skill}:', description)
+                else:
+                    print(f'New Skill - {skill}:', description)
          # Improved Animal Companion
         if self._level >= 15:
             self._total_companion = 2

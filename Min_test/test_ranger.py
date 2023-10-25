@@ -24,6 +24,27 @@ class TestRanger(unittest.TestCase):
         self.assertEqual(self.character._defense_power,
                          self.character.agility // 2)
 
+    def test_equipment_weapon(self):
+        '''Check if the weapon stat increases as character levels up'''
+        weapon = self.character._weapon
+        weapon_name = weapon._name
+        print(weapon_name)
+        # Check the modifier of the bow
+        if "Wrath" in weapon_name.split() or "Defense" in weapon_name.split():
+            self.assertEqual(len(weapon._dam_modifiers), 1)
+            self.assertEqual(weapon._dam_modifiers[0][1] <=\
+                             self.character._level + 10, True)
+
+    def test_equipment_armor(self):
+        '''Check if the Armor Resist is set correctly'''
+        armor = self.character._armor
+        armor_modifier = armor._def_modifiers
+        total_resist = 0
+        for resist in armor_modifier:
+            total_resist += resist[1]
+        self.assertEqual(total_resist, (self.character._level * 3) + 30)
+
+
     def test_active_skill(self):
         '''Test to check if the Ranger learn skills correctly'''
         # Test when character level is 1
@@ -89,6 +110,7 @@ class TestRanger(unittest.TestCase):
         self.assertEqual(self.character.agility, 112)
         self.assertEqual(self.character.intelligence, 5)
         self.assertEqual(self.character._special, 51)
+
 
 if __name__ == "__main__":
     unittest.main()
