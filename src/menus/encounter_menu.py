@@ -114,9 +114,12 @@ class EncounterMenu(cmd.Cmd):
         else:
             self.printer(f"{self.player_2.name} flees the battle")
         input("Press Enter to Continue")
+        self.do_scroll_of_escape("", forced=True)
 
-    def do_scroll_of_escape(self, arg):
+    def do_scroll_of_escape(self, arg, forced=False):
         '''Active Player ends Combat with a scroll of escape'''
+        if forced:
+            return True
         if self.player_1.scroll_of_escape > 0:
             self.player_1.scroll_of_escape -= 1
             self.printer(f"{self.player_1.name} escapes to town with a scroll of escape")
