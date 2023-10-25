@@ -8,16 +8,20 @@ from ...combat_action import CombatAction
 
 class Ogre(Humanoid):
     '''Ogre Module'''
-    stats_structure: Dict[str, Tuple[int]] = {"Hit Points": (75, 20),
-                                              "Strength": (18, 3),
+    stats_structure: Dict[str, Tuple[int]] = {"Strength": (18, 3),
                                               "Agility": (10, 3),
-                                              "Intelligence": (7, 1),
                                               "Special": (0, 0)}
     ogre_types = [("Blood-Thirster", "Physical"), ("Ogre-Magi", "Physical")]
 
     def __init__(self, level_mod: int):
         ogre_type = choice(self.ogre_types)
         self._ogre_type: str = ogre_type[0]
+        if self._ogre_type == "Blood-Thirster":
+            self.stats_structure["Hit Points"] = (90, 22)
+            self.stats_structure["Intelligence"] = (5, 0)
+        else:
+            self.stats_structure["Hit Points"] = (75, 12)
+            self.stats_structure["Intelligence"] = (15, 3)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         self._damage_type: str = ogre_type[1]
         super().__init__(f"{self._ogre_type} Ogre",
