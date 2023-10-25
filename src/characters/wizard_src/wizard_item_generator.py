@@ -60,7 +60,7 @@ class WizardEquipmentGenerator:
             weapon_name += f" (+{modifier} {elemental_damage_type})"
             weapon_special["Offensive"].append((elemental_damage_type, modifier))
 
-        return Weapon(weapon_type, weapon_name, attack, special=weapon_special, armor=armor, cost=cost)
+        return Weapon(weapon_type, weapon_name, attack, special=weapon_special, armor=armor, dmg_type=elemental_damage_type, cost=cost)
 
     def generate_armor(self, level : int) -> Armor:
         '''
@@ -80,22 +80,22 @@ class WizardEquipmentGenerator:
             defensive_modifiers.append((damage_type, modifier_value))
 
         # Generate additional defense modifier or defense power with a chance
-        prefix = ""
-        prefix_chance = randint(1, 5)
-        if prefix_chance >= 4:
+        descriptor = ""
+        desc_chance = randint(1, 5)
+        if desc_chance >= 4:
             defense_power += max(1, ceil(gauss(level / 2, level / 5)))
-            prefix = "Fortified"
-        elif prefix_chance == 3:
+            descriptor = "Fortification"
+        elif desc_chance == 3:
             modifier_value = 30 + (level * 3)
             damage_type = choice(self._elemental_types)
             defensive_modifiers.append((damage_type, modifier_value))
-            prefix = "Empowered"
+            descriptor = "Empowerment"
 
         # Adjust the cost range 
         cost = randint(level * 2, level * 4)  
         cost = max(cost, 1)
 
-        armor_name = f'{armor_name} {prefix}'.strip()
+        armor_name = f'{armor_name} {descriptor}'.strip()
         armor_special = {"Defensive": defensive_modifiers}
         return Armor(armor_type, armor_name, defense_power, special=armor_special, cost=cost)
 
