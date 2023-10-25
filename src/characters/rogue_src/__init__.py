@@ -1,0 +1,1 @@
+from .rogue_item_generator import RogueEquipmentGenerator
