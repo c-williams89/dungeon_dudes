@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 from random import choice, randint
 from ..elemental import Elemental
 from ...combat_action import CombatAction
-from ...dd_data import CombatPrint, LimitedDict, damage_types
+from ...dd_data import LimitedDict
 
 
 class FireElemental(Elemental):
@@ -101,8 +101,7 @@ class FireElemental(Elemental):
         else:
             self._defense_power += 1
         if self.level >= 5:
-            self._options.append("explode")
-            self._options.append("scorched_earth")
+            self._options.append(self.explode)
         if self.level >= 11:
             self.elemental_reconstitute = self.improved_reconstitute
 
