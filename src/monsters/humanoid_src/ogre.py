@@ -26,7 +26,6 @@ class Ogre(Humanoid):
         self._sub_type: str = "Ogre"
         self._dam_modifiers = LimitedDict(("Physical", (self._damage_type)),
                                           default_value=100)
-        self._special_count = 0
         self._two_minds = False
         self._damage = self.humanoid_damage(self.modify_damage(self.strength))
 
@@ -40,10 +39,12 @@ class Ogre(Humanoid):
 
     @property
     def damage(self):
+        '''Getter for damage'''
         return self._damage
 
     @property
     def ogre_type(self):
+        '''Getter for ogre type'''
         return self._ogre_type
 
     def get_skills(self):
@@ -55,16 +56,20 @@ class Ogre(Humanoid):
         return special_skills
 
     def risky_blow(self) -> CombatAction:
+        '''Return tuple for Risky Blow Attack. 'Miss' Tuple returned if
+        attack is unsuccessful
+        '''
         msg: str = ("Blood-Thirster Ogre performs a risky blow, dealing "
                     "<value> physical damage")
         risky_chance = randint(0, 10)
-        if ((risky_chance % 2) == 0):
+        if risky_chance % 2 == 0:
             damage = int(2 * self.damage)
             return ("Attack", damage, "Physical", msg)
         self.printer("Blood-Thirster Ogre missed with Risky Blow")
         return ("Miss", 0, "Miss", "")
 
     def wild_magics(self):
+        '''Return tuple for Wild Magics Attack.'''
         self._two_minds = True
         options = ["Lightning", "Ice", "Fire"]
         damage_type = choice(options)
@@ -74,16 +79,19 @@ class Ogre(Humanoid):
         return ("Attack", damage_amt, damage_type, msg)
 
     def frenzy(self):
+        '''Return tuple for Frenzy Attack.'''
         msg: str = ("Blood-Thirster Ogre goes into a frenzy, dealing <value> "
                     "damage")
         return ("Attack", self.damage, "Physical", msg)
 
     def improved_frenzy(self):
+        '''Return tuple for Improved Frenzy Attack.'''
         msg: str = ("Blood-Thirster Ogre goes into an Improved Frenzy, dealing"
                     " <value> damage.")
         return ("Attack", self.damage, "Physical", msg)
 
     def special_skill(self):
+        '''Returns the special skill based on ogre type'''
         if self._ogre_type == "Blood-Thirster":
             return self.risky_blow()
         return self.wild_magics()
@@ -95,6 +103,10 @@ class Ogre(Humanoid):
         return ("Attack", damage, "Physical", msg)
 
     def blood_thirster_attack(self):
+        '''Creates a list with Risky Blow attack. If random chances are met
+        based on the manual, Frenzy and Improved Frenzy Attacks are appended.
+        Prints message if attacks are unsuccessful and returns list.
+        '''
         actions = []
         actions.append(self.risky_blow())
         if randint(0, 100) < 25:
@@ -110,12 +122,17 @@ class Ogre(Humanoid):
         return actions
 
     def strategic_thinking(self):
+        '''Increases damage modifier by 25 percent if health is above 75 or
+        below 25 percent of max hit points.
+        '''
         if ((self.hit_points > int(self.max_hit_points * .75)) or
            (self.hit_points < int(self.max_hit_points * .25))):
             self._damage += int(self.damage * .25)
 
     def bloodlust(self):
-        pass
+        '''Increase damage modifier for Physical, Fire, Ice and Lightning by
+        30 percent when a healing potion is consumed.
+        '''
 
     def take_turn(self) -> CombatAction:
         '''Create list of normal attack and special attacks and choose one'''
@@ -129,19 +146,19 @@ class Ogre(Humanoid):
         if self.ogre_type == "Blood-Thirster":
             actions = [self.attack, self.blood_thirster_attack]
             option = choice(actions)
-            if option == self.attack:
+            if option.__name__ == "attack":
                 action_list.append(option())
                 return CombatAction(action_list, "")
             return CombatAction(option(), "")
+
+        actions = [self.attack, self.wild_magics]
+        option = choice(actions)
+        if option.__name__ == "attack":
+            action_list.append(option())
+            if self.level > 4:
+                action_list.append(self.wild_magics())
         else:
-            actions = [self.attack, self.wild_magics]
-            option = choice(actions)
-            if option == self.attack:
-                action_list.append(option())
-                if self.level > 4:
-                    action_list.append(self.wild_magics())
-            else:
-                action_list.append(option())
-                if self.level > 4:
-                    action_list.append(self.attack())
-            return CombatAction(action_list, "")
+            action_list.append(option())
+            if self.level > 4:
+                action_list.append(self.attack())
+        return CombatAction(action_list, "")

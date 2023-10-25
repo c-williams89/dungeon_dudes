@@ -49,22 +49,27 @@ class Murloc(Humanoid):
 
     @property
     def tribe_size(self):
+        '''Getter for tribe size'''
         return self._tribe_size
 
     @property
     def damage(self):
+        '''Getter for damage'''
         return self._damage
 
     @property
     def base_attack(self):
+        '''Getter for base attack'''
         return self._base_attack
 
     @property
     def damage_type(self):
+        '''Getter for damage type'''
         return self.damage_type
 
     @property
     def poisoned(self) -> bool:
+        '''Getter for poisoned boolean'''
         return self._poisoned
 
     def get_skills(self):
@@ -81,6 +86,9 @@ class Murloc(Humanoid):
         return alive
 
     def get_base_att(self):
+        '''Creates and returns the base attack basedon whether weapons are
+        poisoned. 30 percent chance of increased Poison damage.
+        '''
         if self.poisoned:
             if randint(0, 9) < 3:
                 msg: str = "Murloc attacks, dealing <value> Poison damage"
@@ -91,11 +99,13 @@ class Murloc(Humanoid):
         return self.base_attack
 
     def ice_bolt(self):
+        '''Returns tuple for Ice Bolt Attack.'''
         damage = self.humanoid_damage(self.modify_damage(self.intelligence))
         msg: str = "Murloc casts Ice Bolt for <value> Ice Damage"
         return ("Attack", damage, "Ice", msg)
 
     def forage(self):
+        '''Returns tuple for Forage Action.'''
         self._healing_potions += 1
         self.printer(f"Murloc has gathered ingredients to make a healing "
                      f"potion. Murloc tribe now has {self.healing_potions} "
@@ -103,11 +113,13 @@ class Murloc(Humanoid):
         return ("Heal", 0, "Heal", "")
 
     def poisons(self):
+        '''Returns empty tuple for Poisons Action and sets boolean to true.'''
         self._poisoned = True
         self.printer("Murloc Rogue has coated Murloc Weapons in Poison")
         return ("", 0, "", "")
 
     def holy_nova(self):
+        '''Returns tuple for Holy Nova Attack.'''
         health = int(self.max_hit_points * .3)
         self.hit_points += health
         msg: str = ("Murloc Oracle errupts with Holy energy, dealing <value> "
@@ -115,6 +127,11 @@ class Murloc(Humanoid):
         return ("Attack", self.damage, "Holy", msg)
 
     def get_action(self):
+        '''Creates a list of Acctions based on current level. Randomly selects
+        an action and returns it, popping it from the list so it is unable to
+        be used again. Ice Bolt and Forage can be used twice per encounter, so
+        they are added to the list twice.
+        '''
         actions = [self.ice_bolt,
                    self.ice_bolt,
                    self.forage,

@@ -6,7 +6,7 @@ from ..dd_data import CombatPrint, LimitedDict, damage_types
 
 
 class Humanoid(Monster):
-    '''Humanoid Monster Class'''
+    '''Humanoid Monster Base Class'''
 
     def __init__(self, name: str, level_mod: int, stat_structure: dict):
         self._gold = 10 + (8 * (level_mod - 1))
@@ -26,17 +26,20 @@ class Humanoid(Monster):
         return modified
 
     def attack(self) -> CombatAction:
+        '''Builds the base attack used by all humanoid monsters'''
         damage: int = self.humanoid_damage(
             self.modify_damage(self._attack_power))
         message: str = f"{self.name} Attacks with for <value> physical damage"
         return CombatAction([("Attack", damage, "Physical", message)], "")
 
     def base_att_def_power(self):
+        '''Set the base attack and defense powers for humanoid monsters'''
         self._attack_power = self.strength
         self._defense_power = self.agility
 
     @property
     def hit_points(self):
+        '''Override Parent Getter for HP'''
         return self._hit_points
 
     @hit_points.setter
@@ -48,9 +51,11 @@ class Humanoid(Monster):
 
     @property
     def healing_potions(self):
+        '''Getter for amount of healing potions'''
         return self._healing_potions
 
     def take_damage(self, damage: int, dmg_type, message: str) -> bool:
+        '''Override Parent take_damage'''
         alive = True
         if dmg_type == "Physical":
             damage = damage - (self._defense_power // 2)
@@ -77,6 +82,10 @@ class Humanoid(Monster):
         return int(damage)
 
     def healing_potion(self):
+        '''
+        Determine if a monster has a healing potion, and heals the monster
+        with 45 percent of max hitpoints
+        '''
         if self.healing_potions > 0:
             health = int(self.max_hit_points * .45)
             self._hit_points += health
