@@ -50,8 +50,6 @@ class RangerEquipmentGenerator:
         prefix_key: [str, None] =\
             max(filter(lambda key: key < physical_modifier,
                        self._weapon_prefix.keys()), default=None)
-
-        physical_modifier: int = randint(0, level + 10)
         if prefix_key is None:
             prefix: str = ""
         else:
