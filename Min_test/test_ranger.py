@@ -100,19 +100,19 @@ class TestRanger(unittest.TestCase):
         '''Test to check if the Ranger and companions attack correctly'''
         damage = 10
         # Test with no companion
-        combat = self.character.modify_damage(damage)
+        combat = self.character.combat_action_list(damage)
         self.assertEqual(len(combat), 1)
         # With one companion
         self.character._companion["Wolf"][0] = True
-        combat = self.character.modify_damage(damage)
+        combat = self.character.combat_action_list(damage)
         self.assertEqual(len(combat), 2)
         # With two companions
         self.character._companion["Bear"][0] = True
-        combat = self.character.modify_damage(damage)
+        combat = self.character.combat_action_list(damage)
         self.assertEqual(len(combat), 3)
         # With two companions and trap on
         self.character._trap[0] = True
-        combat = self.character.modify_damage(damage)
+        combat = self.character.combat_action_list(damage)
         self.assertEqual(len(combat), 4)
 
     def test_max_stat(self):
