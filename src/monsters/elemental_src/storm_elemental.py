@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 from random import choice, randint, random
 from ..elemental import Elemental
 from ...combat_action import CombatAction
-from ...dd_data import CombatPrint, LimitedDict, damage_types
+from ...dd_data import LimitedDict
 
 
 class StormElemental(Elemental):
@@ -27,7 +27,7 @@ class StormElemental(Elemental):
         self._sub_type: str = "Lightning"
         self._dam_modifiers = LimitedDict(
             ("Lightning", (self._damage_type)), default_value=100)
-        self._options = [self.attack]
+        self._options = [self.static_shock, self.double_shock]
         self._static_shock_count = 0
 
     def spawn_elemental(self, level_mod: int, elemental_types: list):
