@@ -1,6 +1,6 @@
 '''Fire Elemental Module for Dungeon Dudes'''
 from typing import Dict, Tuple
-from random import choice, randint, random
+from random import choice, randint
 from ..elemental import Elemental
 from ...combat_action import CombatAction
 from ...dd_data import CombatPrint, LimitedDict, damage_types
@@ -19,7 +19,6 @@ class FireElemental(Elemental):
                        ("Fire Elemental Lord", "Fire")]
 
     def __init__(self, level_mod: int):
-        # elemental_type: tuple = choice(self.elemental_types)
         elemental_type: tuple = self.spawn_elemental(
             level_mod, self.elemental_types)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
@@ -29,66 +28,57 @@ class FireElemental(Elemental):
         self._sub_type: str = "Fire"
         self._dam_modifiers = LimitedDict(
             ("Fire", (self._damage_type)), default_value=100)
-        self._reconstitute_count = 0
+        self._reconstitute_count = 0.0
         self._burning_strike_count = 0
         self._special_count = 0
         self._max_hit_points = self._hit_points
-        self._options = [self.attack]
+        self._options = [self.immolate]
+        self._explode_once = False
 
     def base_att_def_power(self):
         self._attack_power = self.strength + self.intelligence
         self._defense_power = self.agility
 
-    # def name(self):
-    #     if level_mod <= 5:
-        # self.name = "Lesser Fire Elemental"
-    #     if self._level <=
-
-    def spawn_elemental(self, level_mod, elemental_types: list):
+    def spawn_elemental(self, level_mod: int, elemental_types: list):
         if level_mod <= 5:
             print(f'{elemental_types[0]}')
             return elemental_types[0]
         if level_mod in range(6, 11):
-            tier_2 = {6: .2,
-                      7: .4,
-                      8: .6,
-                      9: .8,
-                      10: 1}
-            if random() <= tier_2.get(level_mod):
+            tier_2 = {6: 20,
+                      7: 40,
+                      8: 60,
+                      9: 80,
+                      10: 100}
+            if randint(1, 100) <= tier_2.get(level_mod):
                 return elemental_types[1]
             else:
                 return elemental_types[0]
         if level_mod in range(11, 21):
             tier_3 = {
-                11: .1,
-                12: .2,
-                13: .3,
-                14: .4,
-                15: .5,
-                16: .6,
-                17: .7,
-                18: .8,
-                19: .9,
-                20: 1}
-            if random() <= tier_3.get(level_mod):
+                11: 10,
+                12: 20,
+                13: 30,
+                14: 40,
+                15: 50,
+                16: 60,
+                17: 70,
+                18: 80,
+                19: 90,
+                20: 100}
+            if randint(1, 100) <= tier_3.get(level_mod):
                 return elemental_types[2]
             else:
                 return elemental_types[1]
         if level_mod >= 20:
             return elemental_types[2]
         elif level_mod >= 25:
-            if random() <= .01:
+            if randint(1, 100) <= 1:
                 return elemental_types[3]
 
     @property
     def damage_modifiers(self) -> LimitedDict:
         '''Getter for Damage Modifiers'''
         return self._dam_modifiers
-
-    # @damage_modifiers.setter
-    # def damage_modifiers(self, damage_enhancement: int) -> LimitedDict:
-    #     ''' Setter for Damage Modifiers '''
-    #     return self._dam_modifiers + damage_enhancement
 
     @property
     def defense_modifiers(self) -> LimitedDict:
@@ -101,18 +91,17 @@ class FireElemental(Elemental):
 
     def get_skills_list(self) -> list:
         '''Get List of Skills Learned'''
-        self._options.append("burning_strike")
         self._options.append("immolate")
 
     def level_up(self):
         super().level_up()
-        if self._level % 2 == 0:
+        if self.level % 2 == 0:
             self._attack_power += 1
         else:
             self._defense_power += 1
-        if self._level >= 5:
+        if self.level >= 5:
             self._options.append("explode")
-        if self._level >= 11:
+        if self.level >= 11:
             self.elemental_reconstitute = self.improved_reconstitute
 
     def attack(self) -> CombatAction:
@@ -128,12 +117,15 @@ class FireElemental(Elemental):
             hit_points and dealing an equal amount of Fire damage to their
             opponent.
         '''
-        # TODO: add once per battle flag
-        if self._level >= 5:
-            self._max_hit_points = self._hit_points
-            pass
+        if self._explode_once is False:
+            self._hit_points = int(self._max_hit_points * .25)
+            damage: int = int(self._hit_points * .25)
+            message: str = f"{self.name} explodes for <value> Fire damage"
+            self._explode_once = True
+            return CombatAction([("Attack", damage, "Fire", message)], "")
+        return self.attack()
 
-    def improved_reconstitute(self) -> CombatAction:
+    def improved_reconstitute(self):
         ''' passive: Greater Fire Elemental Reconstitute Healing is based on
             max_hit_points instead of current hit_points '''
         result = round(self._max_hit_points * 0.08)
@@ -144,7 +136,7 @@ class FireElemental(Elemental):
             self._hit_points += result
             self.printer(f"{self.name} heals for {result}!")
 
-    def burning_strike(self) -> CombatAction:
+    def burning_strike(self):
         ''' passive: Fire Elemental Attack increase their Fire damage offensive
             modifier by 5 for the remainder of combat in addition to the damage
             dealt.  This effect is capped at an increase of 20 '''
@@ -160,9 +152,12 @@ class FireElemental(Elemental):
             Fire damage to their opponent based on 50% of attack power. The
             effect of Reconstitute is increased by 1% for the remainder of
             the battle. (Maximum increase 4%) '''
-        print("Using immolate")
+        damage: int = int(self.damage_modify(self._attack_power) * .75)
+        message: str = (f"{self.name} immolates you in <value> Fire damage "
+                        f"and increases its reconstituting abilities!")
         if self._reconstitute_count < 0.04:
             self._reconstitute_count += 0.01
+        return CombatAction([("Attack", damage, "Fire", message)], "")
 
     def scorched_earth(self) -> CombatAction:
         ''' Once per Combat: Fire Elemental lights the area blaze, dealing 33%
@@ -178,4 +173,7 @@ class FireElemental(Elemental):
             Elementals have a 75% chance to return a random skill, and a 25%
             chance to Attack. '''
         self.elemental_reconstitute()
-        return choice(self._options)()
+        if randint(1, 100) <= 25:
+            return choice(self._options)()
+        else:
+            return self.attack()
