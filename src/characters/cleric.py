@@ -312,7 +312,8 @@ class Cleric(Character):
                 self._halfdamage = True
                 self.divine_blessing()
                 improved_healing_atk = self.improved_healing(special_cost)
-                if self.level >= 25:
+                if (self.level >= 25 and
+                   (self.special > (self.max_special * 0.5))):
                     battle_smite = self._battle_smite
                 else:
                     battle_smite = ("Heal", 0, "Holy", "")
@@ -349,7 +350,7 @@ class Cleric(Character):
         self._attack_power += 1
         if self.agility % 2 == 0:
             self._defense_power += 1
-        if self.level is 20:
+        if self.level == 20:
             self._smite_multi = 2
 
     ''' Getters and Setters for types and variables'''
