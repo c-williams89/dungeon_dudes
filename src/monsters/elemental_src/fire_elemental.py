@@ -185,7 +185,8 @@ class FireElemental(Elemental):
             Elementals have a 75% chance to return a random skill, and a 25%
             chance to Attack. '''
         self.elemental_reconstitute()
-        if randint(1, 100) <= 25:
-            return choice(self._options)(), self.scorched_earth_trigger()
-        # TODO: switch skill/attack for burning_strike counter
-        return self.attack(), self.scorched_earth_trigger()
+        # if randint(1, 100) <= 25:
+        #     return choice(self._options)(), self.scorched_earth_trigger()
+        # # TODO: switch skill/attack for burning_strike counter
+        # return self.attack(), self.scorched_earth_trigger()
+        return self.attack()
