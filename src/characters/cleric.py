@@ -146,7 +146,7 @@ class Cleric(Character):
         self._defense_power = self.agility // 2
 
     def modify_damage(self, damage) -> int:
-        '''Adds Variance to Damage Events and Calculates Critical Chance'''
+        '''Adds Variance to Damage Events'''
         std_dev_percent: float = 0.12
         modified: int = max(floor(gauss(damage,
                                         (std_dev_percent * damage))), 1)
@@ -327,6 +327,7 @@ class Cleric(Character):
             return False, CombatAction([("Heal", 0, "Holy", "")], "")
 
     def level_up(self, combat=False):
+        ''' Handles the Events that occur at every Level Up'''
         super().level_up(combat=combat)
         if self._level in self.skills_dict:
             skill: str = self.skills_dict[self._level][0]
@@ -488,7 +489,7 @@ class Cleric(Character):
         return skill_list
 
     def win_battle(self, combatant: Combatant):
-        '''Instructors for Wining a Battle'''
+        '''Instructors for Winning a Battle'''
         if isinstance(combatant, Combatant):
             exp, gold, name = combatant.experience_points, \
                 combatant.gold, combatant.name
