@@ -24,13 +24,11 @@ class Bandit(Humanoid):
                          self.stats_structure)
         self._dam_modifiers = LimitedDict(("Physical", "Fire"),
                                           default_value=100)
-
-        if self.level < 8:
-            self._num_bandits = 3
-        elif self.level < 15:
-            self._num_bandits = 4
-        else:
-            self._num_bandits = 5
+        self._num_bandits = 3
+        if self.level > 7:
+            self._num_bandits += 1
+            if self.level > 14:
+                self._num_bandits += 1
 
         if self.level > 2:
             self._healing_potions += 1
