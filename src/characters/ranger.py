@@ -146,9 +146,10 @@ class Ranger(Character):
         # Companions damage
         for key, value in self._companion.items():
             if value[0] is True:
+                companion_dmg = value[1] + self.modify_damage(value[1])
                 companion_msg: str = \
-                    f"{key} companion attacks for {int(value[1])} damage"
-                combat_list.append(("Attack", int(value[1]), 'Physical',
+                    f"{key} companion attacks for {int(companion_dmg)} damage"
+                combat_list.append(("Attack", int(companion_dmg), 'Physical',
                                     companion_msg))
         # Trap damage
         if self._trap[0]:
@@ -288,9 +289,7 @@ class Ranger(Character):
                 end_turn = False
             else:
                 end_turn = True
-        modified_damage = damage + floor(max(0, min(damage*.24,
-                                         (gauss(damage*.08, damage*.04)))))
-        return end_turn, int(modified_damage)
+        return end_turn, int(damage)
 
     def summon_wolf(self) -> [bool, CombatAction]:
         '''Summons a Wolf Companion. Whenever the Ranger deals damage, the \
@@ -317,7 +316,7 @@ class Ranger(Character):
                              for damage_type in resist_type]
         awareness = self.awareness()
         if awareness is not None:
-            aura.append(awareness)
+            aura.extend(awareness)
         self.printer(f"{self.name} summons a Wolf companion")
         return end_turn, CombatAction(aura, "")
 
@@ -362,7 +361,7 @@ class Ranger(Character):
         # Checks if the improved awareness buff is on
         awareness = self.awareness()
         if awareness is not None:
-            aura.append(awareness)
+            aura.extend(awareness)
         self.printer(f"{self.name} summons a Bear companion")
         return end_turn, CombatAction(aura, "")
 
@@ -432,7 +431,7 @@ class Ranger(Character):
             self._attack_power += self._att_modified
         awareness = self.awareness()
         if awareness is not None:
-            aura.append(awareness)
+            aura.extend(awareness)
         self.printer(f"{self.name} summons a Cat companion")
         return end_turn, CombatAction(aura, "")
 
