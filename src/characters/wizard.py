@@ -71,6 +71,75 @@ class Wizard(Character):
         self._reflect: bool = False
         self._last_element_att: str = ""
 
+    @property
+    def special(self) -> int:
+        '''Getter for current Mana'''
+        return self._special
+
+    @property
+    def max_special(self):
+        '''Getter for max Mana'''
+        return self._stats.special
+
+    @special.setter
+    def special(self, change):
+        '''Setter for Mana'''
+        if change >= self.max_special:
+            self._special = self.max_special
+        else:
+            self._special = change
+
+    @property
+    def hit_points(self):
+        '''Override Parent Getter for HP'''
+        return self._hit_points
+
+    @hit_points.setter
+    def hit_points(self, value):
+        '''Setter for Hit Points'''
+        if value >= self.max_hit_points:
+            self._hit_points = self.max_hit_points
+        else:
+            self._hit_points = int(value)
+
+    @property
+    def special_resource(self) -> str:
+        '''Getter for Special Resource Name'''
+        return self._special_resource
+
+    @property
+    def accessory_type(self) -> str:
+        '''Getter for Accessory Type for Class'''
+        return self._accessory_type
+
+    @property
+    def accessory_cost(self) -> int:
+        '''Getter for Accessory Cost'''
+        return self._accessory.cost
+
+    @property
+    def accessory_sheet(self) -> Accessory:
+        '''Getter for Accessory Object'''
+        return self._accessory
+
+    @property
+    def accessory(self) -> str:
+        '''Getter for Accessory Name'''
+        try:
+            return self._accessory.name
+        except AttributeError:
+            return "None"
+
+    @property
+    def damage_modifiers(self) -> LimitedDict:
+        '''Getter for Damage Modifiers'''
+        return self._dam_modifiers
+
+    @property
+    def defense_modifiers(self) -> LimitedDict:
+        '''Getter for Defense Modifiers'''
+        return self._def_modifiers
+
     def adjust_offensive_mod(self, modifiers: list, remove=False):
         '''Adjusts Offensive Modifiers from Equipment'''
         if not remove:
@@ -148,6 +217,7 @@ class Wizard(Character):
 
     def attack(self) -> CombatAction:
         '''Does Damage Based on Attack Power'''
+        attack_type = ["Fire", "Lightning", ]
         damage: int = self.modify_damage(self._attack_power)
         message: str = (f"{self.name} attacks with {self.weapon} "
                         f"for <value> {self._weapon.damage_type} damage")
@@ -184,15 +254,24 @@ class Wizard(Character):
         if self._special >= 20:
             # Calculate the initial fireball damage
             initial_damage = 3 * self.intelligence
-            self._is_on_fire = True
+
             self._last_element_att = "Fire"
+
+            if (self._is_on_fire or self._is_frozen or 
+                self._last_element_att == 'Lightning' and self._level >= 10):
+                initial_damage = round(initial_damage * 1.25)
+
             message = (f"{self.name} throws a fireball, dealing "
                        f"{initial_damage} Fire damage.")
+
             # Reduce mana for using fireball
             self._special -= 20
+            
             # Create a CombatAction for the initial fireball attack
             fireball_action = CombatAction([("Attack", initial_damage,
                                              "Fire", message)], "")
+
+            self._is_on_fire = True
 
             '''Return a list with the initial fireball action and the burning
             effect'''
@@ -200,7 +279,8 @@ class Wizard(Character):
 
         '''If the Wizard doesn't have enough special for the fireball,
         return False and an empty action'''
-        return False, CombatAction([], "")
+        self.printer("Ability Failed, You do not have enough mana")
+        return False, CombatAction([("Attack", 0, "Fire", "")], "")
 
     def blink(self) -> [bool, CombatAction]:
         '''The Wizard Escapes the Battle and returns to town'''
@@ -216,7 +296,8 @@ class Wizard(Character):
 
         '''If the Wizard doesn't have enough special for blink, return False
         and an empty action'''
-        return False, CombatAction([], "")
+        self.printer("Ability Failed, You do not have enough mana")
+        return False, CombatAction([("Attack", 0, "Fire", "")], "")
 
     def blizzard(self) -> [bool, CombatAction]:
         """The wizard summons a blizzard to the battlefield"""
@@ -224,8 +305,11 @@ class Wizard(Character):
         if self._special >= 40:
             # Calculate amount of damage dealt
             blizzard_damage = self.intelligence
-            self._is_frozen = True
+            
             self._last_element_att = "Ice"
+            if (self._is_on_fire or self._is_frozen or 
+                self._last_element_att == 'Lightning' and self._level >= 10):
+                blizzard_damage = round(blizzard_damage * 1.25)
             message = (f"{self.name} summons a blizzard, dealing "
                        f"{blizzard_damage} Ice damage to all enemies.")
             # Reduce mana after spell is cast
@@ -233,10 +317,11 @@ class Wizard(Character):
             # Create combat action
             blizzard_action = CombatAction([("Attack", blizzard_damage, "Ice",
                                              message)], "")
-
+            self._is_frozen = True
             return True, blizzard_action
         # If wizard does not have enough mana for blizzard return False
-        return False, CombatAction([], "")
+        self.printer("Ability Failed, You do not have enough mana")
+        return False, CombatAction([("Attack", 0, "ice", "")], "")
 
     def lightning_bolt(self) -> [bool, CombatAction]:
         '''The Wizard strikes their opponent with Lightning, dealing
@@ -245,7 +330,10 @@ class Wizard(Character):
         if self._special >= 50:
             # Calculate the Lightning damage based on Intelligence
             lightning_damage = self.intelligence * 5
-            self._last_element_att = "Lightning"
+            
+            if (self._is_on_fire or self._is_frozen or 
+                (self._last_element_att == 'Lightning' and self._level >= 10)):
+                lightning_damage = round(lightning_damage * 1.25)
             message = (f"{self.name} strikes their opponent with Lightning, "
                        f"dealing {lightning_damage} Lightning damage.")
             # Reduce mana for using lightning_bolt
@@ -253,9 +341,11 @@ class Wizard(Character):
             # Create a CombatAction
             lightning_bolt_action = CombatAction([("Attack", lightning_damage,
                                                    "Lightning", message)], "")
+            self._last_element_att = "Lightning"
             return True, lightning_bolt_action
         # If wizard does not have enough mana for blizzard return False
-        return False, CombatAction([], "")
+        self.printer("Ability Failed, You do not have enough mana")
+        return False, CombatAction([("Attack", 0, "lightning", "")], "")
 
     def reflect_damage(self) -> [bool, CombatAction]:
         '''For the remainder of the combat, whenever the Wizard is damaged,
@@ -277,7 +367,8 @@ class Wizard(Character):
             self._special -= 30
             return True, reflect_action
         # If the Wizard doesn't have enough mana, return False
-        return False, CombatAction([], "")
+        self.printer("Ability Failed, You do not have enough mana")
+        return False, CombatAction([("Attack", 0, "Fire", "")], "")
 
     def mana_burn(self) -> [bool, CombatAction]:
         '''Consume all your remaining mana to do Fire, Ice, and Lightning
@@ -315,7 +406,8 @@ class Wizard(Character):
             return True, mana_burn_action
 
         # If the Wizard has no remaining mana, return False
-        return False, CombatAction([], "")
+        self.printer("Ability Failed, You do not have enough mana")
+        return False, CombatAction([("Attack", 0, "Fire", "")], "")
 
     def level_up(self, combat=False):
         super().level_up(combat=combat)
@@ -340,75 +432,6 @@ class Wizard(Character):
 
         self._attack_power += 2
         self._defense_power += 1
-
-    @property
-    def special(self) -> int:
-        '''Getter for current Mana'''
-        return self._special
-
-    @property
-    def max_special(self):
-        '''Getter for max Mana'''
-        return self._stats.special
-
-    @special.setter
-    def special(self, change):
-        '''Setter for Mana'''
-        if change >= self.max_special:
-            self._special = self.max_special
-        else:
-            self._special = change
-
-    @property
-    def hit_points(self):
-        '''Override Parent Getter for HP'''
-        return self._hit_points
-
-    @hit_points.setter
-    def hit_points(self, value):
-        '''Setter for Hit Points'''
-        if value >= self.max_hit_points:
-            self._hit_points = self.max_hit_points
-        else:
-            self._hit_points = int(value)
-
-    @property
-    def special_resource(self) -> str:
-        '''Getter for Special Resource Name'''
-        return self._special_resource
-
-    @property
-    def accessory_type(self) -> str:
-        '''Getter for Accessory Type for Class'''
-        return self._accessory_type
-
-    @property
-    def accessory_cost(self) -> int:
-        '''Getter for Accessory Cost'''
-        return self._accessory.cost
-
-    @property
-    def accessory_sheet(self) -> Accessory:
-        '''Getter for Accessory Object'''
-        return self._accessory
-
-    @property
-    def accessory(self) -> str:
-        '''Getter for Accessory Name'''
-        try:
-            return self._accessory.name
-        except AttributeError:
-            return "None"
-
-    @property
-    def damage_modifiers(self) -> LimitedDict:
-        '''Getter for Damage Modifiers'''
-        return self._dam_modifiers
-
-    @property
-    def defense_modifiers(self) -> LimitedDict:
-        '''Getter for Defense Modifiers'''
-        return self._def_modifiers
 
     def take_damage(self, damage: int, dmg_type: str, message: str) -> bool:
         '''Processes Damage Events'''
@@ -439,8 +462,9 @@ class Wizard(Character):
     def win_battle(self, combatant: Combatant):
         '''Instructors for Wining a Battle'''
         if isinstance(combatant, Combatant):
-            exp, gold, name = combatant.experience_points, combatant.gold,
-            combatant.name
+            exp = combatant.experience_points
+            gold = combatant.gold
+            name = combatant.name
             self._battles_won += 1
             self.printer(f"You have defeated {name}!  Gained {gold} Gold.  "
                          f"Gained {exp} Experience")
