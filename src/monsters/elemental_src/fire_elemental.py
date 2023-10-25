@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 from random import choice, randint
 from ..elemental import Elemental
 from ...combat_action import CombatAction
-from ...dd_data import CombatPrint, LimitedDict, damage_types
+from ...dd_data import LimitedDict
 
 
 class FireElemental(Elemental):
@@ -34,12 +34,14 @@ class FireElemental(Elemental):
         self._max_hit_points = self._hit_points
         self._options = [self.immolate]
         self._explode_once = False
+        self._scorched_once = False
 
     def base_att_def_power(self):
         self._attack_power = self.strength + self.intelligence
         self._defense_power = self.agility
 
     def spawn_elemental(self, level_mod: int, elemental_types: list):
+        ''' Spawns elemental based on character level '''
         if level_mod <= 5:
             print(f'{elemental_types[0]}')
             return elemental_types[0]
@@ -51,8 +53,7 @@ class FireElemental(Elemental):
                       10: 100}
             if randint(1, 100) <= tier_2.get(level_mod):
                 return elemental_types[1]
-            else:
-                return elemental_types[0]
+            return elemental_types[0]
         if level_mod in range(11, 21):
             tier_3 = {
                 11: 10,
@@ -71,7 +72,7 @@ class FireElemental(Elemental):
                 return elemental_types[1]
         if level_mod >= 20:
             return elemental_types[2]
-        elif level_mod >= 25:
+        if level_mod >= 25:
             if randint(1, 100) <= 1:
                 return elemental_types[3]
 
@@ -100,7 +101,8 @@ class FireElemental(Elemental):
         else:
             self._defense_power += 1
         if self.level >= 5:
-            self._options.append("explode")
+            self._options.append(self.explode)
+            self._options.append(self.scorched_earth)
         if self.level >= 11:
             self.elemental_reconstitute = self.improved_reconstitute
 
@@ -159,12 +161,22 @@ class FireElemental(Elemental):
             self._reconstitute_count += 0.01
         return CombatAction([("Attack", damage, "Fire", message)], "")
 
-    def scorched_earth(self) -> CombatAction:
+    def scorched_earth(self):
         ''' Once per Combat: Fire Elemental lights the area blaze, dealing 33%
             attack_power based Fire damage every time the Fire Elemental takes
             an action for the remainder of combat. '''
-        # TODO: add once per battle flag
-        pass
+        if self._scorched_once is False:
+            self._scorched_once = True
+            self.printer((f"{self.name} lights the ground ablaze, continually "
+                         f"dealing damage."))
+
+    def scorched_earth_trigger(self):
+        ''' Triggered damage if Scorched Earth is active '''
+        if self._scorched_once is True:
+            damage: int = int(self.damage_modify(self._attack_power) * .33)
+            message: str = ((f"{self.name}'s scorched earth deals <value> Fire"
+                             f" damage this time."))
+            return CombatAction([("Attack", damage, "Fire", message)], "")
 
     def take_turn(self) -> CombatAction:
         ''' Fire Elemental has a 75% to Attack each turn and a 25% chance to
@@ -173,7 +185,8 @@ class FireElemental(Elemental):
             Elementals have a 75% chance to return a random skill, and a 25%
             chance to Attack. '''
         self.elemental_reconstitute()
-        if randint(1, 100) <= 25:
-            return choice(self._options)()
-        else:
-            return self.attack()
+        # if randint(1, 100) <= 25:
+        #     return choice(self._options)(), self.scorched_earth_trigger()
+        # # TODO: switch skill/attack for burning_strike counter
+        # return self.attack(), self.scorched_earth_trigger()
+        return self.attack()

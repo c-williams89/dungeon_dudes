@@ -1,0 +1,111 @@
+\documentclass[12pt]{article} % Set font size to 12 and set document type
+\usepackage{listings} % Code highlight
+\usepackage{xcolor}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{codestyle}{
+    backgroundcolor=\color{backcolour}
+}
+\lstset{style=codestyle}
+
+\usepackage{geometry}
+\geometry{letterpaper, portrait, margin=1in} % Set document layout
+\usepackage{graphicx} % Needed to import images
+% \usepackage{indentfirst} % Enable the first paragraph to be indented
+\renewcommand{\familydefault}{\sfdefault} % Set document fonts to sans-serif
+\setlength{\parindent}{30pt} % Set indent size
+
+\begin{document}
+
+\begin{flushright}
+        WO1 Jik Oh\\
+        OOP: dungeon dudes\\
+        2023.10.25\\
+\end{flushright}
+
+\begin{center}
+        {\huge Test Plan}
+\end{center}
+
+The requirement of this project was to create a Rogue class according to the provided manual.\newline
+\indent
+Since the game depends heavily on multiple objects, CMD based GUI menu system, and randomness to run, it is difficult to test every aspect of the Rogue class. For this reason, unit testings will focused on skill acquisition at certain levels, stat growth, and equipment generation. Actual battle testing should be done manually by playing the game as a Rogue. 
+
+\section{Skill Acquisition}
+Every playable class in Dungeon Dudes acquires a skill at a certain level. All of active skills will require to have their own methods to be triggered while some of passive skills will be dependent on using flags. 
+
+\subsection{Active Skills}
+The class's 'get\_skills\_list' method returns a list of available skills. Using this method, an acquisition of an active skill can be verified at certain level.
+
+\subsubsection*{Test Input}
+
+\begin{itemize}
+        \item "Luck" at level 1
+        \item "Preparation" at Level 3
+        \item "Evasion" at levl 10
+        \item "Ambush" at level 13
+        \item "Increase Luck" at level 17
+\end{itemize}
+
+\subsection{Passive Skills}
+Most of passive skills use class variables as flags. Checking the flag variable at certain level will be the main testing method to check passive skill acquisition.
+
+\subsubsection*{Test Input}
+
+\begin{itemize}
+        \item "Auto-Potion" flag turned on at level 20
+        \item "Enhanced Abilities" flag turned on at level 25
+\end{itemize}
+
+\section{Stat Growth}
+Each class in Dungenon Dudes has different stat growth chart. Checking the stat at a certain level will be used to verify accurate stat growth.
+
+\subsubsection*{Level 1}
+\begin{itemize}
+    \item Hit Points: 75
+    \item Strength: 10
+    \item Agility: 12
+    \item Intelligence: 5
+    \item Special: 1
+\end{itemize}
+
+\subsubsection*{Level 50 (max level)}
+\begin{itemize}
+    \item Hit Points: 957
+    \item Strength: 59
+    \item Agility: 110
+    \item Intelligence: 54
+    \item Special: 26 
+\end{itemize}
+
+\section{Equipment Generation}
+Each class in Dungeon Dudes can only wear certain types of equipment. All of equipment generator functions for the Rogue class will be verified.
+
+\subsection{Weapon}
+Rogue class can only use "Dagger" as its weapon. "Dagger" type weapon has "Physical" damage type.
+
+\subsubsection*{generate\_weapon() method}
+\begin{itemize}
+    \item "weapon\_sheet.equipment\_type" should be "Weapon"
+    \item "weapon\_sheet.damage\_type" should be "Physical"
+    \item "weapon\_sheet.subtype" should be "Dagger"
+\end{itemize}
+
+\subsection{Armor}
+Rogue class can only use "Medium" armor.
+
+\subsubsection*{generate\_armor() method}
+\begin{itemize}
+    \item "armor\_sheet.equipment\_type" should be "Armor"
+    \item "armor\_sheet.subtype" should be "Medium"
+\end{itemize}
+
+\subsection{Accessory}
+Rogue class can only use "Thieves Tools".
+
+\subsubsection*{generate\_accessory() method}
+\begin{itemize}
+    \item "accessory\_sheet.equipment\_type" should be "Accessory"
+    \item "accessory\_sheet.subtype" should be "Thieves Tools"
+\end{itemize}
+
+\end{document}
