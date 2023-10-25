@@ -122,7 +122,7 @@ class Wizard(Character):
         self._defense_power = self.agility // 2
         
     def modify_damage(self, damage, spell_type=None) -> int:
-        '''Adds Variance to Damage Events and Calculates Critical Chance'''
+        '''Adds Variance to Damage Events'''
         max_mana = self._stats.special
         current_mana = self._special
         mana_dev = current_mana/max_mana
