@@ -53,8 +53,7 @@ class FireElemental(Elemental):
                       10: 100}
             if randint(1, 100) <= tier_2.get(level_mod):
                 return elemental_types[1]
-            else:
-                return elemental_types[0]
+            return elemental_types[0]
         if level_mod in range(11, 21):
             tier_3 = {
                 11: 10,
@@ -73,7 +72,7 @@ class FireElemental(Elemental):
                 return elemental_types[1]
         if level_mod >= 20:
             return elemental_types[2]
-        elif level_mod >= 25:
+        if level_mod >= 25:
             if randint(1, 100) <= 1:
                 return elemental_types[3]
 
