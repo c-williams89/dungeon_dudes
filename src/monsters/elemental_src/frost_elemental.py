@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 from random import choice, random, randint
 from ..elemental import Elemental
 from ...combat_action import CombatAction
-from ...dd_data import CombatPrint, LimitedDict, damage_types
+from ...dd_data import LimitedDict
 
 
 class FrostElemental(Elemental):
@@ -32,6 +32,7 @@ class FrostElemental(Elemental):
         self._options = [self.brittle_strikes, self.freeze]
 
     def spawn_elemental(self, level_mod: int, elemental_types: list):
+        ''' Spawns elemental based on character level '''
         if level_mod >= 25:
             increased_odds = level_mod - 25
             base_value = .0
