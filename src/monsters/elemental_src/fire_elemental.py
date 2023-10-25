@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 from random import choice, randint
 from ..elemental import Elemental
 from ...combat_action import CombatAction
-from ...dd_data import CombatPrint, LimitedDict, damage_types
+from ...dd_data import LimitedDict
 
 
 class FireElemental(Elemental):
@@ -185,7 +185,6 @@ class FireElemental(Elemental):
             Elementals have a 75% chance to return a random skill, and a 25%
             chance to Attack. '''
         self.elemental_reconstitute()
-
         if randint(1, 100) <= 25:
             return choice(self._options)(), self.scorched_earth_trigger()
         # TODO: switch skill/attack for burning_strike counter
