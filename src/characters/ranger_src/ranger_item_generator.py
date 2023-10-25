@@ -11,7 +11,8 @@ class RangerEquipmentGenerator:
             defensive_suffix_mapping
         self._weapons : list = ["Bow"]
         self._weapon_prefix : Dict[int, str] = {
-            10:"Long", 20:"Heavy", 30:"Deadly", 40:"Vicious", 50 :"Hellfire"
+            0: "", 10:"Long", 20:"Heavy",
+            30:"Deadly", 40:"Vicious", 50 :"Hellfire"
         }
 
     @staticmethod
@@ -38,37 +39,36 @@ class RangerEquipmentGenerator:
 
         attack_average : int = level
         attack, attack_cost_mod = self.generate_value_mod(attack_average,
-                                                    ceil(attack_average/2.5))
+                                                    attack_average/2.5)
         attack : int = max(10, ceil(attack) + 20)
 
         physical_modifier_avg : int = level
         physical_modifier, physical_cost_modifier = self.generate_value_mod(
-            physical_modifier_avg, ceil(physical_modifier_avg/5))
-        prefix_key : [str, None] = max(filter(lambda key: key <\
-                                              physical_modifier,
-                                              self._weapon_prefix.keys()),\
-                                              default=None)
-        if prefix_key is None:
+            physical_modifier_avg, ceil(physical_modifier_avg /5))
+        key = choice(list(self._weapon_prefix.keys()))
+
+        physical_modifier :int = randint(0, level + 10)
+        if key == 0:
             prefix : str = ""
         else:
-            prefix : str = self._weapon_prefix[prefix_key]
+            prefix : str = self._weapon_prefix[key]
+            attack += key
         armor : int = 0
         suffix : str = ""
         suffix_chance : int = randint(1,5)
-        armor_mod : int = 1
-        wrath_mod : int = 1
+        mod : int = 1
         if suffix_chance == 5:
-            armor += ceil(gauss(level/2, level/5))
+            armor += int(level * 0.5)
             suffix : str = "of Defense"
-            armor_mod : float = level * .5
+            mod : float = level * 1.5
         elif suffix_chance > 2:
-            attack += ceil(gauss(level/2, level/5))
+            attack += int(level * 0.5)
             suffix : str = "of Wrath"
-            wrath_mod : float = level * .5
+            mod : float = level * 1.5
         cost : int = self.generate_value(weapon_base_cost,
                                          attack_cost_mod,
                                          physical_cost_modifier,
-                                         armor_mod, wrath_mod)
+                                         key, mod)
         cost = max(cost, 1)
         weapon_name : str = f'{prefix} {weapon_type} {suffix}'.strip()
         weapon_special : dict = {"Offensive": [("Physical",
@@ -110,21 +110,22 @@ class RangerEquipmentGenerator:
         # Additional Bonus for defense power or attack power
         prefix : str = ""
         prefix_chance : str = randint(1,5)
+        prefix_mod = 1
         fortified_cost_mod : int = 1
-        attack_cost_mod : int = 1
         if prefix_chance >= 4:
-            armor += level
+            armor += int(level * 0.5)
             prefix : str = "Fortified"
             fortified_cost_mod : float= 1.5
         elif prefix_chance == 3:
-            attack += level
+            attack += int(level * 0.5)
             prefix : str = "Powerful"
-            attack_cost_mod : float = 1.5
+            fortified_cost_mod : float = 1.5
 
         cost : int = self.generate_value(armor_base_cost,
                                          armor_cost_mod,
                                          fortified_cost_mod,
-                                         attack_cost_mod)
+                                         prefix_mod
+                                         )
         cost = max(cost, 1)
         armor_name : str = f'{prefix} {armor_name} of {suffix}'.strip()
         armor_special : dict = {"Defensive":[(modifiers[0], mod_1),
