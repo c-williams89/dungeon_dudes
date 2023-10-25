@@ -1,0 +1,1 @@
+from .cleric_item_generator import ClericEquipmentGenerator
