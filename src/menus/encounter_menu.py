@@ -22,6 +22,7 @@ class EncounterMenu(cmd.Cmd):
         self.player_2 : Monster = encounter.combatant_2
         self.player_1_alive : bool = True
         self.player_2_alive : bool = True
+        self.escape : bool = False
         self.prompt = f'{self.player_1.name}: {self.player_1.level} {self.player_1.char_class} > '
         if not self._encounter.turn_order():
             self.printer(f"{self.player_2.name} acts before you are ready!")
@@ -114,9 +115,13 @@ class EncounterMenu(cmd.Cmd):
         else:
             self.printer(f"{self.player_2.name} flees the battle")
         input("Press Enter to Continue")
+        self.escape = True
+        self.do_scroll_of_escape("")
 
     def do_scroll_of_escape(self, arg):
         '''Active Player ends Combat with a scroll of escape'''
+        if self.escape:
+            return True
         if self.player_1.scroll_of_escape > 0:
             self.player_1.scroll_of_escape -= 1
             self.printer(f"{self.player_1.name} escapes to town with a scroll of escape")
