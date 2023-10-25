@@ -4,9 +4,9 @@ from .monsters_abc import Monster
 from ..combat_action import CombatAction
 from ..dd_data import CombatPrint, LimitedDict, damage_types
 
+
 class Golem(Monster):
     '''Golem Monster Class'''
-
     def __init__(self, name: str, level_mod: int, stat_structure: dict):
         self._gold = level_mod * 6
         super().__init__(name, level_mod, "Golem", stat_structure)
@@ -22,8 +22,8 @@ class Golem(Monster):
 
     def attack(self) -> CombatAction:
         '''Golem attack deals phys damage with a base of its attack_power'''
-        damage : int = self.golem_damage(self.modify_damage(self._attack_power))
-        message : str = f"{self.name} Attacks with for <value> physical damage"
+        damage: int = self.golem_damage(self.modify_damage(self._attack_power))
+        message: str = f"{self.name} Attacks with for <value> physical damage"
         return CombatAction([("Attack", damage, "Physical", message)], "")
 
     def base_att_def_power(self):
@@ -34,7 +34,7 @@ class Golem(Monster):
     def hit_points(self):
         '''Override Parent Getter for HP'''
         return self._hit_points
-    
+
     @hit_points.setter
     def hit_points(self, value):
         '''Setter for HP'''
@@ -46,8 +46,8 @@ class Golem(Monster):
     def sum_parts(self):
         '''attack/defense power reduced by 15% for ever 25% loss of max HP'''
         if self.max_hit_points == 0:
-            return # We don't divide by zero here
-        
+            return
+
         health_percent = (self._hit_points / self.max_hit_points) * 100
         debuff_stack = 4 - int(health_percent // 25)
         multiplier = 1 - (0.15 * debuff_stack)
@@ -59,7 +59,7 @@ class Golem(Monster):
         alive = True
         if dmg_type == "Poison":
             damage = 0
-            msg : str = "Golems are immune to poison!"
+            msg: str = "Golems are immune to poison!"
             self.printer(msg)
         elif dmg_type == "Physical":
             damage = damage - (self._defense_power // 2)
@@ -75,14 +75,15 @@ class Golem(Monster):
             self.printer(message)
             self._hit_points = 0
             return alive
-        
+
         damage = max(1, damage)
         self._hit_points -= damage
         message = message.replace('<value>', str(damage))
         self.printer(message)
         return alive
-    
-    def golem_damage(self, damage : float) -> int:
+
+    def golem_damage(self, damage: float) -> int:
+        '''golem damage'''
         return int(damage)
 
     def take_turn(self) -> CombatAction:
