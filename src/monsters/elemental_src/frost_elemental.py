@@ -1,6 +1,6 @@
 '''Frost Elemental Module for Dungeon Dudes'''
 from typing import Dict, Tuple
-from random import choice, randint, random
+from random import choice, random, randint
 from ..elemental import Elemental
 from ...combat_action import CombatAction
 from ...dd_data import CombatPrint, LimitedDict, damage_types
@@ -29,7 +29,7 @@ class FrostElemental(Elemental):
             ("Ice", (self._damage_type)), default_value=100)
         self._special_count = 0
         self._brittle_count = 0
-        self._options = [self.attack]
+        self._options = [self.brittle_strikes, self.freeze]
 
     def spawn_elemental(self, level_mod: int, elemental_types: list):
         if level_mod >= 25:
@@ -62,23 +62,21 @@ class FrostElemental(Elemental):
 
     def get_skills_list(self):
         '''Get List of Skills Learned'''
-        # level 1
-        self._options.append("brittle_strikes")
-        self._options.append("freeze")
+        self._options = ["brittle_strikes", "freeze"]
 
     def level_up(self):
         super().level_up()
-        if self._level % 2 == 0:
+        if self.level % 2 == 0:
             self._attack_power += 1
         else:
             self._defense_power += 1
-        if self._level >= 5:
+        if self.level >= 5:
             self._options.append("blizzard")
-        if self._level >= 10:
+        if self.level >= 10:
             self._options.append("frost_splinter")
-        if self._level >= 15:
+        if self.level >= 15:
             self._options.append("improved_blizzard")
-        if self._level >= 20:
+        if self.level >= 20:
             self._options.append("improved_frost_splinter")
 
     def attack(self) -> CombatAction:
@@ -100,7 +98,12 @@ class FrostElemental(Elemental):
             Physical damage by 10 for the remainder of the encounter.
             (Maximum improvement of 30)
         '''
-        pass
+        damage: int = self.damage_modify(self._attack_power) * .75
+        message: str = (f"{self.name} pulses a wave of freezing Ice for "
+                        f"<value> damage and increases its defense to Physical"
+                        f" damage.")
+        # TODO: add defense reduction modification
+        return CombatAction([("Attack", damage, "Ice", message)], "")
 
     def blizzard(self) -> CombatAction:
         ''' Once per Combat: Frost Elemental Summons a Blizzard, which deals
@@ -148,4 +151,7 @@ class FrostElemental(Elemental):
             25% chance to Attack.
         '''
         self.elemental_reconstitute()
-        return choice(self._options)()
+        if randint(1, 100) <= 40:
+            return choice(self._options)()
+        else:
+            return self.attack()
