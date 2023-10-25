@@ -9,6 +9,7 @@ class Golem(Monster):
     '''Golem Monster Class'''
     def __init__(self, name: str, level_mod: int, stat_structure: dict):
         self._gold = level_mod * 6
+        self._experience_points = 10 * (20 * level_mod - 1)
         super().__init__(name, level_mod, "Golem", stat_structure)
         self.printer = CombatPrint()
         self._def_modifiers = LimitedDict(damage_types, default_value=100)

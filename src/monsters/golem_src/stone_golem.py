@@ -132,10 +132,12 @@ class StoneGolem(Golem):
         '''one-time use: calls lightning bolt every time an action is taken'''
         if not self.used_lightning_rod:
             self.used_lightning_rod: bool = True
+            lightning: int = \
+                self.golem_damage(self.modify_damage(self.attack_power * .4))
             msg: str = ("Granite Golem becomes a lightning rod, calling down "
                         "bolts of electricity with each action.")
-            return CombatAction([("Status Effect", "Lightning Rod",
-                                  "Special", msg)], "")
+            return CombatAction([("Aura", lightning,
+                                  "Lightning", msg)], "")
 
     # obsidian golem
     def harden(self):
@@ -158,11 +160,12 @@ class StoneGolem(Golem):
         if not self.thermal_core_used:
             self.thermal_core_used = True
             self.ignited = True
+            thermal: int = \
+                self.golem_damage(self.modify_damage(self.attack_power * 0.5))
             msg: str = ("Obsidian Golem's core overheats, adding fire "
                         "damage to its actions and making it vulnerable to"
                         " additional fire damage.")
-            return CombatAction([("Status Effect", "Thermal Core", "Special",
-                                  msg)], "")
+            return CombatAction([("Attack", thermal, "Fire", msg)], "")
 
     def attack(self) -> CombatAction:
         '''Stone Golem attack deals physical damage based on attack power'''
@@ -195,20 +198,13 @@ class StoneGolem(Golem):
             self.absorb_heat(dmg_type)
         return super().take_damage(damage, dmg_type, message)
 
-    def special_skill(self):
-        '''return special attack per golem type'''
-        if self._stone_type == "Granite":
-            return self.lightning_rod()
-        if self._stone_type == "Obsidian":
-            return self.thermal_core()
-
     def take_turn(self) -> CombatAction:
         '''Takes turn and returns the action'''
         options = [self.attack]
-        if self._stone_type == "Granite":
-            if self.level >= 15:
-                options.append(self.lightning_rod)
-        if self._stone_type == "Obsidian":
-            if self.level >= 15:
-                options.append(self.thermal_core)
+        # if self._stone_type == "Granite":
+        #     if self.level >= 15:
+        #         options.append(self.lightning_rod)
+        # if self._stone_type == "Obsidian":
+        #     if self.level >= 15:
+        #         options.append(self.thermal_core)
         return choice(options)()
