@@ -1,5 +1,5 @@
 '''Module for the Dungeon Dudes Rogue Class'''
-from typing import Dict, Tuple, List, Callable
+from typing import Dict, Tuple, List
 from random import gauss, randint
 from math import floor
 from .character_abc import Character
