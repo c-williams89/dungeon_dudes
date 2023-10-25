@@ -1,11 +1,12 @@
 '''Bandit Module for Dungeon Dudes'''
 from typing import Dict, Tuple
-from random import randint, randrange, choice, choices
+from random import randint, randrange, choices
 
 from src.dd_data import LimitedDict
 from ..humanoid import Humanoid
 from ...dd_data import LimitedDict
 from ...combat_action import CombatAction
+
 
 class Bandit(Humanoid):
     '''Bandit Module'''
@@ -14,14 +15,15 @@ class Bandit(Humanoid):
                                               "Agility": (10, 3),
                                               "Intelligence": (7, 1),
                                               "Special": (0, 0)}
-    
+
     def __init__(self, level_mod: int):
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         self._damage_type = "Physical"
         super().__init__("Pack of Bandits",
                          level_mod,
                          self.stats_structure)
-        self._dam_modifiers = LimitedDict(("Physical", "Fire"), default_value=100)
+        self._dam_modifiers = LimitedDict(("Physical", "Fire"),
+                                          default_value=100)
 
         if self.level < 8:
             self._num_bandits = 3
@@ -40,7 +42,7 @@ class Bandit(Humanoid):
     @property
     def defense_modifiers(self) -> LimitedDict:
         return self._def_modifiers
-    
+
     @property
     def num_bandits(self):
         return self._num_bandits
@@ -51,7 +53,7 @@ class Bandit(Humanoid):
         alive = super().take_damage(damage, dmg_type, message)
         return alive
 
-    def get_skills(self) ->Dict[str, 'function']:
+    def get_skills(self) -> Dict[str, 'function']:
         return {}
 
     def get_skills_list(self) -> list:
@@ -59,22 +61,24 @@ class Bandit(Humanoid):
         return skills_list
 
     def fireball(self) -> Tuple:
-        damage: int = self.humanoid_damage(self.modify_damage(self.intelligence))
-        msg: str = "Bandit Sorcerer casts fireball, dealing <value> fire damage"
+        damage: int = self.humanoid_damage(
+            self.modify_damage(self.intelligence))
+        msg: str = ("Bandit Sorcerer casts fireball, dealing <value> "
+                    "fire damage")
         return ("Attack", damage, "Fire", msg)
 
     def dirty_tricks(self) -> Tuple:
         msg: str = "Bandit Rogue attacks for <value> Physical damage"
         damage_amt = int((3 * self.attack_power) / 4)
         return ("Attack", damage_amt, "Physical", msg)
-    
+
     def rallying_cry(self):
         self.printer("Bandit Bard strengthens future physical attacks")
         return ("Battle Cry", 10, "Physical", "")
-    
+
     def bless(self):
-        self.printer("Bandit Cleric blesses the band, increasing damage modifier "
-                     "and healing the band")
+        self.printer("Bandit Cleric blesses the band, increasing damage "
+                     "modifier and healing the band")
         self.hit_points += int(self.max_hit_points / 2)
         return ("Battle Cry", 10, "Physical", "")
 
@@ -90,18 +94,19 @@ class Bandit(Humanoid):
         index = randint(0, (len(actions) - 1))
         option = actions.pop(index)
         return option()
-    
+
     def turn_options(self):
-        damage: int = self.humanoid_damage(self.modify_damage((self.attack_power)))
+        damage: int = self.humanoid_damage(
+            self.modify_damage((self.attack_power)))
         msg: str = "Bandit attacks, dealing <value> physical damage"
         attack = ("Attack", damage, "Physical", msg)
         action_list = []
-        
+
         for _ in range(1, self._num_bandits):
             action_list.append(attack)
         action_list.append(self.get_action())
         return action_list
-    
+
     def escape(self):
         return ("Escape", 0, "", "")
 
@@ -116,7 +121,7 @@ class Bandit(Humanoid):
         if self.hit_points <= int(self.max_hit_points * .10):
             if self.healing_potions:
                 option_list.append(self.healing_potion)
-                option = choices(option_list, weights=(25, 25, 50), k = 1)
+                option = choices(option_list, weights=(25, 25, 50), k=1)
                 if option != self.turn_options:
                     action_list.append(option())
                 else:
@@ -129,6 +134,5 @@ class Bandit(Humanoid):
                     action_list = option()
         else:
             action_list = self.turn_options()
-        
-        return CombatAction(action_list, "")
 
+        return CombatAction(action_list, "")

@@ -5,11 +5,6 @@ from ..humanoid import Humanoid
 from ...dd_data import LimitedDict
 from ...combat_action import CombatAction
 
-'''
-For both ogres, they can each conduct a normal attack for physical damage.
-For blood-thirster, special attack is risky blow.
-For ogre magi, special attack is wild magics
-'''
 
 class Ogre(Humanoid):
     '''Ogre Module'''
@@ -17,15 +12,13 @@ class Ogre(Humanoid):
                                               "Strength": (18, 3),
                                               "Agility": (10, 3),
                                               "Intelligence": (7, 1),
-                                              "Special": (0,0)}
+                                              "Special": (0, 0)}
     ogre_types = [("Blood-Thirster", "Physical"), ("Ogre-Magi", "Physical")]
 
     def __init__(self, level_mod: int):
         ogre_type = choice(self.ogre_types)
+        self._ogre_type: str = ogre_type[0]
         self._hit_points: int = self.stats_structure["Hit Points"][0]
-        # self._ogre_type: str = ogre_type[0]
-        # self._ogre_type = "Ogre-Magi"
-        self._ogre_type = "Blood-Thirster"
         self._damage_type: str = ogre_type[1]
         super().__init__(f"{self._ogre_type} Ogre",
                          level_mod,
@@ -40,11 +33,11 @@ class Ogre(Humanoid):
     @property
     def damage_modifiers(self):
         return self._dam_modifiers
-    
+
     @property
     def defense_modifiers(self):
         return self._def_modifiers
-    
+
     @property
     def damage(self):
         return self._damage
@@ -52,10 +45,10 @@ class Ogre(Humanoid):
     @property
     def ogre_type(self):
         return self._ogre_type
-    
+
     def get_skills(self):
         return {}
-    
+
     def get_skills_list(self) -> list:
         special_skills = {"Blood-Thirster": "Risky Blow",
                           "Ogre-Magi": "Wild Magics"}
@@ -67,10 +60,10 @@ class Ogre(Humanoid):
         risky_chance = randint(0, 10)
         if ((risky_chance % 2) == 0):
             damage = int(2 * self.damage)
-            return("Attack", damage, "Physical", msg)
+            return ("Attack", damage, "Physical", msg)
         self.printer("Blood-Thirster Ogre missed with Risky Blow")
-        return("Miss", 0, "Miss", "")
-    
+        return ("Miss", 0, "Miss", "")
+
     def wild_magics(self):
         self._two_minds = True
         options = ["Lightning", "Ice", "Fire"]
@@ -80,27 +73,27 @@ class Ogre(Humanoid):
                     f"{damage_type} damage and attacking again")
         return ("Attack", damage_amt, damage_type, msg)
 
-
     def frenzy(self):
         msg: str = ("Blood-Thirster Ogre goes into a frenzy, dealing <value> "
                     "damage")
-        return("Attack", self.damage, "Physical", msg)
+        return ("Attack", self.damage, "Physical", msg)
 
     def improved_frenzy(self):
         msg: str = ("Blood-Thirster Ogre goes into an Improved Frenzy, dealing"
                     " <value> damage.")
-        return("Attack", self.damage, "Physical", msg)
+        return ("Attack", self.damage, "Physical", msg)
 
     def special_skill(self):
         if self._ogre_type == "Blood-Thirster":
             return self.risky_blow()
         return self.wild_magics()
-    
+
     def attack(self):
-        damage: int = self.humanoid_damage(self.modify_damage(self._attack_power))
+        damage: int = self.humanoid_damage(
+            self.modify_damage(self._attack_power))
         msg: str = f"{self.name} Attacks with for <value> physical damage"
         return ("Attack", damage, "Physical", msg)
-        
+
     def blood_thirster_attack(self):
         actions = []
         actions.append(self.risky_blow())
@@ -117,23 +110,21 @@ class Ogre(Humanoid):
         return actions
 
     def strategic_thinking(self):
-        if ((self.hit_points > int(self.max_hit_points * .75)) or \
-            (self.hit_points < int(self.max_hit_points * .25))):
+        if ((self.hit_points > int(self.max_hit_points * .75)) or
+           (self.hit_points < int(self.max_hit_points * .25))):
             self._damage += int(self.damage * .25)
 
     def bloodlust(self):
         pass
 
-
     def take_turn(self) -> CombatAction:
         '''Create list of normal attack and special attacks and choose one'''
-
-
         self.strategic_thinking()
         action_list = []
         if self.hit_points < int(self.max_hit_points / 2):
             if randint(0, 100) < 75:
-                if (self.healing_potion(self.ogre_type)):
+                if self.healing_potions:
+                    self.healing_potion()
                     self.bloodlust()
         if self.ogre_type == "Blood-Thirster":
             actions = [self.attack, self.blood_thirster_attack]
