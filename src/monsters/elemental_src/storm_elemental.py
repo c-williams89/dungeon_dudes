@@ -28,13 +28,15 @@ class StormElemental(Elemental):
         self._dam_modifiers = LimitedDict(
             ("Lightning", (self._damage_type)), default_value=100)
         self._options = [self.attack]
+        self._static_shock_count = 0
 
     def spawn_elemental(self, level_mod: int, elemental_types: list):
+        ''' Spawns elemental based on character level '''
         if level_mod >= 25:
             increased_odds = level_mod - 25
             base_value = .0
             lord_chance = .01
-            for n in range(increased_odds):
+            for _ in range(increased_odds):
                 base_value += lord_chance
             if random() <= lord_chance:
                 return elemental_types[1]
@@ -131,11 +133,13 @@ class StormElemental(Elemental):
         pass
 
     def take_turn(self) -> CombatAction:
-        ''' Frost Elemental has a 60% to Attack each turn and a 40% chance to
-            return a random skill, until they have maxed out the benefit of
-            Brittle Strikes.  When Brittle Strikes reaches maximum benefit,
-            Frost Elementals have a 75% chance to return a random skill, and a
-            25% chance to Attack.
+        ''' Storm Elemental has a 75% to Attack each turn and a 25% chance to
+            return a random skill, until they have unleashed a Shock Nova.
+            After unleashing a Shock Nova, Storm Elementals have a 100% chance
+            to return a random non-Attack action.
         '''
         self.elemental_reconstitute()
-        return choice(self._options)()
+        if randint(1, 100) <= 25:
+            return choice(self._options)()
+        # TODO: after self._static_shock_count == 5
+        return self.attack()
