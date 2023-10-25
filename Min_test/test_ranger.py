@@ -25,7 +25,7 @@ class TestRanger(unittest.TestCase):
                          self.character.agility // 2)
 
     def test_equipment_weapon(self):
-        '''Check if the weapon stat increases as character levels up'''
+        '''Check if the weapon has the correct weapon modifier'''
         weapon = self.character._weapon
         weapon_name = weapon._name
         print(weapon_name)
@@ -44,6 +44,13 @@ class TestRanger(unittest.TestCase):
             total_resist += resist[1]
         self.assertEqual(total_resist, (self.character._level * 3) + 30)
 
+    def test_equipment_accessory(self):
+        '''Check if the Accessory has the correct element affinity'''
+        accessory = self.character._accessory
+        accessory_suffix = accessory.name.split()
+        affinity = ["Ice", "Fire", "Lightning"]
+        self.assertEqual(accessory_suffix[-1] in affinity, True)
+
 
     def test_active_skill(self):
         '''Test to check if the Ranger learn skills correctly'''
@@ -54,7 +61,11 @@ class TestRanger(unittest.TestCase):
         self.assertEqual(self.character._level, 1)
         self.assertEqual(self.character.summon_wolf,
                          skills_dict["Summon Wolf Companion"])
-        self.assertTrue("Summon Wolf Companion" in skills_list, True)
+        self.assertEqual("Summon Wolf Companion" in skills_list, True)
+        self.assertEqual("Take Aim" in skills_list, False)
+        self.assertEqual("Summon Bear Companion" in skills_list, False)
+        self.assertEqual("Steel Trap" in skills_list, False)
+        self.assertEqual("Summon Cat Companion" in skills_list, False)
 
         # Test when character level is 10
         for _ in range(9):
@@ -72,6 +83,7 @@ class TestRanger(unittest.TestCase):
         self.assertEqual(self.character.steel_trap,
                          skills_dict["Steel Trap"])
         self.assertTrue("Steel Trap" in skills_list, True)
+        self.assertEqual("Summon Cat Companion" in skills_list, False)
 
         # Test when character level is 20
         for _ in range(10):
