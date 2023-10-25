@@ -28,10 +28,13 @@ class Ogre(Humanoid):
                          level_mod,
                          self.stats_structure)
         self._sub_type: str = "Ogre"
-        self._dam_modifiers = LimitedDict(("Physical", (self._damage_type)),
-                                          default_value=100)
+        # self._dam_modifiers = LimitedDict(("Physical", (self._damage_type)),
+        #                                   default_value=100)
+        self._dam_modifiers = LimitedDict(
+            ("Physical", "Ice", "Lightning", "Fire"), default_value=100)
         self._two_minds = False
         self._damage = self.humanoid_damage(self.modify_damage(self.strength))
+        self._spiked_attack = 0
 
     @property
     def damage_modifiers(self):
@@ -50,6 +53,11 @@ class Ogre(Humanoid):
     def ogre_type(self):
         '''Getter for ogre type'''
         return self._ogre_type
+
+    @property
+    def spiked_attack(self):
+        '''Getter for spiked attack'''
+        return self._spiked_attack
 
     def get_skills(self):
         return {}
@@ -133,26 +141,46 @@ class Ogre(Humanoid):
            (self.hit_points < int(self.max_hit_points * .25))):
             self._damage += int(self.damage * .25)
 
-    def bloodlust(self):
+    def spike_attacks(self):
         '''Increase damage modifier for Physical, Fire, Ice and Lightning by
         30 percent when a healing potion is consumed.
         '''
+        orig_dam = self.damage_modifiers.get("Physical")
+        new_dam = int(orig_dam + (orig_dam * .30))
+        self.damage_modifiers["Physical"] = new_dam
+        self.damage_modifiers["Fire"] = new_dam
+        self.damage_modifiers["Ice"] = new_dam
+        self.damage_modifiers["Lightning"] = new_dam
+        self._spiked_attack += 2
+
+    def unspike_attacks(self):
+        '''Reset damage modifiers for Physical, Fire, Ice and Lightning after
+        2 turns.
+        '''
+        self.damage_modifiers["Physical"] = 100
+        self.damage_modifiers["Fire"] = 100
+        self.damage_modifiers["Ice"] = 100
+        self.damage_modifiers["Lightning"] = 100
 
     def take_turn(self) -> CombatAction:
         '''Create list of normal attack and special attacks and choose one'''
         self.strategic_thinking()
+        if self._spiked_attack == 0:
+            self.unspike_attacks()
         action_list = []
         if self.hit_points < int(self.max_hit_points / 2):
             if randint(0, 100) < 75:
                 if self.healing_potions:
                     self.healing_potion()
-                    self.bloodlust()
+                    self.spike_attacks()
         if self.ogre_type == "Blood-Thirster":
             actions = [self.attack, self.blood_thirster_attack]
             option = choice(actions)
             if option.__name__ == "attack":
                 action_list.append(option())
+                self._spiked_attack -= 1
                 return CombatAction(action_list, "")
+            self._spiked_attack -= 1
             return CombatAction(option(), "")
 
         actions = [self.attack, self.wild_magics]
@@ -165,4 +193,5 @@ class Ogre(Humanoid):
             action_list.append(option())
             if self.level > 4:
                 action_list.append(self.attack())
+        self._spiked_attack -= 1
         return CombatAction(action_list, "")
