@@ -65,7 +65,7 @@ class Murloc(Humanoid):
     @property
     def damage_type(self):
         '''Getter for damage type'''
-        return self.damage_type
+        return self._damage_type
 
     @property
     def poisoned(self) -> bool:
