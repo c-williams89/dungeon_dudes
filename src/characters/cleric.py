@@ -11,16 +11,16 @@ from .cleric_src import ClericEquipmentGenerator
 
 class Cleric(Character):
     '''Cleric Class for Dungeon Dudes'''
-    stats_structure: Dict[str, Tuple[int]] = {"Hit Points": (85, 20),
-                                              "Strength": (13, 1),
-                                              "Agility": (10, 1),
-                                              "Intelligence": (10, 1),
-                                              "Special": (50, 15)}
+    stats_structure: Dict[str, Tuple[int, int]] = {"Hit Points": (85, 20),
+                                                   "Strength": (13, 1),
+                                                   "Agility": (10, 1),
+                                                   "Intelligence": (10, 1),
+                                                   "Special": (50, 15)}
     item_compatibility: list = ["Mace", "Flail", "Heavy", "Holy Symbol"]
 
     def __init__(self, name: str):
         self.damage_types = damage_types
-        self.skills_dict: Dict[int, List[str, 'function']] = {
+        self.skills_dict: Dict[int, List[str, function]] = {
             1:  ["Heal", self.heal],
             3:  ["Radiance", self.radiance],
             8:  ["Prayer", self.prayer],
@@ -66,7 +66,8 @@ class Cleric(Character):
         super().__init__(name, "Cleric", self.stats_structure,
                          self.item_compatibility)
 
-        self._exp_to_next_iter = iter([(40 * i ** 2) for i in range(1, 50)])
+        self._exp_to_next_iter = iter([(40 * i ** 2)
+                                       for i in range(1, 50)])
         self._exp_to_next: int = next(self._exp_to_next_iter)
         self._hit_points: int = self.stats_structure["Hit Points"][0]
         self._special: int = 50
@@ -146,7 +147,7 @@ class Cleric(Character):
 
     def modify_damage(self, damage) -> int:
         '''Adds Variance to Damage Events and Calculates Critical Chance'''
-        std_dev_percent: int = 0.12
+        std_dev_percent: float = 0.12
         modified: int = max(floor(gauss(damage,
                                         (std_dev_percent * damage))), 1)
 
@@ -170,7 +171,7 @@ class Cleric(Character):
                              f"{int(self.max_special * 0.10)} Mana",
                              "from Divine Blessing!")
 
-    def improved_healing(self, special_cost: int) -> None:
+    def improved_healing(self, special_cost: int) -> Tuple[str, int, str, str]:
         '''Passive: When above 50percent Mana, '''
         '''Heal and Greater heal consume 100percent more Mana '''
         '''and deal Holy damage equal to the number of HP healed.'''
@@ -198,9 +199,10 @@ class Cleric(Character):
 
         if self.special >= special_cost:
             current = self.hit_points
-            heal_amount = int(self.max_hit_points * 0.45)
+            heal_amount = int(self.max_hit_points * 0.5)
             self.hit_points += heal_amount
             amount_healed = self.hit_points - current
+
             if amount_healed > 0:
                 msg: str = (f"{self.name} healed {amount_healed} HP" +
                             f" for {special_cost} Mana!")
@@ -298,9 +300,10 @@ class Cleric(Character):
 
         if self.special >= special_cost:
             current = self.hit_points
-            heal_amount = int(self.max_hit_points * 0.45)
+            heal_amount = int(self.max_hit_points * 0.70)
             self.hit_points += heal_amount
             amount_healed = self.hit_points - current
+
             if amount_healed > 0:
                 msg: str = (f"{self.name} greatly healed {amount_healed} HP" +
                             f" for {special_cost} Mana!")
