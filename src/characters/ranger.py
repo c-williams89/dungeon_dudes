@@ -12,11 +12,11 @@ from .ranger_src import RangerEquipmentGenerator
 
 class Ranger(Character):
     '''Ranger Class for Dungeon Dudes'''
-    stats_structure: Dict[str, Tuple[int]]= {"Hit Points" :(90, 22),
-                                             "Strength":(7, 1),
-                                             "Agility" :(14, 2),
-                                             "Intelligence" :(5, 0),
-                                             "Special" :(2,0)}
+    stats_structure: Dict[str, Tuple[int]] = {"Hit Points": (90, 22),
+                                              "Strength": (7, 1),
+                                              "Agility": (14, 2),
+                                              "Intelligence": (5, 0),
+                                              "Special": (2, 0)}
     item_compatibility: list = ["Bow", "Light", "Quiver"]
 
     def __init__(self, name):
