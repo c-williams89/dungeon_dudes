@@ -1,0 +1,115 @@
+\documentclass[11pt]{extbook}
+% Builds with:
+% xelatex testplan.tex
+
+\usepackage{style}
+\usepackage{enumitem}
+\usepackage{titling}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{multicol}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+\usepackage[utf8]{inputenc}
+\usepackage{pdflscape}
+\usepackage{changepage}
+
+
+\title{%
+\begin{tabular}{cl}
+PROJECT `dungeon\_dudes'\tabularnewline
+\large TestPlan\tabularnewline
+\large MOD O - OOP 2B\tabularnewline
+\small 170D WOBC\tabularnewline
+\small Class 23-001\tabularnewline
+\end{tabular}
+}
+\subtitle{\large dungeon\_dudes}
+
+\author{%
+\begin{tabular}{cl}
+WO1 Josh Kaplan
+\end{tabular}
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{\emph{1 Purpose}}
+
+\tab The project \emph{dungeon\_dudes} is an object-oriented program in Python 
+which are to create a Character or Monster for a Dungeon-Crawler style RPG
+in accordance with an already existing codebase. The Character or Monster must
+match the associated Character Stats and information found in the Manual for 
+Dungeon Dudes. This is in order to teach us the appropriate way to integrate 
+work into an existing codebase and master the art of git collaboration. 
+
+\section*{\emph{2 Test Components}}
+
+\tab This test plan utilizes the \verb|unittest| Python library as 
+executed by the tester. Instructions on how to run the tests on the Linux 
+Terminal can be found below. 
+
+\emph{Commands can be found in italicized text preceded by a ‘\$>’.}
+
+\emph{Before beginning any tests, ensure you have the repo cloned to the dir of your choice:} \newline
+\emph{\$> git clone https://git.cybbh.space/170D/wobc/student-folders/23\_001/kaplan/dungeon\_dudes.git} \newline
+\emph{\$> cd dungeon\_dudes}
+
+\subsection*{\emph{2.1 Automated Tests}}
+
+The Automated tests cover the each of the key functions 
+within \emph{dungeon\_dudes}. This includes:
+
+\begin{multicols}{2}
+    \begin{itemize}
+        \item Cleric.\_\_init\_\_().Instance
+        \item Cleric.\_\_init\_\_().Skills\_dict
+        \item Cleric.\_\_init\_\_().Passive\_skills
+        \item Cleric.\_\_init\_\_().\_avenged
+        \item Cleric.\_\_init\_\_().\_nodamage
+        \item Cleric.\_\_init\_\_().\_halfdamage
+        \item Cleric.\_\_init\_\_().\_retribution
+        \item Cleric.\_\_init\_\_().hit\_points
+        \item Cleric.\_\_init\_\_().special
+        % 
+        \item Cleric.level\_up().level
+        \item Cleric.level\_up().hit\_points
+        \item Cleric.level\_up().special
+
+    \end{itemize}
+    \end{multicols}
+
+Each function is run with good of data to ensure 
+complete functionality of each function. Once you are ready to run the tests, 
+run the following command from the within the repo directory: 
+\newline
+\emph{\$> python3 -m unittest kaplan\_test/test\_cleric.py} \newline 
+
+The expected output can be found below in Section 3.
+\newpage
+\subsection*{\emph{2.2 Manual Tests}}
+
+There are no manual tests for \emph{dungeon\_dudes}.
+
+\begin{landscape}
+\section*{\emph{3 Expected Output}}
+\begin{verbatim}
+    .test the Cleric has reached level 2!
+    test the Cleric has reached level 3!
+
+    New Skill - Radiance: Deal Holy damage to all enemies for Intelligence + AtkPower
+    test the Cleric has reached level 4!
+    test the Cleric has reached level 5!
+    New Skill - Divine Blessing: Passive: When you take action in combat, you will recover 10percent 
+                of your maximium HP when at full Mana, and 10percent of your maximum mana when at 
+                full Hit Points.
+    .
+    ----------------------------------------------------------------------
+    Ran 2 tests in 0.000s
+
+    OK
+\end{verbatim}
+\end{landscape}
+\end{document}
