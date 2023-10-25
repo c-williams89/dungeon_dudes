@@ -1,6 +1,6 @@
 '''Bandit Module for Dungeon Dudes'''
 from typing import Dict, Tuple
-from random import randint, randrange
+from random import randint, randrange, choice, choices
 
 from src.dd_data import LimitedDict
 from ..humanoid import Humanoid
@@ -48,7 +48,8 @@ class Bandit(Humanoid):
     def take_damage(self, damage: int, dmg_type, message: str) -> bool:
         if "all enemies" in message.lower():
             damage *= self.num_bandits
-            super().take_damage(damage, dmg_type, message)
+        alive = super().take_damage(damage, dmg_type, message)
+        return alive
 
     def get_skills(self) ->Dict[str, 'function']:
         return {}
@@ -89,18 +90,45 @@ class Bandit(Humanoid):
         index = randint(0, (len(actions) - 1))
         option = actions.pop(index)
         return option()
-
-    def take_turn(self) -> CombatAction:
+    
+    def turn_options(self):
         damage: int = self.humanoid_damage(self.modify_damage((self.attack_power)))
         msg: str = "Bandit attacks, dealing <value> physical damage"
         attack = ("Attack", damage, "Physical", msg)
         action_list = []
+        
         for _ in range(1, self._num_bandits):
             action_list.append(attack)
         action_list.append(self.get_action())
+        return action_list
+    
+    def escape(self):
+        return ("Escape", 0, "", "")
+
+    def take_turn(self) -> CombatAction:
+        action_list = []
 
         if (self.hit_points < (self.max_hit_points / 2)):
             if randrange(2):
-                self.healing_potion("Bandits")
-        action = CombatAction(action_list, "")
-        return action
+                self.healing_potion()
+
+        option_list = [self.escape, self.turn_options]
+        if self.hit_points <= int(self.max_hit_points * .10):
+            if self.healing_potions:
+                option_list.append(self.healing_potion)
+                option = choices(option_list, weights=(25, 25, 50), k = 1)
+                if option != self.turn_options:
+                    action_list.append(option())
+                else:
+                    action_list = option()
+            else:
+                option = choices(option_list, weights=(25, 75), k=1)
+                if option != self.turn_options:
+                    action_list.append(option())
+                else:
+                    action_list = option()
+        else:
+            action_list = self.turn_options()
+        
+        return CombatAction(action_list, "")
+

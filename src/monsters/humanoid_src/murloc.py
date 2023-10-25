@@ -75,7 +75,8 @@ class Murloc(Humanoid):
     def take_damage(self, damage: int, dmg_type, message: str) -> bool:
         if "all enemies" in message.lower():
             damage *= self.tribe_size
-            super().take_damage(damage, dmg_type, message)
+        alive = super().take_damage(damage, dmg_type, message)
+        return alive
 
     def get_base_att(self):
         if self.poisoned:
