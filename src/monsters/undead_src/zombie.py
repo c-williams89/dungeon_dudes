@@ -62,6 +62,8 @@ class Zombie(Undead):
         if damage >= self.hit_points:
             if self._resist:
                 self.resist_death(damage, message)
+                self._hit_points = 1
+                return alive
             alive = False
             message = message.replace('<value>', str(self._hit_points))
             self.printer(message)

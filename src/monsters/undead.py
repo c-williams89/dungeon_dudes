@@ -47,7 +47,6 @@ class Undead(Monster):
         resist_message = f"Resist Death saves {self.name}! HP reset to 1."
         self.printer(message)
         self.printer(resist_message)
-        self._hit_points = 1
         self._resist = False
 
     def haunting_arua(self) -> Tuple:

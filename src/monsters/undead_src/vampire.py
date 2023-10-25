@@ -76,6 +76,8 @@ class Vampire(Undead):
         if damage >= self.hit_points:
             if self._resist:
                 self.resist_death(damage, message)
+                self._hit_points = 1
+                return alive
             alive = False
             message = message.replace('<value>', str(self._hit_points))
             self.printer(message)
@@ -203,7 +205,7 @@ class Vampire(Undead):
                 return CombatAction([("Attack", damage, "Ice", msg)], "")
 
         rand_num = randint(1, 10)
-        if 1 <= rand_num <= 7:
+        if rand_num <= 7:
             option = self.icy_touch
         else:
             option = self.attack
