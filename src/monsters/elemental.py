@@ -1,5 +1,5 @@
 ''' Module for the Dungeon Dudes Elemental Monster '''
-from random import randint, gauss
+from random import gauss
 from .monsters_abc import Monster
 from ..combat_action import CombatAction
 from ..dd_data import CombatPrint, LimitedDict, damage_types
@@ -30,7 +30,7 @@ class Elemental(Monster):
         return CombatAction([("Attack", damage, "Elemental", message)], "")
 
     def damage_modify(self, damage) -> int:
-        ''' Adds Variance to Damage Events and Calculates Critical Chance '''
+        ''' Adds Variance to Damage Events '''
         modified: int = gauss(damage, .1)
         return modified
 
@@ -117,7 +117,7 @@ class Elemental(Monster):
         if self._elemental_type == vulnerable:
             return True
 
-    def take_turn(self) -> CombatAction:  # pylint: disable=unused-argument
+    def take_turn(self) -> CombatAction:
         ''' Takes turn and returns the success status of the action and the
             action
         '''
