@@ -94,7 +94,7 @@ class StormElemental(Elemental):
 
     def double_shock(self):
         ''' Storm Elemental quickly shocks their opponent twice, dealing 50%
-            attack_power base damage as Lightning damage and gaining a charge 
+            attack_power base damage as Lightning damage and gaining a charge
             of Static Shock each time.
         '''
         pass
